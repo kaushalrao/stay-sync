@@ -1,36 +1,94 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Guest Greeter
 
-## Getting Started
+Guest Greeter is a modern, responsive web application designed for Airbnb hosts and property managers. It streamlines the process of generating personalized welcome messages for guests, managing property details, and maintaining reusable message templates.
 
-First, run the development server:
+## 🚀 Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+*   **Property Management**: Easily add, edit, and delete multiple properties. Store details like check-in/out times, WiFi credentials, and location links.
+*   **Dynamic Templates**: Create custom message templates using variables (e.g., `{{guestName}}`, `{{wifiPass}}`).
+*   **Real-time Preview**: See exactly how your message will look on a smartphone (WhatsApp style) before sending.
+*   **Instant Calculation**: Automatically calculates total stay cost, nights, and balance due based on check-in/out dates.
+*   **One-Click Actions**: Copy messages to clipboard or open directly in WhatsApp.
+*   **Secure Authentication**: User accounts powered by Firebase Auth to keep your data private.
+*   **Responsive Design**: Fully optimized for both desktop and mobile devices.
+
+## 🛠️ Tech Stack
+
+*   **Framework**: [Next.js 14](https://nextjs.org/) (App Router)
+*   **Language**: [TypeScript](https://www.typescriptlang.org/)
+*   **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+*   **Icons**: [Lucide React](https://lucide.dev/)
+*   **Backend / Auth**: [Firebase](https://firebase.google.com/) (Firestore & Authentication)
+
+## 📂 Project Structure
+
+The project follows a modular architecture for better maintainability:
+
+```
+app/
+├── components/
+│   ├── ui/                 # Reusable atomic components (Button, Input, Card, etc.)
+│   ├── views/              # Main page views (Auth, Home, Settings, Greeter)
+│   ├── GuestForm.tsx       # Guest details input form
+│   ├── PreviewPhone.tsx    # Mobile message preview component
+│   └── ...
+├── lib/                    # Utilities, types, and Firebase config
+└── page.tsx                # Main entry point handling routing and state
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🏁 Getting Started
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Prerequisites
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+*   Node.js (v18 or higher)
+*   npm or yarn
+*   A Firebase project
 
-## Learn More
+### Installation
 
-To learn more about Next.js, take a look at the following resources:
+1.  **Clone the repository**
+    ```bash
+    git clone https://github.com/yourusername/guest-greeter.git
+    cd guest-greeter
+    ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+2.  **Install dependencies**
+    ```bash
+    npm install
+    ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+3.  **Configure Firebase**
+    *   Create a `.env.local` file in the root directory.
+    *   Add your Firebase configuration keys:
+        ```env
+        NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
+        NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project_id.firebaseapp.com
+        NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
+        NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_project_id.appspot.com
+        NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+        NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
+        ```
 
-## Deploy on Vercel
+4.  **Run the development server**
+    ```bash
+    npm run dev
+    ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+5.  **Open the app**
+    Visit [http://localhost:3000](http://localhost:3000) in your browser.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📖 Usage
+
+1.  **Sign Up/Login**: Create an account to start saving your data.
+2.  **Configure Properties**: Go to **Settings > Properties** to add your rental units.
+3.  **Create Templates**: Go to **Settings > Templates** to draft your messages. Use the "Insert Variable" feature to add dynamic placeholders.
+4.  **Generate Messages**:
+    *   Go to **Start Greeting**.
+    *   Select a property and a template.
+    *   Enter guest details (Name, Dates, etc.).
+    *   Review the generated message in the phone preview.
+    *   Click **Send via WhatsApp** or **Copy**.
+
+## 📄 License
+
+This project is licensed under the MIT License.
