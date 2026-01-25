@@ -19,6 +19,11 @@ Guest Greeter is a modern, responsive web application designed for Airbnb hosts 
 *   **Styling**: [Tailwind CSS](https://tailwindcss.com/)
 *   **Icons**: [Lucide React](https://lucide.dev/)
 *   **Backend / Auth**: [Firebase](https://firebase.google.com/) (Firestore & Authentication)
+<div align="center">
+  <img src="public/screenshots/greeter-view.png" alt="Greeter View" width="45%">
+  <img src="public/screenshots/settings-view.png" alt="Settings View" width="45%">
+</div>
+
 
 ## 📂 Project Structure
 
