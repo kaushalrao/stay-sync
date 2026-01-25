@@ -19,6 +19,7 @@ Guest Greeter is a modern, responsive web application designed for Airbnb hosts 
 *   **Styling**: [Tailwind CSS](https://tailwindcss.com/)
 *   **Icons**: [Lucide React](https://lucide.dev/)
 *   **Backend / Auth**: [Firebase](https://firebase.google.com/) (Firestore & Authentication)
+
 <div align="center">
   <img src="public/screenshots/greeter-view.png" alt="Greeter View" width="45%">
   <img src="public/screenshots/settings-view.png" alt="Settings View" width="45%">
@@ -27,18 +28,22 @@ Guest Greeter is a modern, responsive web application designed for Airbnb hosts 
 
 ## 📂 Project Structure
 
-The project follows a modular architecture for better maintainability:
+The project follows the Next.js App Router architecture:
 
 ```
 app/
+├── auth/                   # Authentication page
+├── greeter/                # Main message generator tool
+├── settings/               # Property & Template management
 ├── components/
 │   ├── ui/                 # Reusable atomic components (Button, Input, Card, etc.)
-│   ├── views/              # Main page views (Auth, Home, Settings, Greeter)
+│   ├── providers/          # Global Context Providers (Auth, Data)
+│   ├── AuthForm.tsx        # Authentication form component
 │   ├── GuestForm.tsx       # Guest details input form
 │   ├── PreviewPhone.tsx    # Mobile message preview component
 │   └── ...
 ├── lib/                    # Utilities, types, and Firebase config
-└── page.tsx                # Main entry point handling routing and state
+└── page.tsx                # Landing page
 ```
 
 ## 🏁 Getting Started

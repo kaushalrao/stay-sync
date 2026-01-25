@@ -2,11 +2,11 @@ import * as React from 'react';
 import { useState } from 'react';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, User } from "firebase/auth";
 import { Sparkles, UserCircle, CheckCircle2, XCircle } from 'lucide-react';
-import { app, auth } from '../../lib/firebase';
-import { Input } from '../ui/Input';
-import { Button } from '../ui/Button';
+import { app, auth } from '../lib/firebase';
+import { Input } from './ui/Input';
+import { Button } from './ui/Button';
 
-export const AuthView: React.FC<{ onAuthSuccess: (user: User) => void }> = ({ onAuthSuccess }) => {
+export const AuthForm: React.FC<{ onAuthSuccess: (user: User) => void }> = ({ onAuthSuccess }) => {
     const [isLogin, setIsLogin] = useState(true);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -35,7 +35,7 @@ export const AuthView: React.FC<{ onAuthSuccess: (user: User) => void }> = ({ on
     };
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center px-4 bg-[#0f172a] text-white">
+        <div className="w-full flex flex-col items-center justify-center px-4 py-12">
             <div className="w-full max-w-md bg-slate-800/50 backdrop-blur-xl p-8 rounded-[2rem] border border-white/10 shadow-2xl">
                 <div className="text-center mb-8">
                     <div className="inline-flex items-center justify-center p-4 bg-white/5 rounded-3xl mb-4 border border-white/10">

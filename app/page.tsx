@@ -1,148 +1,67 @@
 "use client";
 
 import * as React from 'react';
-import { useState, useEffect } from 'react';
-import { Loader2 } from 'lucide-react';
-import { onAuthStateChanged, User } from "firebase/auth";
-import { collection, query, onSnapshot } from "firebase/firestore";
+import { Loader2, Sparkles, MessageCircle, Settings } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { useApp } from './components/providers/AppProvider';
 
-import { auth, db, appId } from './lib/firebase';
-import { Property, Template, ViewState, ToastState } from './lib/types';
+export default function HomePage() {
+  const { user, loading } = useApp();
+  const router = useRouter();
 
-import { Toast } from './components/ui/Toast';
-import { Header } from './components/Header';
-import { AuthView } from './components/views/AuthView';
-import { HomeView } from './components/views/HomeView';
-import { SettingsView } from './components/views/SettingsView';
-import { GreeterView } from './components/views/GreeterView';
-
-export default function GuestGreeterPage() {
-  const [view, setView] = useState<ViewState>('home');
-  const [user, setUser] = useState<User | null>(null);
-  const [authLoading, setAuthLoading] = useState(true);
-
-  // Data State
-  const [properties, setProperties] = useState<Property[]>([]);
-  const [templates, setTemplates] = useState<Template[]>([]);
-
-  // UI State
-  const [toast, setToast] = useState<ToastState>({ message: '', type: 'success', visible: false });
-  // Lifted state
-  const [selectedPropId, setSelectedPropId] = useState('');
-  const [mobileTab, setMobileTab] = useState<'edit' | 'preview'>('edit');
-
-  useEffect(() => {
-    if (!selectedPropId && properties.length > 0) {
-      setSelectedPropId(properties[0].id);
+  React.useEffect(() => {
+    if (!loading && !user) {
+      router.push('/auth');
     }
-  }, [properties]);
+  }, [user, loading, router]);
 
-  const showToast = (message: string, type: 'success' | 'error' = 'success') => {
-    setToast({ message, type, visible: true });
-    setTimeout(() => setToast(prev => ({ ...prev, visible: false })), 3000);
-  };
-
-  // Auth Listener
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      setAuthLoading(false);
-    });
-    return () => unsubscribe();
-  }, []);
-
-  // Data Fetching
-  useEffect(() => {
-    if (!user) {
-      setProperties([]);
-      setTemplates([]);
-      return;
-    }
-
-    // Fetch Properties
-    const qProps = query(collection(db, `artifacts/${appId}/users/${user.uid}/properties`));
-    const unsubProps = onSnapshot(qProps, (snapshot) => {
-      const props = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Property));
-      setProperties(props);
-    });
-
-    // Fetch Templates
-    const qTemps = query(collection(db, `artifacts/${appId}/users/${user.uid}/templates`));
-    const unsubTemps = onSnapshot(qTemps, (snapshot) => {
-      const temps = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Template));
-      setTemplates(temps);
-    });
-
-    return () => {
-      unsubProps();
-      unsubTemps();
-    };
-  }, [user]);
-
-  if (authLoading) {
+  if (loading || !user) {
     return (
-      <div className="min-h-screen bg-[#0f172a] flex items-center justify-center text-white">
+      <div className="min-h-screen flex items-center justify-center text-white">
         <Loader2 size={48} className="animate-spin text-orange-500" />
       </div>
     )
   }
 
-  if (!user) {
-    return (
-      <React.Fragment>
-        {/* Background Ambience */}
-        <div className="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none transform-gpu z-0">
-          <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-orange-600/10 rounded-full blur-[100px] will-change-transform" />
-          <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-pink-600/10 rounded-full blur-[100px] will-change-transform" />
-        </div>
-        <AuthView onAuthSuccess={(u) => setUser(u)} />
-      </React.Fragment>
-    )
-  }
-
   return (
-    <div className="min-h-screen bg-[#0f172a] font-sans relative flex flex-col shadow-2xl overflow-x-hidden">
-      <div className="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none transform-gpu z-0">
-        <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-orange-600/10 rounded-full blur-[100px] will-change-transform" />
-        <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-pink-600/10 rounded-full blur-[100px] will-change-transform" />
+    <div className="flex flex-col items-center justify-center min-h-[70vh] gap-8 md:gap-12 animate-fade-in max-w-6xl mx-auto w-full px-4">
+      <div className="text-center space-y-4 md:space-y-6 max-w-3xl">
+        <div className="inline-flex items-center justify-center p-3 md:p-4 bg-white/5 rounded-3xl mb-2 backdrop-blur-md border border-white/10 ring-1 ring-white/5 shadow-2xl animate-[fadeIn_0.5s_ease-out]">
+          <Sparkles size={28} className="text-orange-400 md:w-8 md:h-8" />
+        </div>
+        <h1 className="text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-white/60 tracking-tight drop-shadow-sm">
+          Guest Greeter
+        </h1>
+        <p className="text-slate-400 text-base md:text-xl font-light leading-relaxed max-w-2xl mx-auto px-4">
+          Streamline your hospitality. Create personalized welcome messages and manage guest details with elegance.
+        </p>
       </div>
 
-      <Header
-        view={view}
-        setView={setView}
-        mobileTab={mobileTab}
-        setMobileTab={setMobileTab}
-        properties={properties}
-        selectedPropId={selectedPropId}
-        setSelectedPropId={setSelectedPropId}
-      />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 w-full max-w-4xl">
+        <Link href="/greeter" className="group relative h-60 md:h-72 rounded-[2.5rem] overflow-hidden transition-all duration-500 hover:scale-[1.02] hover:-translate-y-2 shadow-2xl hover:shadow-orange-900/30 block">
+          <div className="absolute inset-0 bg-gradient-to-br from-orange-500 to-pink-600 opacity-90 transition-all duration-500 group-hover:opacity-100" />
+          <div className="absolute inset-0 opacity-20 mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-6 md:p-8">
+            <div className="bg-white/20 p-5 md:p-6 rounded-[2rem] backdrop-blur-md shadow-lg border border-white/20 mb-4 md:mb-6 group-hover:scale-110 transition-transform duration-500">
+              <MessageCircle size={40} className="text-white fill-white/20 md:w-12 md:h-12" />
+            </div>
+            <h2 className="text-2xl md:text-4xl font-bold mb-1 md:mb-2 tracking-tight">Start Greeting</h2>
+            <p className="text-white/80 font-medium text-sm md:text-base">Generate Welcome Messages</p>
+          </div>
+        </Link>
 
-      <Toast toast={toast} onClose={() => setToast(prev => ({ ...prev, visible: false }))} />
-
-      <main className="flex-1 px-4 lg:px-8 relative z-10 pb-10 w-full max-w-7xl mx-auto">
-        {view === 'home' && <HomeView onNavigate={setView} />}
-
-        {view === 'settings' && (
-          <SettingsView
-            properties={properties}
-            templates={templates}
-            showToast={showToast}
-            userId={user.uid}
-          />
-        )}
-
-        {view === 'greeter' && (
-          <GreeterView
-            properties={properties}
-            templates={templates}
-            showToast={showToast}
-            selectedPropId={selectedPropId}
-            setSelectedPropId={setSelectedPropId}
-            mobileTab={mobileTab}
-            setMobileTab={setMobileTab}
-          />
-        )}
-      </main>
+        <Link href="/settings" className="group relative h-60 md:h-72 rounded-[2.5rem] overflow-hidden transition-all duration-500 hover:scale-[1.02] hover:-translate-y-2 shadow-xl hover:shadow-slate-900/50 block">
+          <div className="absolute inset-0 bg-[#1e293b] border border-white/5 transition-all duration-500 group-hover:border-white/10 group-hover:bg-[#253045]" />
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-200 p-6 md:p-8">
+            <div className="bg-slate-800 p-5 md:p-6 rounded-[2rem] shadow-lg border border-white/5 mb-4 md:mb-6 group-hover:bg-slate-700 group-hover:scale-110 transition-all duration-500">
+              <Settings size={40} className="text-slate-400 group-hover:text-white transition-colors md:w-12 md:h-12" />
+            </div>
+            <h2 className="text-2xl md:text-4xl font-bold text-white mb-1 md:mb-2 tracking-tight">Configure</h2>
+            <p className="text-slate-400 group-hover:text-slate-300 font-medium text-sm md:text-base transition-colors">Manage Properties & Templates</p>
+          </div>
+        </Link>
+      </div>
     </div>
   );
 }

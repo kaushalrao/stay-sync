@@ -1,44 +1,66 @@
-import * as React from 'react';
-import { useState, useMemo } from 'react';
-import { Check, Copy, MessageCircle } from 'lucide-react';
-import { Property, Template } from '../../lib/types';
-import { calculateNights, formatDate, formatCurrency, processTemplate } from '../../lib/utils';
-import { PropertyDock } from '../PropertyDock';
-import { GuestForm } from '../GuestForm';
-import { TemplateSelector } from '../TemplateSelector';
-import { PreviewPhone } from '../PreviewPhone';
+"use client";
 
-export const GreeterView: React.FC<{
-    properties: Property[];
-    templates: Template[];
-    showToast: (msg: string, type?: 'success' | 'error') => void;
-    selectedPropId: string;
-    setSelectedPropId: (id: string) => void;
-    mobileTab: 'edit' | 'preview';
-    setMobileTab: (t: 'edit' | 'preview') => void
-}> = ({ properties, templates, showToast, selectedPropId, setSelectedPropId, mobileTab, setMobileTab }) => {
-    const [guestName, setGuestName] = useState('');
-    const [numberOfGuests, setNumberOfGuests] = useState<number>(2);
-    const [advancePaid, setAdvancePaid] = useState<number>(0);
-    const [selectedTempId, setSelectedTempId] = useState(templates[0]?.id || '');
-    const [checkInDate, setCheckInDate] = useState('');
-    const [checkOutDate, setCheckOutDate] = useState('');
+import * as React from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { Check, Copy, MessageCircle, PenTool, Eye } from 'lucide-react';
+import { Property, Template, GuestDetails } from '../lib/types';
+import { calculateNights, formatDate, formatCurrency, processTemplate } from '../lib/utils';
+import { PropertyDock } from '../components/PropertyDock';
+import { GuestForm } from '../components/GuestForm';
+import { TemplateSelector } from '../components/TemplateSelector';
+import { PreviewPhone } from '../components/PreviewPhone';
+import { useApp } from '../components/providers/AppProvider';
+import { TabControl } from '../components/TabControl';
+import { useRouter } from 'next/navigation';
+
+export default function GreeterPage() {
+    const { properties, templates, showToast, user } = useApp();
+    const router = useRouter();
+    const [selectedPropId, setSelectedPropId] = useState('');
+    const [mobileTab, setMobileTab] = useState<'edit' | 'preview'>('edit');
+    const [guestDetails, setGuestDetails] = useState<GuestDetails>({
+        guestName: '',
+        numberOfGuests: 2,
+        advancePaid: 0,
+        checkInDate: '',
+        checkOutDate: ''
+    });
+    const [selectedTempId, setSelectedTempId] = useState('');
     const [copied, setCopied] = useState(false);
+
+    // Redirect if not logged in
+    useEffect(() => {
+        if (!user) {
+            router.push('/');
+        }
+    }, [user, router]);
+
+    useEffect(() => {
+        if (!selectedPropId && properties.length > 0) {
+            setSelectedPropId(properties[0].id);
+        }
+    }, [properties, selectedPropId]);
+
+    useEffect(() => {
+        if (!selectedTempId && templates.length > 0) {
+            setSelectedTempId(templates[0].id);
+        }
+    }, [templates, selectedTempId]);
 
     const selectedProperty = properties.find(p => p.id === selectedPropId) || properties[0];
     const selectedTemplate = templates.find(t => t.id === selectedTempId) || templates[0];
 
     const generatedMessage = useMemo(() => {
         if (!selectedProperty || !selectedTemplate) return '';
-        const nights = calculateNights(checkInDate, checkOutDate);
+        const nights = calculateNights(guestDetails.checkInDate, guestDetails.checkOutDate);
         const totalBaseCost = selectedProperty.basePrice * nights;
-        const extraGuestsCount = Math.max(0, numberOfGuests - selectedProperty.baseGuests);
+        const extraGuestsCount = Math.max(0, guestDetails.numberOfGuests - selectedProperty.baseGuests);
         const totalExtraCost = selectedProperty.extraGuestPrice * extraGuestsCount * nights;
         const totalAmount = totalBaseCost + totalExtraCost;
-        const balanceDue = Math.max(0, totalAmount - advancePaid);
+        const balanceDue = Math.max(0, totalAmount - guestDetails.advancePaid);
 
         const data: Record<string, string | number> = {
-            guestName: guestName.trim() || 'Guest',
+            guestName: guestDetails.guestName.trim() || 'Guest',
             propertyName: selectedProperty.name,
             hostName: selectedProperty.hostName,
             coHostName: selectedProperty.coHostName,
@@ -50,19 +72,21 @@ export const GreeterView: React.FC<{
             checkOutTime: selectedProperty.checkOutTime,
             locationLink: selectedProperty.locationLink,
             propertyLink: selectedProperty.propertyLink || '',
-            checkInDate: formatDate(checkInDate),
-            checkOutDate: formatDate(checkOutDate),
+            checkInDate: formatDate(guestDetails.checkInDate),
+            checkOutDate: formatDate(guestDetails.checkOutDate),
             nights: nights,
-            numberOfGuests: numberOfGuests,
+            numberOfGuests: guestDetails.numberOfGuests,
             totalAmount: formatCurrency(totalAmount),
-            advancePaid: formatCurrency(advancePaid),
+            advancePaid: formatCurrency(guestDetails.advancePaid),
             balanceDue: formatCurrency(balanceDue),
             basePrice: formatCurrency(selectedProperty.basePrice),
             extraGuestPrice: formatCurrency(selectedProperty.extraGuestPrice),
             baseGuests: selectedProperty.baseGuests,
         };
         return processTemplate(selectedTemplate.content, data);
-    }, [guestName, numberOfGuests, advancePaid, selectedProperty, selectedTemplate, checkInDate, checkOutDate]);
+    }, [guestDetails, selectedProperty, selectedTemplate]);
+
+    if (!user) return null;
 
     const handleCopy = () => {
         navigator.clipboard.writeText(generatedMessage);
@@ -81,14 +105,24 @@ export const GreeterView: React.FC<{
                 <PropertyDock properties={properties} selectedId={selectedPropId} onSelect={setSelectedPropId} />
             </div>
 
+            {/* Mobile Header Controls (moved from Header component) */}
+            <div className="lg:hidden w-full pb-3 sticky top-[72px] z-40 bg-[#0f172a]/95 backdrop-blur-xl -mt-4 pt-4">
+                <div className="flex justify-center mb-4">
+                    <TabControl
+                        options={[{ id: 'edit', label: 'Editor', icon: <PenTool size={12} /> }, { id: 'preview', label: 'Preview', icon: <Eye size={12} /> }]}
+                        activeId={mobileTab}
+                        onChange={setMobileTab}
+                        className="text-xs"
+                    />
+                </div>
+                <PropertyDock properties={properties} selectedId={selectedPropId} onSelect={setSelectedPropId} />
+            </div>
+
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 <div className={`lg:col-span-7 space-y-6 md:space-y-8 ${mobileTab === 'preview' ? 'hidden lg:block' : 'block'}`}>
                     <GuestForm
-                        guestName={guestName} setGuestName={setGuestName}
-                        checkInDate={checkInDate} setCheckInDate={setCheckInDate}
-                        checkOutDate={checkOutDate} setCheckOutDate={setCheckOutDate}
-                        numberOfGuests={numberOfGuests} setNumberOfGuests={setNumberOfGuests}
-                        advancePaid={advancePaid} setAdvancePaid={setAdvancePaid}
+                        details={guestDetails}
+                        onChange={setGuestDetails}
                         templateContent={selectedTemplate?.content}
                     />
                     {templates.length > 0 && (
@@ -111,4 +145,4 @@ export const GreeterView: React.FC<{
             </div>
         </div>
     );
-};
+}

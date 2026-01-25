@@ -30,3 +30,11 @@ export interface ToastState {
     type: 'success' | 'error';
     visible: boolean;
 }
+
+export interface GuestDetails {
+    guestName: string;
+    checkInDate: string;
+    checkOutDate: string;
+    numberOfGuests: number;
+    advancePaid: number;
+}

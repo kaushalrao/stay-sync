@@ -3,9 +3,9 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const getFirebaseConfig = () => {
-    if (typeof window !== 'undefined' && (window as any).__firebase_config) {
+    if (typeof window !== 'undefined' && window.__firebase_config) {
         try {
-            return JSON.parse((window as any).__firebase_config);
+            return JSON.parse(window.__firebase_config);
         } catch (e) {
             console.error("Failed to parse injected firebase config", e);
         }
@@ -21,7 +21,7 @@ const getFirebaseConfig = () => {
     };
 };
 
-export const appId = typeof window !== 'undefined' && (window as any).__app_id ? (window as any).__app_id : 'guest-greeter-default';
+export const appId = typeof window !== 'undefined' && window.__app_id ? window.__app_id : 'guest-greeter-default';
 const firebaseConfig = getFirebaseConfig();
 
 export const app = !getApps().length && firebaseConfig.apiKey ? initializeApp(firebaseConfig) : (getApps().length ? getApp() : undefined);
