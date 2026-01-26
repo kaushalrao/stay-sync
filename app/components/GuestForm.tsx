@@ -3,6 +3,7 @@ import { Users, Edit3, Calendar, CalendarCheck, Wallet } from 'lucide-react';
 import { Card } from './ui/Card';
 import { SectionHeader } from './ui/SectionHeader';
 import { Input } from './ui/Input';
+import { DatePicker } from './ui/DatePicker';
 
 import { GuestDetails } from '../lib/types';
 
@@ -10,9 +11,31 @@ export const GuestForm: React.FC<{
     details: GuestDetails;
     onChange: (details: GuestDetails) => void;
     templateContent?: string;
-}> = ({ details, onChange, templateContent = '' }) => {
+    blockedDates?: { start: string, end: string }[];
+}> = ({ details, onChange, templateContent = '', blockedDates = [] }) => {
+
+    const isDateBlocked = (dateStr: string, type: 'checkIn' | 'checkOut') => {
+        if (!dateStr || blockedDates.length === 0) return false;
+        // String comparison is safer for YYYY-MM-DD format to avoid timezone issues
+        return blockedDates.some(range => {
+            if (type === 'checkIn') {
+                return dateStr >= range.start && dateStr < range.end;
+            } else {
+                // For check-out, it's blocked if it falls strictly after start and before-or-on end.
+                // i.e. we cannot checkout if we stayed the night of 'start'.
+                return dateStr > range.start && dateStr <= range.end;
+            }
+        });
+    };
 
     const update = (field: keyof GuestDetails, value: any) => {
+        if ((field === 'checkInDate' || field === 'checkOutDate')) {
+            const type = field === 'checkInDate' ? 'checkIn' : 'checkOut';
+            if (isDateBlocked(value, type)) {
+                alert("This date is booked on Airbnb!");
+                // return; // Optional: Force block, or just warn. Alert is strict enough.
+            }
+        }
         onChange({ ...details, [field]: value });
     };
 
@@ -36,27 +59,24 @@ export const GuestForm: React.FC<{
                     {(templateContent.includes('{{checkIn') || templateContent.includes('{{nights') || templateContent.includes('{{totalAmount')) && (
                         <div className="grid grid-cols-2 gap-3 md:gap-4">
                             <div className="group bg-black/20 p-3 md:p-4 rounded-2xl border border-white/5 focus-within:border-orange-500/50 focus-within:ring-2 focus-within:ring-orange-500/10 transition-all">
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 flex items-center gap-1 group-focus-within:text-orange-400">
-                                    <Calendar size={12} className="shrink-0" />
-                                    <span>Check-in</span>
-                                </label>
-                                <input
-                                    type="date"
-                                    value={details.checkInDate}
-                                    onChange={(e) => update('checkInDate', e.target.value)}
-                                    className="w-full text-xs md:text-sm font-bold bg-transparent text-white outline-none [color-scheme:dark] min-h-[1.5rem]"
+                                <DatePicker
+                                    label="Check-in"
+                                    variant="check-in"
+                                    date={details.checkInDate}
+                                    otherDate={details.checkOutDate}
+                                    onChange={(date) => update('checkInDate', date)}
+                                    blockedDates={blockedDates}
                                 />
                             </div>
                             <div className="group bg-black/20 p-3 md:p-4 rounded-2xl border border-white/5 focus-within:border-orange-500/50 focus-within:ring-2 focus-within:ring-orange-500/10 transition-all">
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 flex items-center gap-1 group-focus-within:text-orange-400">
-                                    <CalendarCheck size={12} className="shrink-0" />
-                                    <span>Check-out</span>
-                                </label>
-                                <input
-                                    type="date"
-                                    value={details.checkOutDate}
-                                    onChange={(e) => update('checkOutDate', e.target.value)}
-                                    className="w-full text-xs md:text-sm font-bold bg-transparent text-white outline-none [color-scheme:dark] min-h-[1.5rem]"
+                                <DatePicker
+                                    label="Check-out"
+                                    variant="check-out"
+                                    align="right"
+                                    date={details.checkOutDate}
+                                    otherDate={details.checkInDate}
+                                    onChange={(date) => update('checkOutDate', date)}
+                                    blockedDates={blockedDates}
                                 />
                             </div>
                         </div>

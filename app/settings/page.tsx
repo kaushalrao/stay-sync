@@ -83,6 +83,7 @@ export default function SettingsPage() {
             wifiPass: formData.get('wifiPass') as string,
             locationLink: formData.get('locationLink') as string,
             propertyLink: formData.get('propertyLink') as string,
+            airbnbIcalUrl: formData.get('airbnbIcalUrl') as string,
             basePrice: Number(formData.get('basePrice')) || DEFAULT_PROPERTY_VALUES.basePrice,
             extraGuestPrice: Number(formData.get('extraGuestPrice')) || DEFAULT_PROPERTY_VALUES.extraGuestPrice,
             baseGuests: Number(formData.get('baseGuests')) || DEFAULT_PROPERTY_VALUES.baseGuests,
@@ -237,6 +238,7 @@ export default function SettingsPage() {
                                         <Input name="wifiPass" label="WiFi Password" defaultValue={editingProp.wifiPass} />
                                         <Input name="locationLink" label="Maps Link" defaultValue={editingProp.locationLink} placeholder="https://maps..." />
                                         <Input name="propertyLink" label="Website Link" defaultValue={editingProp.propertyLink} placeholder="https://website..." />
+                                        <Input name="airbnbIcalUrl" label="Airbnb iCal URL" defaultValue={editingProp.airbnbIcalUrl} placeholder="https://www.airbnb.com/calendar/ical/..." />
                                     </div>
                                 </div>
                                 <div className="flex gap-4 pt-8 mt-4 border-t border-white/5">

@@ -35,10 +35,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const [issues, setIssues] = useState<MaintenanceIssue[]>([]);
     const [toast, setToast] = useState<ToastState>({ message: '', type: 'success', visible: false });
 
-    const showToast = (message: string, type: 'success' | 'error' = 'success') => {
+    const showToast = React.useCallback((message: string, type: 'success' | 'error' = 'success') => {
         setToast({ message, type, visible: true });
         setTimeout(() => setToast(prev => ({ ...prev, visible: false })), 3000);
-    };
+    }, []);
 
     // Auth Listener
     useEffect(() => {

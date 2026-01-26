@@ -20,6 +20,7 @@ export default function GreeterPage() {
     const [guestDetails, setGuestDetails] = useState<GuestDetails>(DEFAULT_GUEST_DETAILS);
     const [selectedTempId, setSelectedTempId] = useState('');
     const [copied, setCopied] = useState(false);
+    const [blockedDates, setBlockedDates] = useState<{ start: string, end: string }[]>([]);
 
     // Redirect if not logged in
     useEffect(() => {
@@ -41,6 +42,38 @@ export default function GreeterPage() {
     }, [templates, selectedTempId]);
 
     const selectedProperty = properties.find(p => p.id === selectedPropId) || properties[0];
+
+    // Reset dates when property changes
+    useEffect(() => {
+        setGuestDetails(prev => ({
+            ...prev,
+            checkInDate: '',
+            checkOutDate: ''
+        }));
+    }, [selectedPropId]);
+
+    // Fetch Calendar Data
+    useEffect(() => {
+        if (selectedProperty?.airbnbIcalUrl) {
+            fetch(`/api/calendar?url=${encodeURIComponent(selectedProperty.airbnbIcalUrl)}`)
+                .then(res => {
+                    if (!res.ok) throw new Error("Failed to fetch calendar");
+                    return res.json();
+                })
+                .then(data => {
+                    if (data.events) {
+                        setBlockedDates(data.events);
+                    }
+                })
+                .catch(err => {
+                    console.error("Failed to sync calendar", err);
+                    showToast("Calendar sync failed", "error");
+                });
+        } else {
+            setBlockedDates([]);
+        }
+    }, [selectedProperty?.airbnbIcalUrl, showToast]);
+
     const selectedTemplate = templates.find(t => t.id === selectedTempId) || templates[0];
 
     const generatedMessage = useMemo(() => {
@@ -109,11 +142,12 @@ export default function GreeterPage() {
                 {/* Left Section: Form and Templates */}
                 <div className={`lg:col-span-8 ${mobileTab === 'preview' ? 'hidden lg:block' : 'block'}`}>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 items-start">
-                        <div className="space-y-6 md:space-y-8">
+                        <div className="space-y-6 md:space-y-8 relative z-20">
                             <GuestForm
                                 details={guestDetails}
                                 onChange={setGuestDetails}
                                 templateContent={selectedTemplate?.content}
+                                blockedDates={blockedDates}
                             />
                         </div>
 

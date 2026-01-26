@@ -11,6 +11,7 @@ export interface Property {
     wifiPass: string;
     locationLink: string;
     propertyLink: string;
+    airbnbIcalUrl?: string;
     basePrice: number;
     extraGuestPrice: number;
     baseGuests: number;
