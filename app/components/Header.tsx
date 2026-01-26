@@ -3,7 +3,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ChevronLeft, Settings, MessageCircle, LogOut } from 'lucide-react';
+import { ChevronLeft, Settings, MessageCircle, LogOut, Wrench, Home } from 'lucide-react';
 import { signOut } from "firebase/auth";
 import { auth } from '../lib/firebase';
 
@@ -12,6 +12,7 @@ export const Header: React.FC = () => {
     const isHome = pathname === '/';
     const isSettings = pathname === '/settings';
     const isGreeter = pathname === '/greeter';
+    const isMaintenance = pathname === '/maintenance';
     const isAuth = pathname === '/auth';
 
     if (isAuth) return null;
@@ -23,7 +24,7 @@ export const Header: React.FC = () => {
                     <div className="flex items-center gap-3 w-full">
                         {!isHome && (
                             <Link href="/" className="p-2 -ml-2 hover:bg-white/10 rounded-full transition-colors text-slate-300">
-                                <ChevronLeft size={24} />
+                                <Home size={24} />
                             </Link>
                         )}
 
@@ -36,12 +37,18 @@ export const Header: React.FC = () => {
                                 <h1 className="text-xl font-bold text-white tracking-tight animate-fade-in">Greeter</h1>
                             </div>
                         )}
+
+                        {isMaintenance && (
+                            <h1 className="text-xl font-bold text-white tracking-tight animate-fade-in">Maintenance</h1>
+                        )}
                     </div>
 
                     <div className="ml-auto flex-shrink-0 flex items-center gap-2">
                         {isGreeter ? (
-                            <Link href="/settings" className="p-2 bg-slate-800 rounded-full text-slate-400 hover:text-white transition-colors border border-white/5 hover:bg-slate-700"><Settings size={20} /></Link>
-                        ) : isSettings ? (
+                            <>
+                                <Link href="/settings" className="p-2 bg-slate-800 rounded-full text-slate-400 hover:text-white transition-colors border border-white/5 hover:bg-slate-700"><Settings size={20} /></Link>
+                            </>
+                        ) : isSettings || isMaintenance ? (
                             <Link href="/greeter" className="p-2 bg-slate-800 rounded-full text-slate-400 hover:text-white transition-colors border border-white/5 hover:bg-slate-700"><MessageCircle size={20} /></Link>
                         ) : null}
 

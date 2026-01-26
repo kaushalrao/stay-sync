@@ -5,6 +5,7 @@ Guest Greeter is a modern, responsive web application designed for Airbnb hosts 
 ## 🚀 Features
 
 *   **Property Management**: Easily add, edit, and delete multiple properties. Store details like check-in/out times, WiFi credentials, and location links.
+*   **Maintenance Tracker**: Track repairs and issues for each property with status (Pending/Fixed) and priority levels.
 *   **Dynamic Templates**: Create custom message templates using variables (e.g., `{{guestName}}`, `{{wifiPass}}`).
 *   **Real-time Preview**: See exactly how your message will look on a smartphone (WhatsApp style) before sending.
 *   **Instant Calculation**: Automatically calculates total stay cost, nights, and balance due based on check-in/out dates.
@@ -34,6 +35,7 @@ The project follows the Next.js App Router architecture:
 app/
 ├── auth/                   # Authentication page
 ├── greeter/                # Main message generator tool
+├── maintenance/            # Maintenance tracker dashboard
 ├── settings/               # Property & Template management
 ├── components/
 │   ├── ui/                 # Reusable atomic components (Button, Input, Card, etc.)

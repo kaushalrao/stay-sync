@@ -5,7 +5,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { User, onAuthStateChanged } from 'firebase/auth';
 import { collection, query, onSnapshot } from 'firebase/firestore';
 import { auth, db, appId } from '../../lib/firebase';
-import { Property, Template, ToastState } from '../../lib/types';
+import { Property, Template, ToastState, MaintenanceIssue } from '../../lib/types';
 import { Toast } from '../ui/Toast';
 
 interface AppContextType {
@@ -13,6 +13,7 @@ interface AppContextType {
     loading: boolean;
     properties: Property[];
     templates: Template[];
+    issues: MaintenanceIssue[];
     showToast: (message: string, type?: 'success' | 'error') => void;
 }
 
@@ -21,6 +22,7 @@ const AppContext = createContext<AppContextType>({
     loading: true,
     properties: [],
     templates: [],
+    issues: [],
     showToast: () => { },
 });
 
@@ -31,6 +33,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const [loading, setLoading] = useState(true);
     const [properties, setProperties] = useState<Property[]>([]);
     const [templates, setTemplates] = useState<Template[]>([]);
+    const [issues, setIssues] = useState<MaintenanceIssue[]>([]);
     const [toast, setToast] = useState<ToastState>({ message: '', type: 'success', visible: false });
 
     const showToast = (message: string, type: 'success' | 'error' = 'success') => {
@@ -52,6 +55,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         if (!user) {
             setProperties([]);
             setTemplates([]);
+            setIssues([]);
             return;
         }
 
@@ -67,14 +71,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             setTemplates(temps);
         });
 
+        const qIssues = query(collection(db, `artifacts/${appId}/users/${user.uid}/maintenance`));
+        const unsubIssues = onSnapshot(qIssues, (snapshot) => {
+            const issuesData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as MaintenanceIssue));
+            setIssues(issuesData);
+        });
+
         return () => {
             unsubProps();
             unsubTemps();
+            unsubIssues();
         };
     }, [user]);
 
     return (
-        <AppContext.Provider value={{ user, loading, properties, templates, showToast }}>
+        <AppContext.Provider value={{ user, loading, properties, templates, issues, showToast }}>
             {children}
             <Toast toast={toast} onClose={() => setToast(prev => ({ ...prev, visible: false }))} />
         </AppContext.Provider>

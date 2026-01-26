@@ -38,3 +38,13 @@ export interface GuestDetails {
     numberOfGuests: number;
     advancePaid: number;
 }
+
+export interface MaintenanceIssue {
+    id: string;
+    propertyId: string;
+    title: string;
+    status: 'pending' | 'in-progress' | 'fixed';
+    priority: 'low' | 'medium' | 'high';
+    dueDate?: string;
+    createdAt: number;
+}
