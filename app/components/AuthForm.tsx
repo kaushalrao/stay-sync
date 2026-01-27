@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, User } from "firebase/auth";
-import { Sparkles, UserCircle, CheckCircle2, XCircle } from 'lucide-react';
+import { User as UserIcon, UserCircle, CheckCircle2, XCircle } from 'lucide-react';
 import { app, auth } from '../lib/firebase';
 import { Input } from './ui/Input';
 import { Button } from './ui/Button';
@@ -38,9 +38,9 @@ export const AuthForm: React.FC<{ onAuthSuccess: (user: User) => void }> = ({ on
             <div className="w-full max-w-md bg-slate-800/50 backdrop-blur-xl p-8 rounded-[2rem] border border-white/10 shadow-2xl">
                 <div className="text-center mb-8">
                     <div className="inline-flex items-center justify-center p-4 bg-white/5 rounded-3xl mb-4 border border-white/10">
-                        <Sparkles size={32} className="text-orange-400" />
+                        <UserIcon size={32} className="text-orange-400" />
                     </div>
-                    <h1 className="text-3xl font-extrabold mb-2">Guest Greeter</h1>
+                    <h1 className="text-3xl font-extrabold mb-2">HostPilot</h1>
                     <p className="text-slate-400">Sign in to manage your properties</p>
                 </div>
 

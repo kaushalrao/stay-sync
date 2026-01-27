@@ -83,7 +83,7 @@ export const GuestForm: React.FC<{
                     )}
 
                     {(templateContent.includes('{{totalAmount') || templateContent.includes('{{balanceDue')) && (
-                        <div className="grid grid-cols-2 gap-3 md:gap-4 animate-fade-in">
+                        <div className="grid grid-cols-1 gap-3 md:gap-4 animate-fade-in">
                             <Input
                                 type="number"
                                 min={1}
@@ -97,14 +97,36 @@ export const GuestForm: React.FC<{
                                 placeholder="Guests"
                                 className="text-sm md:text-base font-bold bg-black/20"
                             />
+                        </div>
+                    )}
+
+                    {(templateContent.includes('{{totalAmount') || templateContent.includes('{{balanceDue')) && (
+                        <div className="grid grid-cols-2 gap-3 md:gap-4 animate-fade-in">
                             <Input
                                 type="number"
                                 min={0}
-                                label="Advance (₹)"
+                                label="Advance Paid"
                                 icon={<Wallet size={12} className="shrink-0" />}
                                 value={details.advancePaid === 0 ? '' : details.advancePaid}
-                                onChange={(e) => update('advancePaid', parseFloat(e.target.value) || 0)}
-                                placeholder="0"
+                                onChange={(e) => {
+                                    const val = parseFloat(e.target.value);
+                                    update('advancePaid', isNaN(val) ? 0 : val);
+                                }}
+                                placeholder="₹0"
+                                className="text-sm md:text-base font-bold bg-black/20"
+                            />
+                            <Input
+                                type="number"
+                                min={0}
+                                label="Discount"
+                                labelClassName="!text-green-500 group-focus-within:!text-green-400"
+                                icon={<Wallet size={12} className="shrink-0" />}
+                                value={details.discount === 0 ? '' : details.discount}
+                                onChange={(e) => {
+                                    const val = parseFloat(e.target.value);
+                                    update('discount', isNaN(val) ? 0 : val);
+                                }}
+                                placeholder="₹0"
                                 className="text-sm md:text-base font-bold bg-black/20"
                             />
                         </div>

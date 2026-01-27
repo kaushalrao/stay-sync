@@ -4,6 +4,7 @@ export const DEFAULT_GUEST_DETAILS: GuestDetails = {
     guestName: '',
     numberOfGuests: 2,
     advancePaid: 0,
+    discount: 0,
     checkInDate: '',
     checkOutDate: ''
 };

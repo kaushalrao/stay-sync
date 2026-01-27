@@ -5,8 +5,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Guest Greeter App",
-  description: "Generate personalized welcome messages for guests easily",
+  title: "HostPilot",
+  description: "The management tool for hosts",
   manifest: "/manifest.json",
 };
 

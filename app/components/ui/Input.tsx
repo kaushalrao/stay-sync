@@ -3,12 +3,13 @@ import React from 'react';
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     label?: string;
     icon?: React.ReactNode;
+    labelClassName?: string;
 }
 
-export const Input: React.FC<InputProps> = ({ label, icon, className = '', ...props }) => (
+export const Input: React.FC<InputProps> = ({ label, icon, labelClassName = '', className = '', ...props }) => (
     <div className="space-y-1.5 group w-full">
         {label && (
-            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 flex items-center gap-1.5 group-focus-within:text-orange-400 transition-colors">
+            <label className={`text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 flex items-center gap-1.5 group-focus-within:text-orange-400 transition-colors ${labelClassName}`}>
                 {icon} {label}
             </label>
         )}

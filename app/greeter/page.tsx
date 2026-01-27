@@ -82,7 +82,11 @@ export default function GreeterPage() {
         const totalBaseCost = selectedProperty.basePrice * nights;
         const extraGuestsCount = Math.max(0, guestDetails.numberOfGuests - selectedProperty.baseGuests);
         const totalExtraCost = selectedProperty.extraGuestPrice * extraGuestsCount * nights;
-        const totalAmount = totalBaseCost + totalExtraCost;
+
+        const subTotal = totalBaseCost + totalExtraCost;
+        const discount = guestDetails.discount || 0;
+        const totalAmount = Math.max(0, subTotal - discount);
+
         const balanceDue = Math.max(0, totalAmount - guestDetails.advancePaid);
 
         const data: Record<string, string | number> = {

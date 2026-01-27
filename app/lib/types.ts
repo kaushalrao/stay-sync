@@ -38,6 +38,7 @@ export interface GuestDetails {
     checkOutDate: string;
     numberOfGuests: number;
     advancePaid: number;
+    discount?: number;
 }
 
 export interface MaintenanceIssue {
