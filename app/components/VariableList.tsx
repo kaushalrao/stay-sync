@@ -1,5 +1,5 @@
 import React from 'react';
-import { VARIABLE_CATEGORIES } from '../lib/utils';
+import { VARIABLE_CATEGORIES } from '../lib/constants';
 
 export const VariableList: React.FC<{ onInsert: (tag: string) => void }> = ({ onInsert }) => (
     <div className="space-y-6">

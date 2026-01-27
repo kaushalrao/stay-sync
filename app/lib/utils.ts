@@ -1,19 +1,4 @@
-import {
-    CalendarCheck, MapPin, Coffee, Wifi,
-    Utensils, MessageCircle, LogOut, Home, FileText
-} from 'lucide-react';
 import React from 'react';
-
-export const AVAILABLE_ICONS: Record<string, React.ElementType> = {
-    CalendarCheck, MapPin, Coffee, Wifi, Utensils, LogOut, MessageCircle, Home, FileText
-};
-
-export const VARIABLE_CATEGORIES = {
-    "Property Details": ['propertyName', 'wifiName', 'wifiPass', 'locationLink', 'propertyLink', 'checkInTime', 'checkOutTime', 'baseGuests'],
-    "Guest & Booking": ['guestName', 'numberOfGuests', 'nights', 'checkInDate', 'checkOutDate'],
-    "Host & Contact": ['hostName', 'coHostName', 'contactPrimary', 'contactSecondary'],
-    "Financials": ['totalAmount', 'advancePaid', 'balanceDue', 'basePrice', 'extraGuestPrice']
-};
 
 export const getIconForTemplate = (label: string): string => {
     const lowerLabel = label.toLowerCase();
@@ -52,5 +37,23 @@ export const formatCurrency = (amount: number) => new Intl.NumberFormat('en-IN')
 export const processTemplate = (templateStr: string, data: Record<string, string | number>): string => {
     return templateStr.replace(/\{\{(\w+)\}\}/g, (match, key) => {
         return data[key] !== undefined ? String(data[key]) : match;
+    });
+};
+
+export const isDateBlocked = (dateStr: string, blockedDates: { start: string, end: string }[], variant: 'check-in' | 'check-out' = 'check-in'): boolean => {
+    // Check-out Blocked: check-out > start AND check-out <= end
+    if (variant === 'check-out') {
+        return blockedDates.some(range => dateStr > range.start && dateStr <= range.end);
+    }
+    // Check-in (default)
+    // Blocked if: day >= start && day < end
+    return blockedDates.some(range => dateStr >= range.start && dateStr < range.end);
+};
+
+export const isTurnoverDate = (dateStr: string, blockedDates: { start: string, end: string }[], variant: 'check-in' | 'check-out' = 'check-in'): boolean => {
+    return blockedDates.some(range => {
+        if (variant === 'check-in') return dateStr === range.end;
+        if (variant === 'check-out') return dateStr === range.start;
+        return false;
     });
 };

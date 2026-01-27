@@ -16,6 +16,7 @@ import {
     isBefore,
 } from 'date-fns';
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
+import { isDateBlocked, isTurnoverDate } from '../../lib/utils';
 
 interface DatePickerProps {
     date: string;
@@ -35,24 +36,14 @@ export const DatePicker: React.FC<DatePickerProps> = ({ date, onChange, label, b
     const selectedDate = date ? parseISO(date) : undefined;
     const comparisonDate = otherDate ? parseISO(otherDate) : undefined;
 
-    // Helper to check if a date is blocked
-    const isDateBlocked = (day: Date) => {
-        const dayStr = format(day, 'yyyy-MM-dd');
-        return blockedDates.some(range => {
-            const start = range.start;
-            const end = range.end;
+    const checkIsDateBlocked = (day: Date) => {
+        // Strict check for "yesterday" and before
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        if (isBefore(day, today)) return true;
 
-            if (variant === 'check-out') {
-                // Check-out Blocked: check-out > start AND check-out <= end
-                // We cannot checkout if we stayed the night of 'start'.
-                return dayStr > start && dayStr <= end;
-            } else {
-                // Check-in (default)
-                // Blocked if: day >= start && day < end
-                // We cannot check in if the night is taken.
-                return dayStr >= start && dayStr < end;
-            }
-        });
+        const dayStr = format(day, 'yyyy-MM-dd');
+        return isDateBlocked(dayStr, blockedDates, variant);
     };
 
     const nextMonth = () => setCurrentMonth(addMonths(currentMonth, 1));
@@ -67,7 +58,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({ date, onChange, label, b
     const days = eachDayOfInterval({ start: startDate, end: endDate });
 
     const handleSelect = (day: Date) => {
-        if (!isDateBlocked(day)) {
+        if (!checkIsDateBlocked(day)) {
             onChange(format(day, 'yyyy-MM-dd'));
             setIsOpen(false);
         }
@@ -133,11 +124,13 @@ export const DatePicker: React.FC<DatePickerProps> = ({ date, onChange, label, b
                     {/* Days */}
                     <div className="grid grid-cols-7 gap-y-1">
                         {days.map((day) => {
+                            const dayStr = format(day, 'yyyy-MM-dd');
                             const isSelected = selectedDate && isSameDay(day, selectedDate);
                             const isComparison = comparisonDate && isSameDay(day, comparisonDate);
-                            const blocked = isDateBlocked(day);
+                            const blocked = checkIsDateBlocked(day);
                             const isCurrentMonth = isSameMonth(day, currentMonth);
                             const isToDay = isToday(day);
+                            const isTurnover = isTurnoverDate(dayStr, blockedDates, variant);
 
                             // Range Logic
                             let isInRange = false;
@@ -161,30 +154,34 @@ export const DatePicker: React.FC<DatePickerProps> = ({ date, onChange, label, b
                             if (isInRange) {
                                 bgClass = 'bg-orange-500/20';
                                 textClass = 'text-white';
-                                roundedClass = 'rounded-none'; // remove rounding for connected look
-                                // Add subtle rounding to start/end of rows if needed, but basic square is fine for filler
+                                roundedClass = 'rounded-none';
                             }
 
-                            // Visual fix for ends of range to connect nicely
+                            // Range Connections
                             if (isRangeStart && comparisonDate) roundedClass = 'rounded-l-lg rounded-r-none';
                             if (isRangeEnd && comparisonDate) roundedClass = 'rounded-l-none rounded-r-lg';
-                            if (isRangeStart && isRangeEnd) roundedClass = 'rounded-lg'; // Single day range
+                            if (isRangeStart && isRangeEnd) roundedClass = 'rounded-lg';
 
                             // Overrides for endpoints
                             if (isSelected || isComparison) {
                                 bgClass = 'bg-orange-600';
                                 textClass = '!text-white font-bold shadow-lg';
-                                // roundedClass stays as determined above to connect
+                            }
+
+                            // Turnover Styling
+                            if (isTurnover && !isSelected && !isComparison && !isInRange) {
+                                textClass = 'text-slate-500 font-medium relative';
                             }
 
                             if (blocked) {
-                                textClass = 'text-slate-600 cursor-not-allowed';
-                                bgClass = ''; // Remove background if blocked, though check-in/out logic should prevent overlapping ranges usually
+                                textClass = 'text-slate-700 cursor-not-allowed';
+                                bgClass = '';
                             }
 
                             return (
                                 <button
                                     key={day.toISOString()}
+                                    type="button"
                                     onClick={() => handleSelect(day)}
                                     disabled={blocked}
                                     className={`

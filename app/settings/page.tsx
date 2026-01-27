@@ -6,7 +6,8 @@ import { collection, addDoc, updateDoc, deleteDoc, doc } from "firebase/firestor
 import { Property, Template } from '../lib/types';
 import { DEFAULT_PROPERTY_TIMES, DEFAULT_PROPERTY_VALUES } from '../lib/constants';
 import { app, db, appId } from '../lib/firebase';
-import { getIconForTemplate, AVAILABLE_ICONS } from '../lib/utils';
+import { AVAILABLE_ICONS } from '../lib/constants';
+import { getIconForTemplate } from '../lib/utils';
 import { TabControl } from '../components/TabControl';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
