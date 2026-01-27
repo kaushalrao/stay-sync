@@ -1,18 +1,12 @@
 import React from 'react';
-import { Users, Edit3, Calendar, CalendarCheck, Wallet } from 'lucide-react';
-import { Card } from './ui/Card';
-import { SectionHeader } from './ui/SectionHeader';
-import { Input } from './ui/Input';
-import { DatePicker } from './ui/DatePicker';
+import { CalendarCheck, Users, Edit3, Wallet } from 'lucide-react';
+import { GuestDetails, GuestFormProps } from '../../lib/types';
+import { Card } from '../ui/Card';
+import { SectionHeader } from '../ui/SectionHeader';
+import { Input } from '../ui/Input';
+import { DatePicker } from '../ui/DatePicker';
 
-import { GuestDetails } from '../lib/types';
-
-export const GuestForm: React.FC<{
-    details: GuestDetails;
-    onChange: (details: GuestDetails) => void;
-    templateContent?: string;
-    blockedDates?: { start: string, end: string }[];
-}> = ({ details, onChange, templateContent = '', blockedDates = [] }) => {
+export const GuestForm: React.FC<GuestFormProps> = ({ details, onChange, templateContent = '', blockedDates = [], onSaveGuest, onOpenDirectory }) => {
 
     const isDateBlocked = (dateStr: string, type: 'checkIn' | 'checkOut') => {
         if (!dateStr || blockedDates.length === 0) return false;
@@ -40,8 +34,9 @@ export const GuestForm: React.FC<{
     };
 
     return (
-        <Card className="!p-4 md:!p-8">
+        <Card className="!p-4 md:!p-8 relative">
             <SectionHeader title="Guest Details" icon={<Users size={16} />} />
+
             <div className="space-y-4 md:space-y-6">
                 <div className="relative group">
                     <input
@@ -53,6 +48,15 @@ export const GuestForm: React.FC<{
                     <div className="absolute right-4 md:right-5 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-orange-400 transition-colors">
                         <Edit3 size={16} />
                     </div>
+                </div>
+
+                <div className="relative group animate-fade-in">
+                    <input
+                        value={details.phoneNumber || ''}
+                        onChange={(e) => update('phoneNumber', e.target.value.replace(/[^0-9+\-\(\)\s]/g, ''))}
+                        placeholder="Phone Number"
+                        className="w-full px-4 py-3 md:px-5 md:py-3.5 pl-4 md:pl-5 text-sm md:text-base font-medium text-white bg-black/20 border border-white/5 rounded-2xl outline-none transition-all focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/10 focus:bg-black/30 placeholder:text-slate-600"
+                    />
                 </div>
 
                 <div className="space-y-3 md:space-y-4">
@@ -131,6 +135,35 @@ export const GuestForm: React.FC<{
                             />
                         </div>
                     )}
+
+                    <div className="grid grid-cols-2 gap-3 pt-2">
+                        {onOpenDirectory && (
+                            <button
+                                type="button"
+                                onClick={onOpenDirectory}
+                                className="w-full h-[54px] bg-gradient-to-br from-slate-800 to-slate-900 text-slate-300 rounded-xl hover:text-white hover:from-slate-700 hover:to-slate-800 transition-all text-xs md:text-sm font-bold uppercase tracking-wider flex items-center justify-center gap-2 border border-white/10 hover:border-white/20 shadow-lg active:scale-95 group"
+                            >
+                                <Users size={16} className="text-indigo-400 group-hover:text-indigo-300 transition-colors" /> Directory
+                            </button>
+                        )}
+                        {onSaveGuest && (() => {
+                            const isPhoneValid = details.phoneNumber && details.phoneNumber.length >= 10 && /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/im.test(details.phoneNumber.replace(/\s/g, ''));
+                            const isValid = details.guestName && isPhoneValid && details.checkInDate && details.checkOutDate && details.numberOfGuests > 0;
+                            return (
+                                <button
+                                    type="button"
+                                    onClick={onSaveGuest}
+                                    disabled={!isValid}
+                                    className={`w-full h-[54px] rounded-xl transition-all text-xs md:text-sm font-bold uppercase tracking-wider flex items-center justify-center gap-2 border active:scale-95 shadow-lg ${isValid
+                                        ? 'bg-gradient-to-br from-orange-500 to-red-600 text-white border-orange-400/20 hover:shadow-orange-500/25 hover:from-orange-400 hover:to-red-500'
+                                        : 'bg-slate-800 text-slate-500 border-white/5 cursor-not-allowed opacity-50 shadow-none'
+                                        }`}
+                                >
+                                    <CalendarCheck size={16} className={isValid ? "text-orange-100" : ""} /> Save Guest
+                                </button>
+                            );
+                        })()}
+                    </div>
                 </div>
             </div>
         </Card>

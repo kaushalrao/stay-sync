@@ -1,26 +1,39 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { Check, Copy, MessageCircle, PenTool, Eye } from 'lucide-react';
-import { GuestDetails } from '../lib/types';
+import { Check, Copy, MessageCircle, PenTool, Eye, X, Loader2 } from 'lucide-react';
+import { GuestDetails, Guest } from '../lib/types';
 import { DEFAULT_GUEST_DETAILS } from '../lib/constants';
 import { calculateNights, formatDate, formatCurrency, processTemplate } from '../lib/utils';
 import { PropertyDock } from '../components/PropertyDock';
-import { GuestForm } from '../components/GuestForm';
+import { Portal } from '../components/ui/Portal';
+import { GuestForm } from '../components/guests/GuestForm';
 import { TemplateSelector } from '../components/TemplateSelector';
 import { PreviewPhone } from '../components/PreviewPhone';
+import { GuestDirectory } from '../components/guests/GuestDirectory';
 import { useApp } from '../components/providers/AppProvider';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { db, appId } from '../lib/firebase';
+import { collection, addDoc, updateDoc, doc, getDoc } from 'firebase/firestore';
 
-export default function GreeterPage() {
+import { Suspense } from 'react';
+
+function GreeterContent() {
     const { properties, templates, showToast, user } = useApp();
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const guestIdParam = searchParams.get('guestId');
+
     const [selectedPropId, setSelectedPropId] = useState('');
     const [mobileTab, setMobileTab] = useState<'edit' | 'preview'>('edit');
     const [guestDetails, setGuestDetails] = useState<GuestDetails>(DEFAULT_GUEST_DETAILS);
+    const [currentGuestId, setCurrentGuestId] = useState<string | null>(null);
     const [selectedTempId, setSelectedTempId] = useState('');
     const [copied, setCopied] = useState(false);
     const [blockedDates, setBlockedDates] = useState<{ start: string, end: string }[]>([]);
+
+    // Guest Directory State
+    const [isGuestbookOpen, setIsGuestbookOpen] = useState(false);
 
     // Redirect if not logged in
     useEffect(() => {
@@ -28,6 +41,34 @@ export default function GreeterPage() {
             router.push('/');
         }
     }, [user, router]);
+
+    // Fetch Guest from URL if present
+    useEffect(() => {
+        const loadGuestFromUrl = async () => {
+            if (!user || !guestIdParam) return;
+
+            try {
+                const docRef = doc(db, `artifacts/${appId}/users/${user.uid}/guests`, guestIdParam);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const guest = { id: docSnap.id, ...docSnap.data() } as Guest;
+                    handleSelectGuest(guest);
+                    // Clear param so a refresh doesn't re-fetch if we navigate away inside app?
+                    // Or keep it. Let's keep it simple for now.
+                    // Actually, let's replace URL to be clean if desired, but user might want to refresh.
+                } else {
+                    showToast("Guest not found", "error");
+                }
+            } catch (err) {
+                console.error("Error loading guest:", err);
+            }
+        };
+
+        if (user && guestIdParam && !currentGuestId) {
+            loadGuestFromUrl();
+        }
+    }, [user, guestIdParam]);
 
     useEffect(() => {
         if (!selectedPropId && properties.length > 0) {
@@ -43,14 +84,18 @@ export default function GreeterPage() {
 
     const selectedProperty = properties.find(p => p.id === selectedPropId) || properties[0];
 
-    // Reset dates when property changes
+    // Reset dates & guest ID when property changes
     useEffect(() => {
-        setGuestDetails(prev => ({
-            ...prev,
-            checkInDate: '',
-            checkOutDate: ''
-        }));
-    }, [selectedPropId]);
+        // Only reset if we are NOT currently loading a guest from URL
+        if (!guestIdParam) {
+            setGuestDetails(prev => ({
+                ...prev,
+                checkInDate: '',
+                checkOutDate: ''
+            }));
+            setCurrentGuestId(null);
+        }
+    }, [selectedPropId, guestIdParam]);
 
     // Fetch Calendar Data
     useEffect(() => {
@@ -131,18 +176,77 @@ export default function GreeterPage() {
         window.open(url, '_blank');
     };
 
+    const handleSaveGuest = async () => {
+        if (!guestDetails.guestName) {
+            showToast("Please enter a guest name", "error");
+            return;
+        }
+
+        try {
+            // Calculate Total Amount for saving
+            const nights = calculateNights(guestDetails.checkInDate, guestDetails.checkOutDate);
+            const totalBaseCost = selectedProperty.basePrice * nights;
+            const extraGuestsCount = Math.max(0, guestDetails.numberOfGuests - selectedProperty.baseGuests);
+            const totalExtraCost = selectedProperty.extraGuestPrice * extraGuestsCount * nights;
+            const subTotal = totalBaseCost + totalExtraCost;
+            const discount = guestDetails.discount || 0;
+            const totalAmount = Math.max(0, subTotal - discount);
+
+            const guestData: Partial<Guest> = {
+                ...guestDetails,
+                createdAt: Date.now(),
+                status: 'upcoming',
+                firstName: guestDetails.guestName.split(' ')[0],
+                notes: `Stay at ${selectedProperty.name}`,
+                totalAmount: totalAmount
+            };
+
+            const path = `artifacts/${appId}/users/${user.uid}/guests`;
+
+            if (currentGuestId) {
+                // Update existing
+                await updateDoc(doc(db, path, currentGuestId), guestData);
+                showToast("Guest updated!", "success");
+            } else {
+                // Create new
+                const docRef = await addDoc(collection(db, path), guestData);
+                setCurrentGuestId(docRef.id);
+                showToast("Guest saved to directory!", "success");
+            }
+        } catch (error) {
+            console.error("Error saving guest:", error);
+            showToast("Failed to save guest", "error");
+        }
+    };
+
+    const handleSelectGuest = (guest: Guest) => {
+        setGuestDetails({
+            guestName: guest.guestName,
+            numberOfGuests: guest.numberOfGuests,
+            advancePaid: guest.advancePaid,
+            discount: guest.discount || 0,
+            checkInDate: guest.checkInDate,
+            checkOutDate: guest.checkOutDate,
+            phoneNumber: guest.phoneNumber || ''
+        });
+        setCurrentGuestId(guest.id);
+        setIsGuestbookOpen(false);
+        showToast("Guest details loaded", "success");
+    };
+
     return (
-        <div className="animate-fade-in pb-24 md:pb-0 flex flex-col gap-6 md:gap-10 h-full relative">
-            <div className="hidden lg:block mt-8">
+        <div className="pb-24 md:pb-0 flex flex-col gap-6 md:gap-10 h-full relative">
+            <div className="hidden lg:block mt-8 animate-fade-in">
                 <PropertyDock properties={properties} selectedId={selectedPropId} onSelect={setSelectedPropId} />
             </div>
 
-            {/* Mobile Header Controls - REMOVED TabControl, kept PropertyDock but simplified */}
-            <div className="lg:hidden w-[calc(100%+2rem)] -mx-4 sticky top-[72px] z-40 bg-[#0f172a]/95 backdrop-blur-xl -mt-4 py-3 px-4 border-b border-white/5">
+            {/* Mobile Header Controls */}
+            <div className="lg:hidden w-[calc(100%+2rem)] -mx-4 sticky top-[72px] z-40 bg-[#0f172a]/95 backdrop-blur-xl -mt-4 py-3 px-4 border-b border-white/5 animate-fade-in">
                 <PropertyDock properties={properties} selectedId={selectedPropId} onSelect={setSelectedPropId} />
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            {/* Main Content Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 flex-1 animate-fade-in">
                 {/* Left Section: Form and Templates */}
                 <div className={`lg:col-span-8 ${mobileTab === 'preview' ? 'hidden lg:block' : 'block'}`}>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 items-start">
@@ -152,6 +256,8 @@ export default function GreeterPage() {
                                 onChange={setGuestDetails}
                                 templateContent={selectedTemplate?.content}
                                 blockedDates={blockedDates}
+                                onSaveGuest={handleSaveGuest}
+                                onOpenDirectory={() => setIsGuestbookOpen(true)}
                             />
                         </div>
 
@@ -167,6 +273,28 @@ export default function GreeterPage() {
                 <div className={`lg:col-span-4 lg:sticky lg:top-24 ${mobileTab === 'edit' ? 'hidden lg:block' : 'block'}`}>
                     <PreviewPhone message={generatedMessage} onSend={handleWhatsApp} onCopy={handleCopy} copied={copied} />
                 </div>
+
+                {/* Guest Directory Drawer */}
+                {isGuestbookOpen && (
+                    <Portal>
+                        <div className="fixed inset-0 z-[100] flex justify-end">
+                            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={() => setIsGuestbookOpen(false)} />
+
+                            <div className="relative w-full max-w-md h-full bg-slate-900 border-l border-white/10 shadow-2xl p-6 flex flex-col animate-slide-left">
+                                <div className="flex justify-between items-center mb-6 shrink-0">
+                                    <h3 className="text-xl font-bold text-white flex items-center gap-2">Guest Directory</h3>
+                                    <button onClick={() => setIsGuestbookOpen(false)} className="p-2 bg-slate-800 rounded-lg text-slate-400 hover:text-white">
+                                        <X size={20} />
+                                    </button>
+                                </div>
+
+                                <div className="flex-1 overflow-hidden">
+                                    <GuestDirectory mode="picker" onSelect={handleSelectGuest} className="h-full" />
+                                </div>
+                            </div>
+                        </div>
+                    </Portal>
+                )}
             </div>
 
             {/* Mobile Bottom Navigation Bar */}
@@ -202,12 +330,21 @@ export default function GreeterPage() {
                     {/* WhatsApp Action */}
                     <button
                         onClick={handleWhatsApp}
-                        className="flex flex-col items-center justify-center rounded-xl bg-[#25D366] text-white shadow-lg active:scale-95 transition-all"
+                        className="flex flex-col items-center justify-center rounded-xl text-slate-400 hover:text-green-400 active:scale-95 transition-all"
                     >
-                        <MessageCircle size={24} fill="white" />
+                        <MessageCircle size={20} />
+                        <span className="text-[10px] font-medium mt-1">Send</span>
                     </button>
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function GreeterPage() {
+    return (
+        <Suspense fallback={<div className="flex items-center justify-center p-10"><Loader2 className="animate-spin text-orange-400" /></div>}>
+            <GreeterContent />
+        </Suspense>
     );
 }

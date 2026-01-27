@@ -22,7 +22,8 @@ export const DEFAULT_GUEST_DETAILS: GuestDetails = {
     advancePaid: 0,
     discount: 0,
     checkInDate: '',
-    checkOutDate: ''
+    checkOutDate: '',
+    phoneNumber: ''
 };
 
 export const DEFAULT_PROPERTY_TIMES = {
@@ -34,4 +35,15 @@ export const DEFAULT_PROPERTY_VALUES = {
     baseGuests: 2,
     basePrice: 0,
     extraGuestPrice: 0
+};
+
+export const COLOR_VARIANTS: Record<string, { bg: string, border: string, text: string, icon: string }> = {
+    indigo: { bg: 'bg-indigo-500/10', border: 'border-indigo-500/20', text: 'text-indigo-300', icon: 'text-indigo-400' },
+    purple: { bg: 'bg-purple-500/10', border: 'border-purple-500/20', text: 'text-purple-300', icon: 'text-purple-400' },
+    rose: { bg: 'bg-rose-500/10', border: 'border-rose-500/20', text: 'text-rose-300', icon: 'text-rose-400' },
+    orange: { bg: 'bg-orange-500/10', border: 'border-orange-500/20', text: 'text-orange-300', icon: 'text-orange-400' },
+    cyan: { bg: 'bg-cyan-500/10', border: 'border-cyan-500/20', text: 'text-cyan-300', icon: 'text-cyan-400' },
+    emerald: { bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', text: 'text-emerald-300', icon: 'text-emerald-400' },
+    blue: { bg: 'bg-blue-500/10', border: 'border-blue-500/20', text: 'text-blue-300', icon: 'text-blue-400' },
+    fuchsia: { bg: 'bg-fuchsia-500/10', border: 'border-fuchsia-500/20', text: 'text-fuchsia-300', icon: 'text-fuchsia-400' },
 };

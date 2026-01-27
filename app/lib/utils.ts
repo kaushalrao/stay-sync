@@ -1,4 +1,5 @@
-import React from 'react';
+import { COLOR_VARIANTS } from './constants';
+import { Guest } from './types';
 
 export const getIconForTemplate = (label: string): string => {
     const lowerLabel = label.toLowerCase();
@@ -56,4 +57,24 @@ export const isTurnoverDate = (dateStr: string, blockedDates: { start: string, e
         if (variant === 'check-out') return dateStr === range.start;
         return false;
     });
+};
+
+export const getStatusColor = (status: Guest['status']) => {
+    switch (status) {
+        case 'upcoming': return 'bg-blue-400 shadow-[0_0_8px] shadow-blue-400/50';
+        case 'active': return 'bg-green-400 shadow-[0_0_8px] shadow-green-400/50';
+        case 'completed': return 'bg-slate-400';
+        case 'cancelled': return 'bg-rose-400';
+        default: return 'bg-slate-400';
+    }
+};
+
+export const getPropertyColorKey = (name: string) => {
+    const keys = Object.keys(COLOR_VARIANTS);
+    if (!name) return keys[0];
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+        hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return keys[Math.abs(hash) % keys.length];
 };
