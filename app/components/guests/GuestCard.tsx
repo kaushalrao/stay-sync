@@ -5,7 +5,8 @@ import { formatDate, formatCurrency, getPropertyColorKey, getStatusColor } from 
 import { COLOR_VARIANTS } from '../../lib/constants';
 
 export const GuestCard: React.FC<GuestCardProps> = ({ guest, mode, onSelect, onDelete }) => {
-    const colorKey = getPropertyColorKey(guest.notes || '');
+    const propertyName = guest.propName || '';
+    const colorKey = getPropertyColorKey(propertyName);
     const styles = COLOR_VARIANTS[colorKey];
 
     return (
@@ -90,11 +91,11 @@ export const GuestCard: React.FC<GuestCardProps> = ({ guest, mode, onSelect, onD
                         </div>
                     </div>
 
-                    {guest.notes && (
+                    {propertyName && (
                         <div className="flex justify-start">
                             <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-[10px] font-bold tracking-wide uppercase ${styles.bg} ${styles.border} ${styles.text}`}>
                                 <Home size={10} className={styles.icon} />
-                                {guest.notes.replace('Stay at ', '')}
+                                {propertyName}
                             </div>
                         </div>
                     )}
@@ -102,11 +103,11 @@ export const GuestCard: React.FC<GuestCardProps> = ({ guest, mode, onSelect, onD
             )}
 
             {/* Property Chip - Picker Mode */}
-            {mode !== 'page' && guest.notes && (
+            {mode !== 'page' && propertyName && (
                 <div className="mt-3 border-t border-white/5 pt-3 flex justify-start">
                     <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-[10px] font-bold tracking-wide uppercase ${styles.bg} ${styles.border} ${styles.text}`}>
                         <Home size={10} className={styles.icon} />
-                        {guest.notes.replace('Stay at ', '')}
+                        {propertyName}
                     </div>
                 </div>
             )}

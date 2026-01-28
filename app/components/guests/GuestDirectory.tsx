@@ -50,17 +50,6 @@ export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode =
 
     const [selectedMonth, setSelectedMonth] = useState<string>(format(new Date(), 'yyyy-MM'));
 
-    // Extract unique months from guests for the filter dropdown
-    const availableMonths = React.useMemo(() => {
-        const months = new Set<string>();
-        guests.forEach(g => {
-            if (g.checkInDate) {
-                months.add(g.checkInDate.substring(0, 7)); // YYYY-MM
-            }
-        });
-        return Array.from(months).sort().reverse(); // Most recent months first
-    }, [guests]);
-
     const handlePrevMonth = () => {
         const date = selectedMonth === 'all' ? new Date() : new Date(selectedMonth + '-01');
         setSelectedMonth(format(subMonths(date, 1), 'yyyy-MM'));
@@ -82,7 +71,7 @@ export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode =
 
     const filteredGuests = guests.filter(g => {
         const matchesSearch = g.guestName.toLowerCase().includes(search.toLowerCase()) ||
-            g.notes?.toLowerCase().includes(search.toLowerCase());
+            g.propName?.toLowerCase().includes(search.toLowerCase());
 
         let matchesStatus = true;
         if (statusFilter === 'upcoming') {

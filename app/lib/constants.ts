@@ -9,6 +9,41 @@ export const AVAILABLE_ICONS: Record<string, React.ElementType> = {
     CalendarCheck, MapPin, Coffee, Wifi, Utensils, LogOut, MessageCircle, Home, FileText
 };
 
+export const FEATURE_CARD_STYLES = {
+    indigo: {
+        bg: 'bg-indigo-600',
+        shadow: 'hover:shadow-indigo-500/30',
+        labelBg: 'bg-indigo-950/30',
+        labelText: 'text-indigo-100',
+        descText: 'text-indigo-100/80',
+        icon: 'text-indigo-400',
+    },
+    rose: {
+        bg: 'bg-rose-600',
+        shadow: 'hover:shadow-rose-500/30',
+        labelBg: 'bg-rose-950/30',
+        labelText: 'text-rose-100',
+        descText: 'text-rose-100/80',
+        icon: 'text-rose-400',
+    },
+    orange: {
+        bg: 'bg-orange-600',
+        shadow: 'hover:shadow-orange-500/30',
+        labelBg: 'bg-orange-950/30',
+        labelText: 'text-orange-100',
+        descText: 'text-orange-100/80',
+        icon: 'text-orange-400',
+    },
+    cyan: {
+        bg: 'bg-cyan-600',
+        shadow: 'hover:shadow-cyan-500/30',
+        labelBg: 'bg-cyan-950/30',
+        labelText: 'text-cyan-100',
+        descText: 'text-cyan-100/80',
+        icon: 'text-cyan-500',
+    }
+};
+
 export const VARIABLE_CATEGORIES = {
     "Property Details": ['propertyName', 'wifiName', 'wifiPass', 'locationLink', 'propertyLink', 'checkInTime', 'checkOutTime', 'baseGuests'],
     "Guest & Booking": ['guestName', 'numberOfGuests', 'nights', 'checkInDate', 'checkOutDate'],

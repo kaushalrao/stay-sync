@@ -84,16 +84,22 @@ function GreeterContent() {
 
     const selectedProperty = properties.find(p => p.id === selectedPropId) || properties[0];
 
+    const isGuestLoadingRef = React.useRef(false);
+
     // Reset dates & guest ID when property changes
     useEffect(() => {
-        // Only reset if we are NOT currently loading a guest from URL
-        if (!guestIdParam) {
+        // Only reset if we are NOT currently loading a guest from URL or explicitly selecting one
+        if (!guestIdParam && !isGuestLoadingRef.current) {
             setGuestDetails(prev => ({
                 ...prev,
                 checkInDate: '',
                 checkOutDate: ''
             }));
             setCurrentGuestId(null);
+        }
+        // Reset the ref after the effect logic runs (if it skipped, it means we consumed the flag)
+        if (isGuestLoadingRef.current) {
+            isGuestLoadingRef.current = false;
         }
     }, [selectedPropId, guestIdParam]);
 
@@ -161,8 +167,6 @@ function GreeterContent() {
         return processTemplate(selectedTemplate.content, data);
     }, [guestDetails, selectedProperty, selectedTemplate]);
 
-    if (!user) return null;
-
     const handleCopy = () => {
         navigator.clipboard.writeText(generatedMessage);
         setCopied(true);
@@ -197,11 +201,11 @@ function GreeterContent() {
                 createdAt: Date.now(),
                 status: 'upcoming',
                 firstName: guestDetails.guestName.split(' ')[0],
-                notes: `Stay at ${selectedProperty.name}`,
+                propName: selectedProperty.name,
                 totalAmount: totalAmount
             };
 
-            const path = `artifacts/${appId}/users/${user.uid}/guests`;
+            const path = `artifacts/${appId}/users/${user?.uid}/guests`;
 
             if (currentGuestId) {
                 // Update existing
@@ -220,6 +224,14 @@ function GreeterContent() {
     };
 
     const handleSelectGuest = (guest: Guest) => {
+        if (guest?.propName) {
+            const prop = properties.find(p => p.name === guest.propName);
+            if (prop && prop.id !== selectedPropId) {
+                isGuestLoadingRef.current = true;
+                setSelectedPropId(prop.id);
+            }
+        }
+
         setGuestDetails({
             guestName: guest.guestName,
             numberOfGuests: guest.numberOfGuests,

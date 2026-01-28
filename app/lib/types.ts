@@ -1,4 +1,16 @@
 import type { MouseEvent, ReactNode } from 'react';
+import { LucideIcon } from 'lucide-react';
+
+export interface FeatureCardProps {
+    href: string;
+    title: React.ReactNode;
+    description: string;
+    label: string;
+    icon: LucideIcon;
+    color: 'indigo' | 'rose' | 'orange' | 'cyan';
+    iconRotation?: string;
+    iconHoverRotation?: string;
+}
 
 export interface Property {
     id: string;
@@ -49,7 +61,7 @@ export interface Guest extends GuestDetails {
     createdAt: number;
     firstName: string;
     status: 'upcoming' | 'active' | 'completed' | 'cancelled';
-    notes?: string;
+    propName?: string;
     phoneNumber?: string;
     email?: string;
     totalAmount?: number;
