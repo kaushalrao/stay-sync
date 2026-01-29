@@ -40,7 +40,7 @@ export const AuthForm: React.FC<{ onAuthSuccess: (user: User) => void }> = ({ on
                     <div className="inline-flex items-center justify-center p-4 bg-white/5 rounded-3xl mb-4 border border-white/10">
                         <UserIcon size={32} className="text-orange-400" />
                     </div>
-                    <h1 className="text-3xl font-extrabold mb-2">HostPilot</h1>
+                    <h2 className="mt-6 text-3xl font-bold tracking-tight text-white mb-2">Welcome to StaySync</h2>
                     <p className="text-slate-400">Sign in to manage your properties</p>
                 </div>
 

@@ -1,6 +1,6 @@
-# Guest Greeter
+# StaySync
 
-Guest Greeter is a modern, responsive web application designed for Airbnb hosts and property managers. It streamlines the process of generating personalized welcome messages for guests, managing property details, and maintaining reusable message templates.
+StaySync is a modern, responsive web application designed for hosts and property managers to seamlessly manage offline, Airbnb, and other platform bookings. It streamlines the process of generating personalized welcome messages for guests, managing property details, and maintaining reusable message templates.
 
 ## 🚀 Features
 
