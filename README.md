@@ -1,5 +1,8 @@
 # StaySync
-
+<div align="center">
+  <img width="1554" height="661" alt="Screenshot 2026-01-31 at 12 40 44 PM" src="https://github.com/user-attachments/assets/679986e9-4b45-4cfe-b81f-becd0bc3a03a" />
+</div>
+</br>
 StaySync is a modern, responsive web application designed for hosts and property managers to seamlessly manage offline, Airbnb, and other platform bookings. It streamlines the process of generating personalized welcome messages for guests, managing property details, and maintaining reusable message templates.
 
 ## 🚀 Features
@@ -20,12 +23,6 @@ StaySync is a modern, responsive web application designed for hosts and property
 *   **Styling**: [Tailwind CSS](https://tailwindcss.com/)
 *   **Icons**: [Lucide React](https://lucide.dev/)
 *   **Backend / Auth**: [Firebase](https://firebase.google.com/) (Firestore & Authentication)
-
-<div align="center">
-  <img src="public/screenshots/greeter-view.png" alt="Greeter View" width="45%">
-  <img src="public/screenshots/settings-view.png" alt="Settings View" width="45%">
-</div>
-
 
 ## 📂 Project Structure
 
