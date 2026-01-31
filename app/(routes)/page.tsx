@@ -5,7 +5,7 @@ import { Loader2, Sparkles, Hand, Settings, Wrench, Users } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { TypewriterEffect } from '@components/ui/TypewriterEffect';
 import { useApp } from '@components/providers/AppProvider';
-import { FeatureCard } from '@components/FeatureCard';
+import { FeatureCard } from '@components/ui/FeatureCard';
 
 export default function HomePage() {
   const { user, loading } = useApp();

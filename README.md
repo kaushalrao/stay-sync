@@ -38,10 +38,12 @@ app/
 │   ├── settings/           # Property & Template management
 │   └── page.tsx            # Landing page
 ├── components/
+│   ├── layout/             # Layout components (Header, etc.)
+│   ├── auth/               # Authentication components
+│   ├── greeter/            # Greeter feature components
 │   ├── ui/                 # Reusable atomic components
-│   ├── providers/          # Global Context Providers
-│   ├── guests/             # Guest-related components
-│   └── ...
+│   ├── guests/             # Guest directory components
+│   └── providers/          # Global Context Providers
 ├── services/               # Data access layer (Repository Pattern)
 │   ├── index.ts            # Service entry point
 │   └── FirebaseService.ts  # Firestore implementation

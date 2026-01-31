@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, User } from "firebase/auth";
 import { User as UserIcon, UserCircle, CheckCircle2, XCircle } from 'lucide-react';
-import { app, auth } from '../lib/firebase';
-import { Input } from './ui/Input';
-import { Button } from './ui/Button';
+import { app, auth } from '@lib/firebase';
+import { Input } from '../ui/Input';
+import { Button } from '../ui/Button';
 
 export const AuthForm: React.FC<{ onAuthSuccess: (user: User) => void }> = ({ onAuthSuccess }) => {
     const [isLogin, setIsLogin] = useState(true);

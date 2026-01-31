@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ChevronLeft, Settings, MessageCircle, LogOut, Wrench, Home } from 'lucide-react';
 import { signOut } from "firebase/auth";
-import { auth } from '../lib/firebase';
+import { auth } from '@lib/firebase';
 
 import { Capacitor } from '@capacitor/core';
 

@@ -8,12 +8,12 @@ import { DEFAULT_PROPERTY_TIMES, DEFAULT_PROPERTY_VALUES } from '@lib/constants'
 import { app, db, appId } from '@lib/firebase';
 import { AVAILABLE_ICONS } from '@lib/constants';
 import { getIconForTemplate } from '@lib/utils';
-import { TabControl } from '@components/TabControl';
+import { TabControl } from '@components/ui/TabControl';
 import { Button } from '@components/ui/Button';
 import { Input } from '@components/ui/Input';
 import { VariableEditor } from '@components/ui/VariableEditor';
 import { VariableEditorRef } from '@lib/types';
-import { VariableList } from '@components/VariableList';
+import { VariableList } from '@components/greeter/VariableList';
 import { useApp } from '@components/providers/AppProvider';
 import { useRouter } from 'next/navigation';
 

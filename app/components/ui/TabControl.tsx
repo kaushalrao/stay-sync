@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { TabControlProps } from '../lib/types';
+import { TabControlProps } from '@lib/types';
 
 export const TabControl: React.FC<TabControlProps> = ({ options, activeId, onChange, className = '' }) => (
     <div className={`bg-slate-900/90 p-1 rounded-2xl inline-flex border border-white/10 relative shadow-2xl ${className}`}>

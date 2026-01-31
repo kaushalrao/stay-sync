@@ -3,7 +3,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useApp } from '@components/providers/AppProvider';
-import { AuthForm } from '@components/AuthForm';
+import { AuthForm } from '@components/auth/AuthForm';
 import { Loader2 } from 'lucide-react';
 
 export default function AuthPage() {

@@ -17,7 +17,7 @@ export const viewport = {
 };
 
 import { AppProvider } from "./components/providers/AppProvider";
-import { Header } from "./components/Header";
+import { Header } from "./components/layout/Header";
 
 export default function RootLayout({
   children,

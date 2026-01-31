@@ -5,11 +5,11 @@ import { Check, Copy, MessageCircle, PenTool, Eye, X, Loader2 } from 'lucide-rea
 import { GuestDetails, Guest, CalendarEvent, IcalFeed } from '@lib/types';
 import { DEFAULT_GUEST_DETAILS } from '@lib/constants';
 import { calculateNights, formatDate, formatCurrency, processTemplate, openWhatsApp } from '@lib/utils';
-import { PropertyDock } from '@components/PropertyDock';
+import { PropertyDock } from '@components/greeter/PropertyDock';
 import { Portal } from '@components/ui/Portal';
 import { GuestForm } from '@components/guests/GuestForm';
-import { TemplateSelector } from '@components/TemplateSelector';
-import { PreviewPhone } from '@components/PreviewPhone';
+import { TemplateSelector } from '@components/greeter/TemplateSelector';
+import { PreviewPhone } from '@components/greeter/PreviewPhone';
 import { GuestDirectory } from '@components/guests/GuestDirectory';
 import { useApp } from '@components/providers/AppProvider';
 import { useRouter, useSearchParams } from 'next/navigation';

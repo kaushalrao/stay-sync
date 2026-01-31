@@ -1,8 +1,8 @@
 import React from 'react';
 import { MessageCircle } from 'lucide-react';
-import { Template } from '../lib/types';
-import { AVAILABLE_ICONS } from '../lib/constants';
-import { SectionHeader } from './ui/SectionHeader';
+import { Template } from '@lib/types';
+import { AVAILABLE_ICONS } from '@lib/constants';
+import { SectionHeader } from '../ui/SectionHeader';
 
 export const TemplateSelector: React.FC<{
     templates: Template[];

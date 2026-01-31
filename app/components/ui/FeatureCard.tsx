@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
-import { FeatureCardProps } from '../lib/types';
-import { FEATURE_CARD_STYLES } from '../lib/constants';
+import { FeatureCardProps } from '@lib/types';
+import { FEATURE_CARD_STYLES } from '@lib/constants';
 
 export const FeatureCard: React.FC<FeatureCardProps> = ({
     href,
