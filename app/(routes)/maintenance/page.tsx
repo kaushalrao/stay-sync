@@ -1,14 +1,14 @@
 "use client";
 
 import React, { useState } from 'react';
-import { useApp } from '../components/providers/AppProvider';
+import { useApp } from '@components/providers/AppProvider';
 import { useRouter } from 'next/navigation';
 import { Wrench, Plus, CheckCircle2, Circle, AlertTriangle, Trash2, Filter, Home, ChevronDown } from 'lucide-react';
-import { Button } from '../components/ui/Button';
-import { Input } from '../components/ui/Input';
+import { Button } from '@components/ui/Button';
+import { Input } from '@components/ui/Input';
 import { addDoc, collection, deleteDoc, doc, updateDoc } from 'firebase/firestore';
-import { db, appId } from '../lib/firebase';
-import { MaintenanceIssue } from '../lib/types';
+import { db, appId } from '@lib/firebase';
+import { MaintenanceIssue } from '@lib/types';
 
 export default function MaintenancePage() {
     const { user, issues, properties, showToast } = useApp();

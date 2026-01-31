@@ -2,11 +2,10 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, onAuthStateChanged } from 'firebase/auth';
-
-import { auth } from '../../lib/firebase';
-import { dataService } from '../../services';
-import { Property, Template, ToastState, MaintenanceIssue } from '../../lib/types';
-import { Toast } from '../ui/Toast';
+import { auth } from '@lib/firebase';
+import { dataService } from '@services/index';
+import { Property, Template, ToastState, MaintenanceIssue } from '@lib/types';
+import { Toast } from '@components/ui/Toast';
 
 interface AppContextType {
     user: User | null;

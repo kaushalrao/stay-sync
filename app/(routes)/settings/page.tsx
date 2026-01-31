@@ -3,18 +3,18 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Home, Edit3, Trash2, Plus, LogOut, Users, CreditCard, Clock, Wifi, MessageCircle, Sparkles, X, Copy, Check, Calendar as CalendarIcon } from 'lucide-react';
 import { collection, addDoc, updateDoc, deleteDoc, doc } from "firebase/firestore";
-import { Property, Template } from '../lib/types';
-import { DEFAULT_PROPERTY_TIMES, DEFAULT_PROPERTY_VALUES } from '../lib/constants';
-import { app, db, appId } from '../lib/firebase';
-import { AVAILABLE_ICONS } from '../lib/constants';
-import { getIconForTemplate } from '../lib/utils';
-import { TabControl } from '../components/TabControl';
-import { Button } from '../components/ui/Button';
-import { Input } from '../components/ui/Input';
-import { VariableEditor } from '../components/ui/VariableEditor';
-import { VariableEditorRef } from '../lib/types';
-import { VariableList } from '../components/VariableList';
-import { useApp } from '../components/providers/AppProvider';
+import { Property, Template } from '@lib/types';
+import { DEFAULT_PROPERTY_TIMES, DEFAULT_PROPERTY_VALUES } from '@lib/constants';
+import { app, db, appId } from '@lib/firebase';
+import { AVAILABLE_ICONS } from '@lib/constants';
+import { getIconForTemplate } from '@lib/utils';
+import { TabControl } from '@components/TabControl';
+import { Button } from '@components/ui/Button';
+import { Input } from '@components/ui/Input';
+import { VariableEditor } from '@components/ui/VariableEditor';
+import { VariableEditorRef } from '@lib/types';
+import { VariableList } from '@components/VariableList';
+import { useApp } from '@components/providers/AppProvider';
 import { useRouter } from 'next/navigation';
 
 export default function SettingsPage() {

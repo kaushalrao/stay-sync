@@ -3,8 +3,8 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Users, ChevronLeft } from 'lucide-react';
-import { useApp } from '../components/providers/AppProvider';
-import { GuestDirectory } from '../components/guests/GuestDirectory';
+import { useApp } from '@components/providers/AppProvider';
+import { GuestDirectory } from '@components/guests/GuestDirectory';
 
 export default function GuestsPage() {
     const { user } = useApp();

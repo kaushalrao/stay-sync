@@ -30,20 +30,35 @@ The project follows the Next.js App Router architecture:
 
 ```
 app/
-├── auth/                   # Authentication page
-├── greeter/                # Main message generator tool
-├── maintenance/            # Maintenance tracker dashboard
-├── settings/               # Property & Template management
+├── (routes)/               # Route Group for all pages
+│   ├── auth/               # Authentication page
+│   ├── greeter/            # Main message generator tool
+│   ├── maintenance/        # Maintenance tracker dashboard
+│   ├── guests/             # Guest Directory
+│   ├── settings/           # Property & Template management
+│   └── page.tsx            # Landing page
 ├── components/
-│   ├── ui/                 # Reusable atomic components (Button, Input, Card, etc.)
-│   ├── providers/          # Global Context Providers (Auth, Data)
-│   ├── AuthForm.tsx        # Authentication form component
-│   ├── GuestForm.tsx       # Guest details input form
-│   ├── PreviewPhone.tsx    # Mobile message preview component
+│   ├── ui/                 # Reusable atomic components
+│   ├── providers/          # Global Context Providers
+│   ├── guests/             # Guest-related components
 │   └── ...
-├── lib/                    # Utilities, types, and Firebase config
-└── page.tsx                # Landing page
+├── services/               # Data access layer (Repository Pattern)
+│   ├── index.ts            # Service entry point
+│   └── FirebaseService.ts  # Firestore implementation
+├── lib/                    # Utilities, types, and constants
+│   ├── urls.ts             # Centralized URL constants
+│   └── ...
+└── hooks/                  # Custom React hooks
 ```
+
+### Import Aliases
+
+The project uses clean import aliases:
+*   `@components/*` → `app/components/*`
+*   `@lib/*` → `app/lib/*`
+*   `@services/*` → `app/services/*`
+*   `@hooks/*` → `app/hooks/*`
+
 
 ## 🏁 Getting Started
 

@@ -3,9 +3,9 @@
 import React from 'react';
 import { Loader2, Sparkles, Hand, Settings, Wrench, Users } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { TypewriterEffect } from './components/ui/TypewriterEffect';
-import { useApp } from './components/providers/AppProvider';
-import { FeatureCard } from './components/FeatureCard';
+import { TypewriterEffect } from '@components/ui/TypewriterEffect';
+import { useApp } from '@components/providers/AppProvider';
+import { FeatureCard } from '@components/FeatureCard';
 
 export default function HomePage() {
   const { user, loading } = useApp();

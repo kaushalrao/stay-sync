@@ -2,18 +2,18 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { Check, Copy, MessageCircle, PenTool, Eye, X, Loader2 } from 'lucide-react';
-import { GuestDetails, Guest, CalendarEvent } from '../lib/types';
-import { DEFAULT_GUEST_DETAILS } from '../lib/constants';
-import { calculateNights, formatDate, formatCurrency, processTemplate, openWhatsApp } from '../lib/utils';
-import { PropertyDock } from '../components/PropertyDock';
-import { Portal } from '../components/ui/Portal';
-import { GuestForm } from '../components/guests/GuestForm';
-import { TemplateSelector } from '../components/TemplateSelector';
-import { PreviewPhone } from '../components/PreviewPhone';
-import { GuestDirectory } from '../components/guests/GuestDirectory';
-import { useApp } from '../components/providers/AppProvider';
+import { GuestDetails, Guest, CalendarEvent, IcalFeed } from '@lib/types';
+import { DEFAULT_GUEST_DETAILS } from '@lib/constants';
+import { calculateNights, formatDate, formatCurrency, processTemplate, openWhatsApp } from '@lib/utils';
+import { PropertyDock } from '@components/PropertyDock';
+import { Portal } from '@components/ui/Portal';
+import { GuestForm } from '@components/guests/GuestForm';
+import { TemplateSelector } from '@components/TemplateSelector';
+import { PreviewPhone } from '@components/PreviewPhone';
+import { GuestDirectory } from '@components/guests/GuestDirectory';
+import { useApp } from '@components/providers/AppProvider';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { dataService, calendarService } from '../services';
+import { dataService, calendarService } from '@services/index';
 
 import { Suspense } from 'react';
 
@@ -160,7 +160,7 @@ function GreeterContent() {
             const feeds = selectedProperty.icalFeeds || [];
 
             // Fetch all feeds in parallel
-            const feedPromises = feeds.map(async (feed) => {
+            const feedPromises = feeds.map(async (feed: IcalFeed) => {
                 const events = await calendarService.fetchExternal(feed.url);
                 return events.map(e => ({
                     ...e,
@@ -171,7 +171,7 @@ function GreeterContent() {
 
             try {
                 const externalResults = await Promise.all(feedPromises);
-                externalResults.forEach(events => {
+                externalResults.forEach((events: CalendarEvent[]) => {
                     allEvents = [...allEvents, ...events];
                 });
             } catch (err) {
