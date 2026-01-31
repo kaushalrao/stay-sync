@@ -6,10 +6,16 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:mobile": "mv app/api app/_api && IS_MOBILE_BUILD=true next build; status=$?; mv app/_api app/api; exit $status",
+    "sync": "npm run build:mobile && npx cap sync",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
+    "@capacitor/android": "^8.0.2",
+    "@capacitor/cli": "^8.0.2",
+    "@capacitor/core": "^8.0.2",
+    "@capacitor/status-bar": "^8.0.0",
     "date-fns": "^4.1.0",
     "firebase": "^10.7.1",
     "lucide-react": "^0.303.0",

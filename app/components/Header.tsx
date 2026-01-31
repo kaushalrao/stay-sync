@@ -7,6 +7,8 @@ import { ChevronLeft, Settings, MessageCircle, LogOut, Wrench, Home } from 'luci
 import { signOut } from "firebase/auth";
 import { auth } from '../lib/firebase';
 
+import { Capacitor } from '@capacitor/core';
+
 export const Header: React.FC = () => {
     const pathname = usePathname();
     const isHome = pathname === '/';
@@ -14,11 +16,19 @@ export const Header: React.FC = () => {
     const isGreeter = pathname === '/greeter';
     const isMaintenance = pathname === '/maintenance';
     const isAuth = pathname === '/auth';
+    const [isAndroid, setIsAndroid] = React.useState(false);
+
+    React.useEffect(() => {
+        setIsAndroid(Capacitor.isNativePlatform());
+    }, []);
 
     if (isAuth) return null;
 
     return (
-        <div className={`sticky top-0 z-50 flex flex-col transition-all duration-300 border-b ${isHome ? 'bg-transparent border-transparent' : 'bg-[#0f172a]/95 backdrop-blur-xl border-white/5'}`}>
+        <div
+            className={`sticky top-0 z-50 flex flex-col transition-all duration-300 border-b ${isHome ? 'bg-transparent border-transparent' : 'bg-[#0f172a]/95 backdrop-blur-xl border-white/5'}`}
+            style={{ paddingTop: isAndroid ? '1rem' : 'env(safe-area-inset-top)' }}
+        >
             <div className="px-4 lg:px-8 py-4 flex items-center justify-between">
                 <div className="flex items-center gap-4 max-w-7xl mx-auto w-full">
                     <div className="flex items-center gap-3 w-full">

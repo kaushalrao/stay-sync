@@ -10,6 +10,12 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
+
 import { AppProvider } from "./components/providers/AppProvider";
 import { Header } from "./components/Header";
 
