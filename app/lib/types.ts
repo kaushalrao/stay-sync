@@ -7,7 +7,7 @@ export interface FeatureCardProps {
     description: string;
     label: string;
     icon: LucideIcon;
-    color: 'indigo' | 'rose' | 'orange' | 'cyan';
+    color: 'indigo' | 'rose' | 'orange' | 'cyan' | 'purple';
     iconRotation?: string;
     iconHoverRotation?: string;
 }
@@ -137,4 +137,60 @@ export interface GuestFormProps {
     onSaveGuest?: () => void;
     onOpenDirectory?: () => void;
     icalFeeds?: IcalFeed[];
+}
+
+// Analytics Interfaces
+export interface DashboardStats {
+    totalRevenue: number;
+    totalBookings: number;
+    occupancyRate: number;
+    avgNightlyRate: number;
+    activeStays: number;
+}
+
+export interface RevenueData {
+    month: string;
+    revenue: number;
+}
+
+export interface DashboardFiltersProps {
+    properties: Property[];
+    selectedProperty: string;
+    onPropertyChange: (id: string) => void;
+    selectedYear: number;
+    onYearChange: (year: number) => void;
+}
+
+export interface DashboardHeaderProps extends DashboardFiltersProps {
+    userName?: string;
+}
+
+export interface StatsGridProps {
+    stats: DashboardStats;
+    loading?: boolean;
+}
+
+export interface RevenueChartProps {
+    data: RevenueData[];
+    year: number;
+    loading?: boolean;
+}
+
+export interface RecentActivityProps {
+    upcomingGuests: Guest[];
+    loading?: boolean;
+}
+
+export interface StatCardProps {
+    label: string;
+    value: string | number;
+    icon: LucideIcon;
+    color: string;
+    bg: string;
+    border: string;
+}
+
+export interface ActivityItemProps {
+    guest: Guest;
+    onClick: () => void;
 }

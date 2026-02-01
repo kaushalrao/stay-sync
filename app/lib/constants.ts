@@ -41,6 +41,14 @@ export const FEATURE_CARD_STYLES = {
         labelText: 'text-cyan-100',
         descText: 'text-cyan-100/80',
         icon: 'text-cyan-500',
+    },
+    purple: {
+        bg: 'bg-purple-600',
+        shadow: 'hover:shadow-purple-500/30',
+        labelBg: 'bg-purple-950/30',
+        labelText: 'text-purple-100',
+        descText: 'text-purple-100/80',
+        icon: 'text-purple-400',
     }
 };
 

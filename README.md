@@ -8,6 +8,7 @@ StaySync is a modern, responsive web application designed for hosts and property
 ## 🚀 Features
 
 *   **Property Management**: Easily add, edit, and delete multiple properties. Store details like check-in/out times, WiFi credentials, and location links.
+*   **Business Analytics**: Visual dashboard tracking revenue, occupancy rates, and booking trends with property and year-based filtering.
 *   **Maintenance Tracker**: Track repairs and issues for each property with status (Pending/Fixed) and priority levels.
 *   **Dynamic Templates**: Create custom message templates using variables (e.g., `{{guestName}}`, `{{wifiPass}}`).
 *   **Real-time Preview**: See exactly how your message will look on a smartphone (WhatsApp style) before sending.
@@ -33,6 +34,7 @@ app/
 ├── (routes)/               # Route Group for all pages
 │   ├── auth/               # Authentication page
 │   ├── greeter/            # Main message generator tool
+│   ├── analytics/          # Business analytics dashboard
 │   ├── maintenance/        # Maintenance tracker dashboard
 │   ├── guests/             # Guest Directory
 │   ├── settings/           # Property & Template management
@@ -41,6 +43,7 @@ app/
 │   ├── layout/             # Layout components (Header, etc.)
 │   ├── auth/               # Authentication components
 │   ├── greeter/            # Greeter feature components
+│   ├── analytics/          # Analytics dashboard components
 │   ├── ui/                 # Reusable atomic components
 │   ├── guests/             # Guest directory components
 │   └── providers/          # Global Context Providers
@@ -108,7 +111,8 @@ The project uses clean import aliases:
 1.  **Sign Up/Login**: Create an account to start saving your data.
 2.  **Configure Properties**: Go to **Settings > Properties** to add your rental units.
 3.  **Create Templates**: Go to **Settings > Templates** to draft your messages. Use the "Insert Variable" feature to add dynamic placeholders.
-4.  **Generate Messages**:
+4.  **Track Performance**: Use the **Business Analytics** dashboard to monitor revenue, occupancy, and upcoming check-ins.
+5.  **Generate Messages**:
     *   Go to **Start Greeting**.
     *   Select a property and a template.
     *   Enter guest details (Name, Dates, etc.).

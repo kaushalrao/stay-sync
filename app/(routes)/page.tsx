@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { Loader2, Sparkles, Hand, Settings, Wrench, Users } from 'lucide-react';
+import { Loader2, Sparkles, Hand, Settings, Wrench, Users, BarChart3 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { TypewriterEffect } from '@components/ui/TypewriterEffect';
 import { useApp } from '@components/providers/AppProvider';
@@ -48,7 +48,7 @@ export default function HomePage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6 w-full max-w-6xl mx-auto relative z-10">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6 w-full max-w-6xl mx-auto relative z-10">
 
         <FeatureCard
           href="/greeter"
@@ -81,6 +81,17 @@ export default function HomePage() {
           icon={Users}
           iconRotation="-rotate-12"
           iconHoverRotation="group-hover:rotate-0"
+        />
+
+        <FeatureCard
+          href="/analytics"
+          color="purple"
+          label="Business"
+          title={<>Analytics<br />Dashboard</>}
+          description="Track revenue, occupancy, and growth."
+          icon={BarChart3}
+          iconRotation="rotate-6"
+          iconHoverRotation="group-hover:-rotate-6"
         />
 
         <FeatureCard
