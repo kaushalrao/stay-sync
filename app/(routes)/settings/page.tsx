@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Home, Edit3, Trash2, Plus, LogOut, Users, CreditCard, Clock, Wifi, MessageCircle, Sparkles, X, Copy, Check, Calendar as CalendarIcon } from 'lucide-react';
+import { Home, Edit3, Trash2, Plus, LogOut, Users, CreditCard, Clock, Wifi, MessageCircle, Sparkles, X, Copy, Check, Calendar as CalendarIcon, Link } from 'lucide-react';
 import { collection, addDoc, updateDoc, deleteDoc, doc } from "firebase/firestore";
 import { Property, Template } from '@lib/types';
 import { DEFAULT_PROPERTY_TIMES, DEFAULT_PROPERTY_VALUES } from '@lib/constants';
@@ -116,9 +116,16 @@ export default function SettingsPage() {
         const formData = new FormData(e.currentTarget);
 
         const label = formData.get('label') as string;
+        const content = editingTemp.content || '';
+
+        if (!label.trim() || !content.trim()) {
+            showToast("Template Name and Content are required", "error");
+            return;
+        }
+
         const newTemp = {
             label: label,
-            content: editingTemp.content || '',
+            content: content,
             icon: getIconForTemplate(label)
         };
 
@@ -218,31 +225,34 @@ export default function SettingsPage() {
                                     </div>
                                     <div className="space-y-4">
                                         <h4 className="text-xs font-bold text-green-400 uppercase tracking-widest mb-2 mt-4 flex items-center gap-2"><Users size={14} /> Host</h4>
-                                        <Input name="hostName" label="Host Name" defaultValue={editingProp.hostName} />
-                                        <Input name="contactPrimary" label="Host Phone" defaultValue={editingProp.contactPrimary} />
+                                        <Input name="hostName" label="Host Name" defaultValue={editingProp.hostName} required />
+                                        <Input name="contactPrimary" label="Host Phone" defaultValue={editingProp.contactPrimary} required />
                                         <Input name="coHostName" label="Co-Host Name" defaultValue={editingProp.coHostName} />
                                         <Input name="contactSecondary" label="Co-Host Phone" defaultValue={editingProp.contactSecondary} />
                                     </div>
                                     <div className="space-y-4">
                                         <h4 className="text-xs font-bold text-purple-400 uppercase tracking-widest mb-2 mt-4 flex items-center gap-2"><CreditCard size={14} /> Pricing</h4>
                                         <div className="grid grid-cols-2 gap-4">
-                                            <Input name="basePrice" type="number" label="Base Price" defaultValue={editingProp.basePrice} />
-                                            <Input name="baseGuests" type="number" label="Base Guests" defaultValue={editingProp.baseGuests} />
+                                            <Input name="basePrice" type="number" label="Base Price" defaultValue={editingProp.basePrice} required />
+                                            <Input name="baseGuests" type="number" label="Base Guests" defaultValue={editingProp.baseGuests} required />
                                         </div>
-                                        <Input name="extraGuestPrice" type="number" label="Extra Guest Price" defaultValue={editingProp.extraGuestPrice} />
+                                        <Input name="extraGuestPrice" type="number" label="Extra Guest Price" defaultValue={editingProp.extraGuestPrice} required />
                                     </div>
                                     <div className="md:col-span-2 h-px bg-white/5 my-4"></div>
                                     <div className="space-y-4">
                                         <h4 className="text-xs font-bold text-orange-400 uppercase tracking-widest mb-2 flex items-center gap-2"><Clock size={14} /> Timings</h4>
                                         <div className="grid grid-cols-2 gap-4">
-                                            <Input name="checkInTime" label="Check-in" defaultValue={editingProp.checkInTime || DEFAULT_PROPERTY_TIMES.checkIn} />
-                                            <Input name="checkOutTime" label="Check-out" defaultValue={editingProp.checkOutTime || DEFAULT_PROPERTY_TIMES.checkOut} />
+                                            <Input name="checkInTime" label="Check-in" defaultValue={editingProp.checkInTime || DEFAULT_PROPERTY_TIMES.checkIn} required />
+                                            <Input name="checkOutTime" label="Check-out" defaultValue={editingProp.checkOutTime || DEFAULT_PROPERTY_TIMES.checkOut} required />
                                         </div>
                                     </div>
                                     <div className="space-y-4">
                                         <h4 className="text-xs font-bold text-pink-400 uppercase tracking-widest mb-2 flex items-center gap-2"><Wifi size={14} /> Connectivity</h4>
                                         <Input name="wifiName" label="WiFi Name" defaultValue={editingProp.wifiName} />
                                         <Input name="wifiPass" label="WiFi Password" defaultValue={editingProp.wifiPass} />
+                                    </div>
+                                    <div className="md:col-span-2 space-y-4">
+                                        <h4 className="text-xs font-bold text-blue-400 uppercase tracking-widest mb-2 flex items-center gap-2"><Link size={14} /> Links</h4>
                                         <Input name="locationLink" label="Maps Link" defaultValue={editingProp.locationLink} placeholder="https://maps..." />
                                         <Input name="propertyLink" label="Website Link" defaultValue={editingProp.propertyLink} placeholder="https://website..." />
 
