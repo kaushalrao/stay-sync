@@ -45,6 +45,7 @@ export interface Property {
     basePrice: number;
     extraGuestPrice: number;
     baseGuests: number;
+    telegramChatId?: string;
 }
 
 export interface Template {

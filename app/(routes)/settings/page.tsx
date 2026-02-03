@@ -94,6 +94,7 @@ export default function SettingsPage() {
             extraGuestPrice: Number(formData.get('extraGuestPrice')) || DEFAULT_PROPERTY_VALUES.extraGuestPrice,
             baseGuests: Number(formData.get('baseGuests')) || DEFAULT_PROPERTY_VALUES.baseGuests,
             icalFeeds: editingProp.icalFeeds || [],
+            telegramChatId: formData.get('telegramChatId') as string,
         };
 
         const success = await saveToFirestore('properties', newProp, editingProp.id);
@@ -229,6 +230,10 @@ export default function SettingsPage() {
                                         <Input name="contactPrimary" label="Host Phone" defaultValue={editingProp.contactPrimary} required />
                                         <Input name="coHostName" label="Co-Host Name" defaultValue={editingProp.coHostName} />
                                         <Input name="contactSecondary" label="Co-Host Phone" defaultValue={editingProp.contactSecondary} />
+                                        <div className="pt-2">
+                                            <Input name="telegramChatId" label="Telegram Chat ID" defaultValue={editingProp.telegramChatId} placeholder="-100..." />
+                                            <p className="text-[10px] text-slate-500 mt-1 ml-1">Send <code>/setup</code> to your bot in a group to get this ID.</p>
+                                        </div>
                                     </div>
                                     <div className="space-y-4">
                                         <h4 className="text-xs font-bold text-purple-400 uppercase tracking-widest mb-2 mt-4 flex items-center gap-2"><CreditCard size={14} /> Pricing</h4>
