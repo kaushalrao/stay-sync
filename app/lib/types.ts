@@ -40,6 +40,8 @@ export interface Property {
     wifiPass: string;
     locationLink: string;
     propertyLink: string;
+    hostEmail?: string;
+    coHostEmail?: string;
     icalFeeds: IcalFeed[];
     airbnbIcalUrl?: string; // Deprecated, kept for migration
     basePrice: number;

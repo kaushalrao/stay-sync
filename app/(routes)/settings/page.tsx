@@ -80,7 +80,9 @@ export default function SettingsPage() {
         const newProp = {
             name: formData.get('name') as string,
             hostName: formData.get('hostName') as string,
+            hostEmail: formData.get('hostEmail') as string,
             coHostName: formData.get('coHostName') as string,
+            coHostEmail: formData.get('coHostEmail') as string,
             contactPrimary: formData.get('contactPrimary') as string,
             contactSecondary: formData.get('contactSecondary') as string,
             checkInTime: formData.get('checkInTime') as string,
@@ -226,9 +228,16 @@ export default function SettingsPage() {
                                     </div>
                                     <div className="space-y-4">
                                         <h4 className="text-xs font-bold text-green-400 uppercase tracking-widest mb-2 mt-4 flex items-center gap-2"><Users size={14} /> Host</h4>
-                                        <Input name="hostName" label="Host Name" defaultValue={editingProp.hostName} required />
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <Input name="hostName" label="Host Name" defaultValue={editingProp.hostName} required />
+                                            <Input name="hostEmail" label="Host Email" defaultValue={editingProp.hostEmail} placeholder="host@example.com" />
+                                        </div>
                                         <Input name="contactPrimary" label="Host Phone" defaultValue={editingProp.contactPrimary} required />
-                                        <Input name="coHostName" label="Co-Host Name" defaultValue={editingProp.coHostName} />
+
+                                        <div className="grid grid-cols-2 gap-4 pt-2">
+                                            <Input name="coHostName" label="Co-Host Name" defaultValue={editingProp.coHostName} />
+                                            <Input name="coHostEmail" label="Co-Host Email" defaultValue={editingProp.coHostEmail} placeholder="cohost@example.com" />
+                                        </div>
                                         <Input name="contactSecondary" label="Co-Host Phone" defaultValue={editingProp.contactSecondary} />
                                         <div className="pt-2">
                                             <Input name="telegramChatId" label="Telegram Chat ID" defaultValue={editingProp.telegramChatId} placeholder="-100..." />
