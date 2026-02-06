@@ -21,6 +21,17 @@ async function getUserEmail(appId: string, userId: string): Promise<string | und
     return undefined;
 }
 
+function getPropertyRecipients(property: Property, ownerEmail?: string): string[] {
+    const recipients = new Set<string>();
+    if (property.hostEmail?.trim()) recipients.add(property.hostEmail.trim());
+    if (property.coHostEmail?.trim()) recipients.add(property.coHostEmail.trim());
+
+    if (recipients.size === 0 && ownerEmail) {
+        recipients.add(ownerEmail);
+    }
+    return Array.from(recipients);
+}
+
 
 interface EmailResult {
     guest: string;
@@ -76,52 +87,34 @@ export async function GET(req: NextRequest) {
                 if (ownerEmail) userEmailCache[userId] = ownerEmail;
             }
 
-            // 2. Query Guests checking in tomorrow
-            // We use simple query on checkInDate.
+            // 2. Query Guests: (A) Checking in Tomorrow, (B) Checking out Today
             try {
-                const q = query(
-                    collection(db, `artifacts/${appId}/users/${userId}/guests`),
-                    where('checkInDate', '==', dateStr)
-                );
+                const guestsRef = collection(db, `artifacts/${appId}/users/${userId}/guests`);
 
-                const querySnap = await getDocs(q);
+                // (A) Check-ins Tomorrow
+                const qCheckIn = query(guestsRef, where('checkInDate', '==', dateStr));
+                const checkInSnap = await getDocs(qCheckIn);
 
+                // (B) Check-outs Today
+                const todayStr = format(new Date(), 'yyyy-MM-dd');
+                const qCheckOut = query(guestsRef, where('checkOutDate', '==', todayStr));
+                const checkOutSnap = await getDocs(qCheckOut);
+
+                const appUrl = process.env.APP_URL || 'https://staysync.app';
+
+                // Process Check-ins
                 emailPromises.push((async () => {
-                    for (const doc of querySnap.docs) {
+                    for (const doc of checkInSnap.docs) {
                         const guest = doc.data() as Guest;
-
                         if (guest.status !== 'upcoming') continue;
 
-                        // Find property details
                         const property = properties.find(p => p.name === guest.propName);
                         if (!property) continue;
 
-                        // Determine Recipients
-                        // Priority: Host Email, Co-Host Email. 
-                        // If NEITHER are set, use Owner Email.
-                        const recipients = new Set<string>();
+                        const recipients = getPropertyRecipients(property, ownerEmail);
+                        const dashboardLink = `${appUrl}/greeter?guestId=${doc.id}`;
 
-                        if (property.hostEmail?.trim()) recipients.add(property.hostEmail.trim());
-                        if (property.coHostEmail?.trim()) recipients.add(property.coHostEmail.trim());
-
-                        // Fallback to owner if no specific emails, or if owner wants copy?
-                        // "Add input to collect host..." implies overriding or delegating.
-                        // Logic: If list is empty, add owner.
-                        if (recipients.size === 0 && ownerEmail) {
-                            recipients.add(ownerEmail);
-                        }
-
-                        if (recipients.size === 0) {
-                            console.log(`No valid email recipients for guest ${guest.guestName} at ${property.name}`);
-                            continue;
-                        }
-
-                        // Send Emails
-                        const dashboardLink = `https://staysync.app/greeter?guestId=${doc.id}`;
-
-                        for (const recipient of Array.from(recipients)) {
-                            console.log(`Sending email to ${recipient} for guest ${guest.guestName}`);
-
+                        for (const recipient of recipients) {
                             try {
                                 await emailService.sendGuestArrivalNotification(
                                     recipient,
@@ -134,7 +127,43 @@ export async function GET(req: NextRequest) {
                                 );
                                 results.push({ guest: guest.guestName, recipient, status: 'sent', property: property.name });
                             } catch (err) {
-                                console.error(`Email send failed to ${recipient}`, err);
+                                console.error(`Check-in Email failed: ${err}`);
+                                results.push({ guest: guest.guestName, recipient, status: 'failed', error: String(err) });
+                            }
+                        }
+                    }
+                })());
+
+                // Process Check-outs
+                emailPromises.push((async () => {
+                    for (const doc of checkOutSnap.docs) {
+                        const guest = doc.data() as Guest;
+                        // Status might be 'active' or even 'upcoming' if not manually moved? 
+                        // But strictly checkOutDate == Today implies they are leaving.
+                        // We filter out 'cancelled'.
+                        if (guest.status === 'cancelled') continue;
+
+                        const property = properties.find(p => p.name === guest.propName);
+                        if (!property) continue;
+
+                        const recipients = getPropertyRecipients(property, ownerEmail);
+                        const dashboardLink = `${appUrl}/greeter?guestId=${doc.id}`;
+
+                        for (const recipient of recipients) {
+                            try {
+                                await emailService.sendGuestCheckoutNotification(
+                                    recipient,
+                                    guest.guestName,
+                                    property.name,
+                                    guest.checkInDate,
+                                    guest.checkOutDate,
+                                    guest.totalAmount || 0,
+                                    guest.advancePaid || 0,
+                                    dashboardLink
+                                );
+                                results.push({ guest: guest.guestName, recipient, status: 'sent', property: property.name, type: 'checkout' } as any);
+                            } catch (err) {
+                                console.error(`Checkout Email failed: ${err}`);
                                 results.push({ guest: guest.guestName, recipient, status: 'failed', error: String(err) });
                             }
                         }
