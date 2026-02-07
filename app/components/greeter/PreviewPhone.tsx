@@ -28,7 +28,7 @@ export const PreviewPhone: React.FC<{
             <div className="bg-[#202c33] p-3 rounded-tr-xl rounded-bl-xl rounded-br-xl text-slate-100 text-xs leading-relaxed shadow-sm max-w-[95%] relative border border-white/5 animate-fade-in">
                 <div className="whitespace-pre-wrap break-words">{message}</div>
                 <div className="text-[9px] text-slate-500 text-right mt-1.5 flex items-center justify-end gap-1">
-                    {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} <Check size={12} className="text-blue-400" />
+                    12:00 PM <Check size={12} className="text-blue-400" />
                 </div>
             </div>
         </div>

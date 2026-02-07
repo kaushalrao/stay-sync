@@ -5,12 +5,13 @@ import { useRouter } from 'next/navigation';
 import { useApp } from '@components/providers/AppProvider';
 import { dataService } from '@/app/services';
 import { Guest } from '@/app/lib/types';
-import { Loader2, ChevronLeft } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import { DashboardHeader } from '@components/analytics/DashboardHeader';
 import { StatsGrid } from '@components/analytics/StatsGrid';
 import { RevenueChart } from '@components/analytics/RevenueChart';
 import { RecentActivity } from '@components/analytics/RecentActivity';
 import { calculateDashboardMetrics } from '@/app/lib/analytics';
+import { Loader } from '@components/ui/Loader';
 
 
 export default function AnalyticsPage() {
@@ -51,11 +52,7 @@ export default function AnalyticsPage() {
 
 
     if (appLoading || !user) {
-        return (
-            <div className="min-h-screen flex items-center justify-center text-white">
-                <Loader2 size={48} className="animate-spin text-orange-500" />
-            </div>
-        );
+        return <Loader className="min-h-screen flex items-center justify-center text-white" iconClassName="text-orange-500" size={48} />;
     }
 
     return (

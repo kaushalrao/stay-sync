@@ -1,12 +1,13 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { Check, Copy, MessageCircle, PenTool, Eye, X, Loader2 } from 'lucide-react';
+import { Check, Copy, MessageCircle, PenTool, Eye, X } from 'lucide-react';
 import { GuestDetails, Guest, CalendarEvent, IcalFeed } from '@lib/types';
 import { DEFAULT_GUEST_DETAILS } from '@lib/constants';
 import { calculateNights, formatDate, formatCurrency, processTemplate, openWhatsApp } from '@lib/utils';
 import { PropertyDock } from '@components/greeter/PropertyDock';
 import { Portal } from '@components/ui/Portal';
+import { Loader } from '@components/ui/Loader';
 import { GuestForm } from '@components/guests/GuestForm';
 import { TemplateSelector } from '@components/greeter/TemplateSelector';
 import { PreviewPhone } from '@components/greeter/PreviewPhone';
@@ -18,7 +19,7 @@ import { dataService, calendarService } from '@services/index';
 import { Suspense } from 'react';
 
 function GreeterContent() {
-    const { properties, templates, showToast, user } = useApp();
+    const { properties, templates, showToast, user, loading } = useApp();
     const router = useRouter();
     const searchParams = useSearchParams();
     const guestIdParam = searchParams.get('guestId');
@@ -61,10 +62,10 @@ function GreeterContent() {
 
     // Redirect if not logged in
     useEffect(() => {
-        if (!user) {
+        if (!loading && !user) {
             router.push('/');
         }
-    }, [user, router]);
+    }, [user, loading, router]);
 
     // Fetch Guest from URL if present
     useEffect(() => {
@@ -76,9 +77,6 @@ function GreeterContent() {
 
                 if (guest) {
                     handleSelectGuest(guest);
-                    // Clear param so a refresh doesn't re-fetch if we navigate away inside app?
-                    // Or keep it. Let's keep it simple for now.
-                    // Actually, let's replace URL to be clean if desired, but user might want to refresh.
                 } else {
                     showToast("Guest not found", "error");
                 }
@@ -87,7 +85,7 @@ function GreeterContent() {
             }
         };
 
-        if (user && guestIdParam && !currentGuestId) {
+        if (user && guestIdParam && currentGuestId !== guestIdParam) {
             loadGuestFromUrl();
         }
     }, [user, guestIdParam, currentGuestId, handleSelectGuest, showToast]);
@@ -108,8 +106,11 @@ function GreeterContent() {
 
     // Reset dates & guest ID when property changes
     useEffect(() => {
+        // If there is a guestId in URL, NEVER reset based on property change. URL is source of truth.
+        if (guestIdParam) return;
+
         // Only reset if we are NOT currently loading a guest from URL or explicitly selecting one
-        if (!guestIdParam && !isGuestLoadingRef.current) {
+        if (!isGuestLoadingRef.current) {
             setGuestDetails(prev => ({
                 ...prev,
                 checkInDate: '',
@@ -118,7 +119,8 @@ function GreeterContent() {
             }));
             setCurrentGuestId(null);
         }
-        // Reset the ref after the effect logic runs (if it skipped, it means we consumed the flag)
+
+        // Reset the ref after the effect logic runs
         if (isGuestLoadingRef.current) {
             isGuestLoadingRef.current = false;
         }
@@ -287,6 +289,10 @@ function GreeterContent() {
         }
     };
 
+    if (loading) {
+        return <Loader className="flex h-screen items-center justify-center" />;
+    }
+
     return (
         <div className="pb-24 md:pb-0 flex flex-col gap-6 md:gap-10 h-full relative">
             <div className="hidden lg:block mt-8 animate-fade-in">
@@ -397,7 +403,7 @@ function GreeterContent() {
 
 export default function GreeterPage() {
     return (
-        <Suspense fallback={<div className="flex items-center justify-center p-10"><Loader2 className="animate-spin text-orange-400" /></div>}>
+        <Suspense fallback={<Loader className="flex items-center justify-center p-10" iconClassName="text-orange-400" />}>
             <GreeterContent />
         </Suspense>
     );

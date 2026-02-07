@@ -1,11 +1,12 @@
 "use client";
 
 import React from 'react';
-import { Loader2, Sparkles, Hand, Settings, Wrench, Users, BarChart3 } from 'lucide-react';
+import { Sparkles, Hand, Settings, Wrench, Users, BarChart3 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { TypewriterEffect } from '@components/ui/TypewriterEffect';
 import { useApp } from '@components/providers/AppProvider';
 import { FeatureCard } from '@components/ui/FeatureCard';
+import { Loader } from '@components/ui/Loader';
 
 export default function HomePage() {
   const { user, loading } = useApp();
@@ -18,11 +19,7 @@ export default function HomePage() {
   }, [user, loading, router]);
 
   if (loading || !user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-white">
-        <Loader2 size={48} className="animate-spin text-orange-500" />
-      </div>
-    )
+    return <Loader className="min-h-screen flex items-center justify-center text-white" iconClassName="text-orange-500" size={48} />;
   }
 
   return (
