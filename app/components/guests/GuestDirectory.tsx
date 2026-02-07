@@ -3,13 +3,14 @@ import { Users } from 'lucide-react';
 import { Guest, GuestDirectoryProps } from '../../lib/types';
 import { format, addMonths, subMonths } from 'date-fns';
 import { app, appId } from '../../lib/firebase';
+import { triggerBookingNotification } from '../../lib/emailUtils';
 import { dataService } from '../../services';
 import { useApp } from '../providers/AppProvider';
 import { GuestCard } from './GuestCard';
 import { GuestFilters } from './GuestFilters';
 
 export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode = 'page', className = '' }) => {
-    const { user, showToast } = useApp();
+    const { user, showToast, properties } = useApp();
     const [guests, setGuests] = useState<Guest[]>([]);
     const [search, setSearch] = useState('');
     const [statusFilter, setStatusFilter] = useState<'upcoming' | 'past' | 'all'>('all');
@@ -35,6 +36,24 @@ export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode =
         if (!confirm('Are you sure you want to delete this guest?')) return;
 
         if (!user) return;
+
+        // Find guest and property details for email notification
+        const guest = guests.find(g => g.id === id);
+        if (guest) {
+            const property = properties.find(p => p.name === guest.propName);
+
+            // Fire and forget email notification if property exists
+            if (property) {
+                triggerBookingNotification({
+                    guest: { ...guest, checkInDate: guest.checkInDate, checkOutDate: guest.checkOutDate }, // Ensure dates are strings as expected
+                    property,
+                    type: 'cancelled',
+                    totalAmount: guest.totalAmount,
+                    dashboardLink: `${window.location.origin}/greeter`
+                });
+            }
+        }
+
         try {
             await dataService.guests.delete(user.uid, id);
             showToast('Guest deleted', 'success');

@@ -3,6 +3,7 @@ import { render } from '@react-email/render';
 import * as React from 'react';
 import { GuestArrivalEmail } from '../emails/GuestArrivalEmail';
 import { GuestCheckoutEmail } from '../emails/GuestCheckoutEmail';
+import { BookingNotificationEmail } from '../emails/BookingNotificationEmail';
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -94,6 +95,41 @@ export const emailService = {
                     checkOutDate={checkOutDate}
                     totalAmount={totalAmount}
                     advancePaid={advancePaid}
+                    dashboardLink={dashboardLink}
+                />
+            ),
+        });
+    },
+
+    sendBookingNotification: async (
+        to: string,
+        type: 'new' | 'cancelled',
+        guestName: string,
+        propName: string,
+        checkInDate: string,
+        checkOutDate: string,
+        numberOfGuests: number,
+        nights: number,
+        totalAmount: string,
+        dashboardLink: string
+    ) => {
+        const subject = type === 'new'
+            ? `New Booking: ${guestName} at ${propName}`
+            : `Booking Cancelled: ${guestName} at ${propName}`;
+
+        return sendEmail({
+            to: to,
+            subject: subject,
+            component: (
+                <BookingNotificationEmail
+                    type={type}
+                    guestName={guestName}
+                    propName={propName}
+                    checkInDate={checkInDate}
+                    checkOutDate={checkOutDate}
+                    numberOfGuests={numberOfGuests}
+                    nights={nights}
+                    totalAmount={totalAmount}
                     dashboardLink={dashboardLink}
                 />
             ),

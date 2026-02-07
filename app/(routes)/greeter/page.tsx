@@ -15,6 +15,7 @@ import { GuestDirectory } from '@components/guests/GuestDirectory';
 import { useApp } from '@components/providers/AppProvider';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { dataService, calendarService } from '@services/index';
+import { triggerBookingNotification } from '@lib/emailUtils';
 
 import { Suspense } from 'react';
 
@@ -251,6 +252,11 @@ function GreeterContent() {
             return;
         }
 
+        if (!selectedProperty) {
+            showToast("No property selected", "error");
+            return;
+        }
+
         try {
             // Calculate Total Amount for saving
             const nights = calculateNights(guestDetails.checkInDate, guestDetails.checkOutDate);
@@ -282,6 +288,15 @@ function GreeterContent() {
                 const id = await dataService.guests.add(user.uid, guestData as any);
                 setCurrentGuestId(id);
                 showToast("Guest saved to directory!", "success");
+
+                // Trigger Email Notification (Async)
+                triggerBookingNotification({
+                    guest: { ...guestDetails, id },
+                    property: selectedProperty,
+                    type: 'new',
+                    totalAmount: totalAmount,
+                    dashboardLink: `${window.location.origin}/greeter?guestId=${id}`
+                });
             }
         } catch (error) {
             console.error("Error saving guest:", error);
