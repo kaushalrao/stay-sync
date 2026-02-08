@@ -282,6 +282,15 @@ function GreeterContent() {
                 // Update existing
                 await dataService.guests.update(user.uid, currentGuestId, guestData);
                 showToast("Guest updated!", "success");
+
+                // Trigger Email Notification (Async) - Updated Type
+                triggerBookingNotification({
+                    guest: { ...guestDetails, id: currentGuestId },
+                    property: selectedProperty,
+                    type: 'updated',
+                    totalAmount: totalAmount,
+                    dashboardLink: `${window.location.origin}/greeter?guestId=${currentGuestId}`
+                });
             } else {
                 // Create new
                 // Cast to any to bypass Partial check here, assuming form validation handles required fields
@@ -289,7 +298,7 @@ function GreeterContent() {
                 setCurrentGuestId(id);
                 showToast("Guest saved to directory!", "success");
 
-                // Trigger Email Notification (Async)
+                // Trigger Email Notification (Async) - New Type
                 triggerBookingNotification({
                     guest: { ...guestDetails, id },
                     property: selectedProperty,

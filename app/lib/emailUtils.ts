@@ -4,7 +4,7 @@ import { calculateNights, formatDate, formatCurrency } from './utils';
 interface NotificationParams {
     guest: Partial<Guest> & { guestName: string; checkInDate: string; checkOutDate: string; numberOfGuests: number };
     property: Property;
-    type: 'new' | 'cancelled';
+    type: 'new' | 'cancelled' | 'updated';
     totalAmount?: string | number; // Can be pre-formatted string or number
     dashboardLink?: string;
 }

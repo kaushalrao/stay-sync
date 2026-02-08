@@ -103,7 +103,7 @@ export const emailService = {
 
     sendBookingNotification: async (
         to: string,
-        type: 'new' | 'cancelled',
+        type: 'new' | 'cancelled' | 'updated',
         guestName: string,
         propName: string,
         checkInDate: string,
@@ -113,9 +113,9 @@ export const emailService = {
         totalAmount: string,
         dashboardLink: string
     ) => {
-        const subject = type === 'new'
-            ? `New Booking: ${guestName} at ${propName}`
-            : `Booking Cancelled: ${guestName} at ${propName}`;
+        let subject = `New Booking: ${guestName} at ${propName}`;
+        if (type === 'cancelled') subject = `Booking Cancelled: ${guestName} at ${propName}`;
+        if (type === 'updated') subject = `Booking Updated: ${guestName} at ${propName}`;
 
         return sendEmail({
             to: to,
