@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Edit3, Plus, LogOut, MessageCircle, Sparkles, X } from 'lucide-react';
+import { Edit3, Plus, ArrowLeft, MessageCircle, Sparkles, X } from 'lucide-react';
 import { collection, addDoc, updateDoc, deleteDoc, doc } from "firebase/firestore";
 import { Template, VariableEditorRef } from '@lib/types';
 import { app, db, appId } from '@lib/firebase';
@@ -182,7 +182,7 @@ export function TemplatesTab() {
                 <form onSubmit={handleSaveTemplate} className="bg-slate-900/40 backdrop-blur-2xl p-8 rounded-[2.5rem] border border-white/10 max-w-4xl mx-auto animate-fade-in shadow-2xl relative ring-1 ring-white/5">
                     <div className="flex justify-between items-center mb-8 pb-6 border-b border-white/5">
                         <h3 className="text-2xl font-bold text-white mb-1">{editingTemp.id ? 'Edit Template' : 'New Template'}</h3>
-                        <button type="button" onClick={() => setEditingTemp(null)} className="p-3 bg-slate-700/50 rounded-full text-slate-400 hover:text-white"><LogOut size={20} className="rotate-180" /></button>
+                        <button type="button" onClick={() => setEditingTemp(null)} className="p-3 bg-slate-700/50 rounded-full text-slate-400 hover:text-white"><ArrowLeft size={20} /></button>
                     </div>
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start relative">
                         <div className="lg:col-span-2 space-y-6">

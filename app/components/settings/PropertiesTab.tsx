@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Home, Edit3, Trash2, Plus, LogOut, Users, CreditCard, Clock, Wifi, Calendar as CalendarIcon, Link, X, Copy } from 'lucide-react';
+import { Home, Edit3, Trash2, Plus, ArrowLeft, Users, CreditCard, Clock, Wifi, Calendar as CalendarIcon, Link, X, Copy } from 'lucide-react';
 import { collection, addDoc, updateDoc, deleteDoc, doc } from "firebase/firestore";
 import { Property } from '@lib/types';
 import { DEFAULT_PROPERTY_TIMES, DEFAULT_PROPERTY_VALUES } from '@lib/constants';
@@ -142,7 +142,7 @@ export function PropertiesTab() {
                 <form onSubmit={handleSaveProperty} className="bg-slate-900/40 backdrop-blur-2xl p-8 rounded-[2.5rem] border border-white/10 max-w-4xl mx-auto animate-fade-in shadow-2xl ring-1 ring-white/5">
                     <div className="flex justify-between items-center mb-8 pb-6 border-b border-white/5">
                         <h3 className="text-2xl font-bold text-white mb-1">{editingProp.id ? 'Edit Property' : 'Add Property'}</h3>
-                        <button type="button" onClick={() => setEditingProp(null)} className="p-3 bg-slate-700/50 rounded-full text-slate-400 hover:text-white"><LogOut size={20} className="rotate-180" /></button>
+                        <button type="button" onClick={() => setEditingProp(null)} className="p-3 bg-slate-700/50 rounded-full text-slate-400 hover:text-white"><ArrowLeft size={20} /></button>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                         <div className="md:col-span-2 space-y-4">
