@@ -148,7 +148,7 @@ export function TemplatesTab() {
             {!editingTemp ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {templates.length === 0 ? (
-                        <div className="col-span-full text-center py-20 text-slate-500">
+                        <div className="col-span-full text-center py-20 text-slate-500 dark:text-slate-500">
                             <MessageCircle size={48} className="mx-auto mb-4 opacity-50" />
                             <p>No templates found. Create your first template!</p>
                         </div>
@@ -173,23 +173,23 @@ export function TemplatesTab() {
                             </SortableContext>
                         </DndContext>
                     )}
-                    <button onClick={() => setEditingTemp({})} className="flex flex-col items-center justify-center min-h-[160px] rounded-[2rem] border-2 border-dashed border-slate-700/50 text-slate-500 hover:text-indigo-300 hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all gap-3 group relative overflow-hidden">
-                        <div className="p-4 rounded-full bg-slate-800 group-hover:bg-indigo-500 group-hover:text-white transition-all duration-300 shadow-lg group-hover:shadow-indigo-500/40"><Plus size={24} /></div>
+                    <button onClick={() => setEditingTemp({})} className="flex flex-col items-center justify-center min-h-[160px] rounded-[2rem] border-2 border-dashed border-slate-400 dark:border-slate-700/50 text-slate-600 dark:text-slate-500 hover:text-indigo-500 dark:hover:text-indigo-300 hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all gap-3 group relative overflow-hidden">
+                        <div className="p-4 rounded-full bg-slate-300 dark:bg-slate-800 text-slate-700 dark:text-slate-400 group-hover:bg-indigo-500 group-hover:text-white transition-all duration-300 shadow-lg group-hover:shadow-indigo-500/40"><Plus size={24} /></div>
                         <span className="font-bold text-sm tracking-wide">Create Template</span>
                     </button>
                 </div>
             ) : (
-                <form onSubmit={handleSaveTemplate} className="bg-slate-900/40 backdrop-blur-2xl p-8 rounded-[2.5rem] border border-white/10 max-w-4xl mx-auto animate-fade-in shadow-2xl relative ring-1 ring-white/5">
-                    <div className="flex justify-between items-center mb-8 pb-6 border-b border-white/5">
-                        <h3 className="text-2xl font-bold text-white mb-1">{editingTemp.id ? 'Edit Template' : 'New Template'}</h3>
-                        <button type="button" onClick={() => setEditingTemp(null)} className="p-3 bg-slate-700/50 rounded-full text-slate-400 hover:text-white"><ArrowLeft size={20} /></button>
+                <form onSubmit={handleSaveTemplate} className="bg-slate-100/80 dark:bg-slate-900/40 backdrop-blur-2xl p-8 rounded-[2.5rem] border border-slate-300 dark:border-white/10 max-w-4xl mx-auto animate-fade-in shadow-2xl relative ring-1 ring-slate-300/50 dark:ring-white/5">
+                    <div className="flex justify-between items-center mb-8 pb-6 border-b border-slate-300 dark:border-white/5">
+                        <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">{editingTemp.id ? 'Edit Template' : 'New Template'}</h3>
+                        <button type="button" onClick={() => setEditingTemp(null)} className="p-3 bg-slate-300 dark:bg-slate-700/50 rounded-full text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"><ArrowLeft size={20} /></button>
                     </div>
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start relative">
                         <div className="lg:col-span-2 space-y-6">
                             <Input name="label" label="Template Name" icon={<MessageCircle size={12} />} defaultValue={editingTemp.label} required />
                             <div className="space-y-2">
                                 <div className="flex justify-between items-end mb-2">
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 flex items-center gap-1.5"><Edit3 size={12} /> Content</label>
+                                    <label className="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest ml-1 flex items-center gap-1.5"><Edit3 size={12} /> Content</label>
                                     <button
                                         type="button"
                                         onClick={() => setIsDrawerOpen(true)}
@@ -206,9 +206,9 @@ export function TemplatesTab() {
                                 />
                             </div>
                         </div>
-                        <div className="hidden lg:flex bg-slate-900/30 rounded-3xl border border-white/5 sticky top-8 h-fit max-h-[600px] flex-col shadow-xl">
-                            <div className="bg-slate-900/95 backdrop-blur-xl z-10 px-6 py-4 border-b border-white/5 rounded-t-3xl shrink-0">
-                                <h4 className="text-xs font-bold text-slate-300 uppercase tracking-widest flex items-center gap-2">
+                        <div className="hidden lg:flex bg-slate-200 dark:bg-slate-900/30 rounded-3xl border border-slate-300 dark:border-white/5 sticky top-8 h-fit max-h-[600px] flex-col shadow-xl">
+                            <div className="bg-slate-300 dark:bg-slate-900/95 backdrop-blur-xl z-10 px-6 py-4 border-b border-slate-400 dark:border-white/5 rounded-t-3xl shrink-0">
+                                <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-widest flex items-center gap-2">
                                     <Sparkles size={14} className="text-orange-400" /> Click to Insert
                                 </h4>
                             </div>
@@ -234,7 +234,7 @@ export function TemplatesTab() {
                             </div>
                         )}
                     </div>
-                    <div className="flex gap-4 pt-8 mt-4 border-t border-white/5">
+                    <div className="flex gap-4 pt-8 mt-4 border-t border-slate-300 dark:border-white/5">
                         <Button type="button" variant="secondary" className="flex-1 py-4 rounded-2xl" onClick={() => setEditingTemp(null)}>Cancel</Button>
                         <Button type="submit" className="flex-1 py-4 rounded-2xl">Save Template</Button>
                     </div>

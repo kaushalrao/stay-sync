@@ -42,7 +42,7 @@ export function SortableTemplateItem({ template, onEdit, onDelete }: SortableTem
         <div
             ref={setNodeRef}
             style={style}
-            className="relative bg-slate-800/30 backdrop-blur-xl p-5 rounded-[2rem] border border-white/10 shadow-xl flex flex-col justify-between group min-h-[160px] hover:bg-slate-800/50 transition-all overflow-hidden ring-1 ring-white/5 hover:ring-white/10"
+            className="relative bg-slate-200/80 dark:bg-slate-800/30 backdrop-blur-xl p-5 rounded-[2rem] border border-slate-300 dark:border-white/10 shadow-xl flex flex-col justify-between group min-h-[160px] hover:shadow-2xl dark:hover:bg-slate-800/50 transition-all overflow-hidden ring-1 ring-slate-300/50 dark:ring-white/5 hover:ring-slate-400 dark:hover:ring-white/10"
         >
             <div className="absolute inset-0 opacity-20 mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')] pointer-events-none"></div>
 
@@ -50,23 +50,23 @@ export function SortableTemplateItem({ template, onEdit, onDelete }: SortableTem
             <div
                 {...attributes}
                 {...listeners}
-                className="absolute top-4 right-4 p-2 text-slate-500 hover:text-white cursor-grab active:cursor-grabbing z-20 touch-none"
+                className="absolute top-4 right-4 p-2 text-slate-500 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white cursor-grab active:cursor-grabbing z-20 touch-none"
             >
                 <GripVertical size={20} />
             </div>
 
             <div className="relative z-10 pt-2">
                 <div className="flex items-center gap-4">
-                    <div className="p-3 bg-white/10 rounded-2xl border border-white/10">
-                        <IconComponent size={24} className="text-slate-300" />
+                    <div className="p-3 bg-slate-300 dark:bg-white/10 rounded-2xl border border-slate-400 dark:border-white/10">
+                        <IconComponent size={24} className="text-slate-700 dark:text-slate-300" />
                     </div>
-                    <h3 className="font-bold text-white text-lg tracking-tight pr-8">{template.label}</h3>
+                    <h3 className="font-bold text-slate-900 dark:text-white text-lg tracking-tight pr-8">{template.label}</h3>
                 </div>
             </div>
 
             <div className="flex gap-2 pt-6 mt-auto relative z-10">
-                <Button variant="secondary" className="flex-1 !py-2.5 text-sm rounded-xl bg-white/5 border-white/10 hover:bg-white/10 hover:text-white" onClick={() => onEdit(template)}><LucideIcons.Edit3 size={16} /> Edit</Button>
-                <Button variant="danger" className="!p-2.5 rounded-xl bg-rose-500/10 text-rose-400 border-rose-500/20 hover:bg-rose-500 hover:text-white hover:border-transparent" onClick={() => onDelete(template.id)}><LucideIcons.Trash2 size={18} /></Button>
+                <Button variant="secondary" className="flex-1 !py-2.5 text-sm rounded-xl bg-slate-300 dark:bg-white/5 border-slate-400 dark:border-white/10 text-slate-900 dark:text-slate-300 hover:bg-slate-400 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white" onClick={() => onEdit(template)}><LucideIcons.Edit3 size={16} /> Edit</Button>
+                <Button variant="danger" className="!p-2.5 rounded-xl bg-rose-100 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-300 dark:border-rose-500/20 hover:bg-rose-500 hover:text-white hover:border-transparent" onClick={() => onDelete(template.id)}><LucideIcons.Trash2 size={18} /></Button>
             </div>
         </div>
     );

@@ -95,32 +95,32 @@ export function PropertiesTab() {
             {!editingProp ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {properties.length === 0 ? (
-                        <div className="col-span-full text-center py-20 text-slate-500">
+                        <div className="col-span-full text-center py-20 text-slate-500 dark:text-slate-500">
                             <Home size={48} className="mx-auto mb-4 opacity-50" />
                             <p>No properties found. Add your first property!</p>
                         </div>
                     ) : properties.map(p => (
-                        <div key={p.id} className="relative bg-slate-800/30 backdrop-blur-xl p-5 rounded-[2rem] border border-white/10 shadow-xl flex flex-col justify-between group min-h-[220px] hover:bg-slate-800/50 transition-all overflow-hidden ring-1 ring-white/5 hover:ring-white/10 hover:scale-[1.02] hover:-translate-y-1">
+                        <div key={p.id} className="relative bg-slate-200/80 dark:bg-slate-800/30 backdrop-blur-xl p-5 rounded-[2rem] border border-slate-300 dark:border-white/10 shadow-xl flex flex-col justify-between group min-h-[220px] hover:shadow-2xl dark:hover:bg-slate-800/50 transition-all overflow-hidden ring-1 ring-slate-300/50 dark:ring-white/5 hover:ring-slate-400 dark:hover:ring-white/10 hover:scale-[1.02] hover:-translate-y-1">
                             <div className="absolute inset-0 opacity-20 mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')] pointer-events-none"></div>
                             <div className="relative z-10 space-y-4">
                                 <div className="flex justify-between items-start">
-                                    <div className="p-3 bg-indigo-500/10 rounded-2xl text-indigo-300 border border-indigo-500/10"><Home size={24} /></div>
-                                    <div className="px-3 py-1 rounded-full bg-white/5 text-[10px] font-bold text-slate-300 uppercase tracking-wider backdrop-blur-md border border-white/5">{p.baseGuests} Guests</div>
+                                    <div className="p-3 bg-indigo-100 dark:bg-indigo-500/10 rounded-2xl text-indigo-600 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-500/10"><Home size={24} /></div>
+                                    <div className="px-3 py-1 rounded-full bg-slate-300 dark:bg-white/5 text-[10px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider backdrop-blur-md border border-slate-400 dark:border-white/5">{p.baseGuests} Guests</div>
                                 </div>
 
                                 <div>
-                                    <h3 className="font-bold text-white text-xl tracking-tight leading-tight mb-1">{p.name}</h3>
-                                    <p className="text-sm text-slate-400 font-medium">₹ {p.basePrice}/night</p>
+                                    <h3 className="font-bold text-slate-900 dark:text-white text-xl tracking-tight leading-tight mb-1">{p.name}</h3>
+                                    <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">₹ {p.basePrice}/night</p>
                                 </div>
 
-                                <div className="space-y-2 pt-2 border-t border-white/5">
-                                    <div className="flex items-center gap-2 text-xs text-slate-400">
-                                        <Clock size={12} className="text-indigo-400" />
+                                <div className="space-y-2 pt-2 border-t border-slate-300 dark:border-white/5">
+                                    <div className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400">
+                                        <Clock size={12} className="text-indigo-500 dark:text-indigo-400" />
                                         <span>{p.checkInTime || '13:00'} - {p.checkOutTime || '11:00'}</span>
                                     </div>
                                     {p.hostName && (
-                                        <div className="flex items-center gap-2 text-xs text-slate-400">
-                                            <Users size={12} className="text-rose-400" />
+                                        <div className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400">
+                                            <Users size={12} className="text-rose-500 dark:text-rose-400" />
                                             <span className="truncate">{p.hostName}</span>
                                         </div>
                                     )}
@@ -128,21 +128,21 @@ export function PropertiesTab() {
                             </div>
 
                             <div className="flex gap-2 pt-6 mt-auto relative z-10">
-                                <Button variant="secondary" className="flex-1 !py-2.5 text-sm rounded-xl bg-white/5 border-white/10 hover:bg-white/10 hover:text-white" onClick={() => setEditingProp(p)}><Edit3 size={16} /> Edit</Button>
-                                <Button variant="danger" className="!p-2.5 rounded-xl bg-rose-500/10 text-rose-400 border-rose-500/20 hover:bg-rose-500 hover:text-white hover:border-transparent" onClick={() => handleDeleteProperty(p.id)}><Trash2 size={18} /></Button>
+                                <Button variant="secondary" className="flex-1 !py-2.5 text-sm rounded-xl bg-slate-300 dark:bg-white/5 border-slate-400 dark:border-white/10 text-slate-900 dark:text-slate-300 hover:bg-slate-400 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white" onClick={() => setEditingProp(p)}><Edit3 size={16} /> Edit</Button>
+                                <Button variant="danger" className="!p-2.5 rounded-xl bg-rose-100 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-300 dark:border-rose-500/20 hover:bg-rose-500 hover:text-white hover:border-transparent" onClick={() => handleDeleteProperty(p.id)}><Trash2 size={18} /></Button>
                             </div>
                         </div>
                     ))}
-                    <button onClick={() => setEditingProp({})} className="flex flex-col items-center justify-center min-h-[180px] rounded-[2rem] border-2 border-dashed border-slate-700/50 text-slate-500 hover:text-indigo-300 hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all gap-3 group relative overflow-hidden">
-                        <div className="p-4 rounded-full bg-slate-800 group-hover:bg-indigo-500 group-hover:text-white transition-all duration-300 shadow-lg group-hover:shadow-indigo-500/40"><Plus size={24} /></div>
+                    <button onClick={() => setEditingProp({})} className="flex flex-col items-center justify-center min-h-[180px] rounded-[2rem] border-2 border-dashed border-slate-400 dark:border-slate-700/50 text-slate-600 dark:text-slate-500 hover:text-indigo-500 dark:hover:text-indigo-300 hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all gap-3 group relative overflow-hidden">
+                        <div className="p-4 rounded-full bg-slate-300 dark:bg-slate-800 text-slate-700 dark:text-slate-400 group-hover:bg-indigo-500 group-hover:text-white transition-all duration-300 shadow-lg group-hover:shadow-indigo-500/40"><Plus size={24} /></div>
                         <span className="font-bold text-sm tracking-wide">Add New Property</span>
                     </button>
                 </div>
             ) : (
-                <form onSubmit={handleSaveProperty} className="bg-slate-900/40 backdrop-blur-2xl p-8 rounded-[2.5rem] border border-white/10 max-w-4xl mx-auto animate-fade-in shadow-2xl ring-1 ring-white/5">
-                    <div className="flex justify-between items-center mb-8 pb-6 border-b border-white/5">
-                        <h3 className="text-2xl font-bold text-white mb-1">{editingProp.id ? 'Edit Property' : 'Add Property'}</h3>
-                        <button type="button" onClick={() => setEditingProp(null)} className="p-3 bg-slate-700/50 rounded-full text-slate-400 hover:text-white"><ArrowLeft size={20} /></button>
+                <form onSubmit={handleSaveProperty} className="bg-slate-100/80 dark:bg-slate-900/40 backdrop-blur-2xl p-8 rounded-[2.5rem] border border-slate-300 dark:border-white/10 max-w-4xl mx-auto animate-fade-in shadow-2xl ring-1 ring-slate-300/50 dark:ring-white/5">
+                    <div className="flex justify-between items-center mb-8 pb-6 border-b border-slate-300 dark:border-white/5">
+                        <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">{editingProp.id ? 'Edit Property' : 'Add Property'}</h3>
+                        <button type="button" onClick={() => setEditingProp(null)} className="p-3 bg-slate-300 dark:bg-slate-700/50 rounded-full text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"><ArrowLeft size={20} /></button>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                         <div className="md:col-span-2 space-y-4">
@@ -175,7 +175,7 @@ export function PropertiesTab() {
                             </div>
                             <Input name="extraGuestPrice" type="number" label="Extra Guest Price" defaultValue={editingProp.extraGuestPrice} required />
                         </div>
-                        <div className="md:col-span-2 h-px bg-white/5 my-4"></div>
+                        <div className="md:col-span-2 h-px bg-slate-300 dark:bg-white/5 my-4"></div>
                         <div className="space-y-4">
                             <h4 className="text-xs font-bold text-orange-400 uppercase tracking-widest mb-2 flex items-center gap-2"><Clock size={14} /> Timings</h4>
                             <div className="grid grid-cols-2 gap-4">
@@ -211,13 +211,13 @@ export function PropertiesTab() {
                                 </div>
 
                                 {(!editingProp.icalFeeds || editingProp.icalFeeds.length === 0) && !editingProp.airbnbIcalUrl && (
-                                    <div className="text-sm text-slate-500 italic px-4 py-2 border border-white/5 bg-white/5 rounded-xl text-center">
+                                    <div className="text-sm text-slate-600 dark:text-slate-500 italic px-4 py-2 border border-slate-300 dark:border-white/5 bg-slate-200 dark:bg-white/5 rounded-xl text-center">
                                         No external calendars linked.
                                     </div>
                                 )}
 
                                 {editingProp.icalFeeds?.map((feed, index) => (
-                                    <div key={feed.id} className="flex gap-2 items-start bg-slate-900/50 p-3 rounded-xl border border-white/10 group animate-fade-in relative">
+                                    <div key={feed.id} className="flex gap-2 items-start bg-slate-200 dark:bg-slate-900/50 p-3 rounded-xl border border-slate-300 dark:border-white/10 group animate-fade-in relative">
                                         <div className="w-1 self-stretch rounded-full" style={{ backgroundColor: feed.color }}></div>
                                         <div className="flex-1 space-y-2">
                                             <input
@@ -228,7 +228,7 @@ export function PropertiesTab() {
                                                     setEditingProp(prev => prev ? ({ ...prev, icalFeeds: newFeeds }) : null);
                                                 }}
                                                 placeholder="Calendar Name (e.g. Booking.com)"
-                                                className="w-full bg-transparent text-sm font-bold text-white placeholder:text-slate-600 focus:outline-none"
+                                                className="w-full bg-transparent text-sm font-bold text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-600 focus:outline-none"
                                             />
                                             <input
                                                 value={feed.url}
@@ -238,7 +238,7 @@ export function PropertiesTab() {
                                                     setEditingProp(prev => prev ? ({ ...prev, icalFeeds: newFeeds }) : null);
                                                 }}
                                                 placeholder="https://..."
-                                                className="w-full bg-transparent text-xs text-slate-400 focus:text-white placeholder:text-slate-700 focus:outline-none font-mono"
+                                                className="w-full bg-transparent text-xs text-slate-600 dark:text-slate-400 focus:text-slate-900 dark:focus:text-white placeholder:text-slate-500 dark:placeholder:text-slate-700 focus:outline-none font-mono"
                                             />
                                             {/* Color Picker (Simple Presets) */}
                                             <div className="flex gap-1.5 pt-1">
@@ -263,7 +263,7 @@ export function PropertiesTab() {
                                                 const newFeeds = editingProp.icalFeeds?.filter((_, i) => i !== index);
                                                 setEditingProp(prev => prev ? ({ ...prev, icalFeeds: newFeeds }) : null);
                                             }}
-                                            className="p-1.5 text-slate-600 hover:text-white hover:bg-white/10 rounded-lg transition-colors absolute top-2 right-2"
+                                            className="p-1.5 text-slate-500 dark:text-slate-600 hover:text-slate-900 dark:hover:text-white hover:bg-slate-300 dark:hover:bg-white/10 rounded-lg transition-colors absolute top-2 right-2"
                                         >
                                             <X size={14} />
                                         </button>
@@ -273,7 +273,7 @@ export function PropertiesTab() {
 
                             {editingProp.id && (
                                 <div className="space-y-1">
-                                    <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1 flex items-center gap-1.5">
+                                    <label className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest ml-1 flex items-center gap-1.5">
                                         Export Calendar (2-Way Sync)
                                     </label>
                                     <div className="flex gap-2">
@@ -282,7 +282,7 @@ export function PropertiesTab() {
                                                 type="text"
                                                 readOnly
                                                 value={`${origin}/api/public/calendar?uid=${user?.uid || ''}&propertyId=${editingProp.id}`}
-                                                className="w-full bg-slate-900/50 border border-white/10 rounded-xl py-3 pl-4 pr-4 text-sm text-slate-400 focus:outline-none cursor-not-allowed select-all"
+                                                className="w-full bg-slate-200 dark:bg-slate-900/50 border border-slate-300 dark:border-white/10 rounded-xl py-3 pl-4 pr-4 text-sm text-slate-700 dark:text-slate-400 focus:outline-none cursor-not-allowed select-all"
                                             />
                                         </div>
                                         <Button
@@ -297,12 +297,12 @@ export function PropertiesTab() {
                                             <Copy size={18} />
                                         </Button>
                                     </div>
-                                    <p className="text-[10px] text-slate-500 ml-1">Paste this URL into Airbnb&apos;s &quot;Import Calendar&quot; to prevent double bookings.</p>
+                                    <p className="text-[10px] text-slate-600 dark:text-slate-500 ml-1">Paste this URL into Airbnb&apos;s &quot;Import Calendar&quot; to prevent double bookings.</p>
                                 </div>
                             )}
                         </div>
                     </div>
-                    <div className="flex gap-4 pt-8 mt-4 border-t border-white/5">
+                    <div className="flex gap-4 pt-8 mt-4 border-t border-slate-300 dark:border-white/5">
                         <Button type="button" variant="secondary" className="flex-1 py-4 rounded-2xl" onClick={() => setEditingProp(null)}>Cancel</Button>
                         <Button type="submit" className="flex-1 py-4 rounded-2xl">Save Changes</Button>
                     </div>
