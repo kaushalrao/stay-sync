@@ -1,17 +1,32 @@
 import { APP_URLS } from './urls';
 import { COLOR_VARIANTS } from './constants';
 import { Guest } from './types';
+import { icons } from 'lucide-react';
 
 export const getIconForTemplate = (label: string): string => {
     const lowerLabel = label.toLowerCase();
 
+    if (lowerLabel.includes('trek') || lowerLabel.includes('hike') || lowerLabel.includes('mountain') || lowerLabel.includes('adventure')) return 'Mountain';
     if (lowerLabel.includes('booking') || lowerLabel.includes('confirm') || lowerLabel.includes('reservation')) return 'CalendarCheck';
-    if (lowerLabel.includes('wifi') || lowerLabel.includes('internet') || lowerLabel.includes('network')) return 'Wifi';
-    if (lowerLabel.includes('location') || lowerLabel.includes('map') || lowerLabel.includes('direction') || lowerLabel.includes('address')) return 'MapPin';
+    if (lowerLabel.includes('internet') || lowerLabel.includes('network')) return 'Wifi';
+    if (lowerLabel.includes('location') || lowerLabel.includes('direction') || lowerLabel.includes('address')) return 'MapPin';
     if (lowerLabel.includes('welcome') || lowerLabel.includes('intro') || lowerLabel.includes('hello')) return 'Coffee';
     if (lowerLabel.includes('checkout') || lowerLabel.includes('check-out') || lowerLabel.includes('bye') || lowerLabel.includes('departure')) return 'LogOut';
-    if (lowerLabel.includes('prop') || lowerLabel.includes('house') || lowerLabel.includes('detail') || lowerLabel.includes('guide')) return 'FileText';
+    if (lowerLabel.includes('prop') || lowerLabel.includes('detail') || lowerLabel.includes('guide')) return 'FileText';
     if (lowerLabel.includes('food') || lowerLabel.includes('dining') || lowerLabel.includes('restaurant') || lowerLabel.includes('eat')) return 'Utensils';
+
+    // Dynamic lookup: Check if any word in the label matches a Lucide icon
+    const words = label.split(/[\s-_]+/);
+    for (const word of words) {
+        // Simple PascalCase conversion attempt: 'car' -> 'Car', 'wifi' -> 'Wifi'
+        const pascalWord = word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+        if (pascalWord in icons) {
+            return pascalWord;
+        }
+        // Check for direct match case-insensitive (e.g. 'dumbbell' -> 'Dumbbell')
+        const match = Object.keys(icons).find(iconName => iconName.toLowerCase() === word.toLowerCase());
+        if (match) return match;
+    }
 
     return 'MessageCircle';
 };

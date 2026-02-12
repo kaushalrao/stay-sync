@@ -1,12 +1,12 @@
 import { GuestDetails } from './types';
 import {
     CalendarCheck, MapPin, Coffee, Wifi,
-    Utensils, MessageCircle, LogOut, Home, FileText
+    Utensils, MessageCircle, LogOut, Home, FileText, Mountain
 } from 'lucide-react';
 import React from 'react';
 
 export const AVAILABLE_ICONS: Record<string, React.ElementType> = {
-    CalendarCheck, MapPin, Coffee, Wifi, Utensils, LogOut, MessageCircle, Home, FileText
+    CalendarCheck, MapPin, Coffee, Wifi, Utensils, LogOut, MessageCircle, Home, FileText, Mountain
 };
 
 export const FEATURE_CARD_STYLES = {

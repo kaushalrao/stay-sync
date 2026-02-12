@@ -1,9 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Edit3, Trash2, Plus, LogOut, MessageCircle, Sparkles, X } from 'lucide-react';
+import { Edit3, Plus, LogOut, MessageCircle, Sparkles, X } from 'lucide-react';
 import { collection, addDoc, updateDoc, deleteDoc, doc } from "firebase/firestore";
 import { Template, VariableEditorRef } from '@lib/types';
 import { app, db, appId } from '@lib/firebase';
-import { AVAILABLE_ICONS } from '@lib/constants';
 import { getIconForTemplate } from '@lib/utils';
 import { Button } from '@components/ui/Button';
 import { Input } from '@components/ui/Input';
@@ -120,7 +119,7 @@ export function TemplatesTab() {
             label: label,
             content: content,
             icon: getIconForTemplate(label),
-            order: templates.length
+            order: editingTemp.id ? editingTemp.order : templates.length
         };
 
         const success = await saveToFirestore('templates', newTemp, editingTemp.id);

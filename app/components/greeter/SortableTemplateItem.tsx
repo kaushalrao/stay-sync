@@ -2,9 +2,13 @@ import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Button } from '@components/ui/Button';
-import { Edit3, Trash2, MessageCircle, GripVertical } from 'lucide-react';
+import * as LucideIcons from 'lucide-react';
+import { GripVertical } from 'lucide-react';
 import { Template } from '@lib/types';
-import { AVAILABLE_ICONS } from '@lib/constants';
+import { getIconForTemplate } from '@lib/utils';
+
+// Fallback icon if dynamic lookup fails completely (though utils should return a valid string)
+const FallbackIcon = LucideIcons.MessageCircle;
 
 interface SortableTemplateItemProps {
     template: Template;
@@ -29,6 +33,11 @@ export function SortableTemplateItem({ template, onEdit, onDelete }: SortableTem
         opacity: isDragging ? 0.5 : 1,
     };
 
+    // Dynamic Icon Lookup
+    const iconKey = getIconForTemplate(template.label);
+    // @ts-ignore - Dynamic access to Lucide icons
+    const IconComponent = LucideIcons[iconKey] || FallbackIcon;
+
     return (
         <div
             ref={setNodeRef}
@@ -49,15 +58,15 @@ export function SortableTemplateItem({ template, onEdit, onDelete }: SortableTem
             <div className="relative z-10 pt-2">
                 <div className="flex items-center gap-4">
                     <div className="p-3 bg-white/10 rounded-2xl border border-white/10">
-                        {React.createElement(AVAILABLE_ICONS[template.icon] || MessageCircle, { size: 24, className: "text-slate-300" })}
+                        <IconComponent size={24} className="text-slate-300" />
                     </div>
                     <h3 className="font-bold text-white text-lg tracking-tight pr-8">{template.label}</h3>
                 </div>
             </div>
 
             <div className="flex gap-2 pt-6 mt-auto relative z-10">
-                <Button variant="secondary" className="flex-1 !py-2.5 text-sm rounded-xl bg-white/5 border-white/10 hover:bg-white/10 hover:text-white" onClick={() => onEdit(template)}><Edit3 size={16} /> Edit</Button>
-                <Button variant="danger" className="!p-2.5 rounded-xl bg-rose-500/10 text-rose-400 border-rose-500/20 hover:bg-rose-500 hover:text-white hover:border-transparent" onClick={() => onDelete(template.id)}><Trash2 size={18} /></Button>
+                <Button variant="secondary" className="flex-1 !py-2.5 text-sm rounded-xl bg-white/5 border-white/10 hover:bg-white/10 hover:text-white" onClick={() => onEdit(template)}><LucideIcons.Edit3 size={16} /> Edit</Button>
+                <Button variant="danger" className="!p-2.5 rounded-xl bg-rose-500/10 text-rose-400 border-rose-500/20 hover:bg-rose-500 hover:text-white hover:border-transparent" onClick={() => onDelete(template.id)}><LucideIcons.Trash2 size={18} /></Button>
             </div>
         </div>
     );
