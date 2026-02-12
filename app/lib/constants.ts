@@ -89,14 +89,14 @@ export const DEFAULT_PROPERTY_VALUES = {
 };
 
 export const COLOR_VARIANTS: Record<string, { bg: string, border: string, text: string, icon: string }> = {
-    indigo: { bg: 'bg-indigo-500/10', border: 'border-indigo-500/20', text: 'text-indigo-300', icon: 'text-indigo-400' },
-    purple: { bg: 'bg-purple-500/10', border: 'border-purple-500/20', text: 'text-purple-300', icon: 'text-purple-400' },
-    rose: { bg: 'bg-rose-500/10', border: 'border-rose-500/20', text: 'text-rose-300', icon: 'text-rose-400' },
-    orange: { bg: 'bg-orange-500/10', border: 'border-orange-500/20', text: 'text-orange-300', icon: 'text-orange-400' },
-    cyan: { bg: 'bg-cyan-500/10', border: 'border-cyan-500/20', text: 'text-cyan-300', icon: 'text-cyan-400' },
-    emerald: { bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', text: 'text-emerald-300', icon: 'text-emerald-400' },
-    blue: { bg: 'bg-blue-500/10', border: 'border-blue-500/20', text: 'text-blue-300', icon: 'text-blue-400' },
-    fuchsia: { bg: 'bg-fuchsia-500/10', border: 'border-fuchsia-500/20', text: 'text-fuchsia-300', icon: 'text-fuchsia-400' },
+    indigo: { bg: 'bg-indigo-100 dark:bg-indigo-500/10', border: 'border-indigo-300 dark:border-indigo-500/20', text: 'text-indigo-700 dark:text-indigo-300', icon: 'text-indigo-600 dark:text-indigo-400' },
+    purple: { bg: 'bg-purple-100 dark:bg-purple-500/10', border: 'border-purple-300 dark:border-purple-500/20', text: 'text-purple-700 dark:text-purple-300', icon: 'text-purple-600 dark:text-purple-400' },
+    rose: { bg: 'bg-rose-100 dark:bg-rose-500/10', border: 'border-rose-300 dark:border-rose-500/20', text: 'text-rose-700 dark:text-rose-300', icon: 'text-rose-600 dark:text-rose-400' },
+    orange: { bg: 'bg-orange-100 dark:bg-orange-500/10', border: 'border-orange-300 dark:border-orange-500/20', text: 'text-orange-700 dark:text-orange-300', icon: 'text-orange-600 dark:text-orange-400' },
+    cyan: { bg: 'bg-cyan-100 dark:bg-cyan-500/10', border: 'border-cyan-300 dark:border-cyan-500/20', text: 'text-cyan-700 dark:text-cyan-300', icon: 'text-cyan-600 dark:text-cyan-400' },
+    emerald: { bg: 'bg-emerald-100 dark:bg-emerald-500/10', border: 'border-emerald-300 dark:border-emerald-500/20', text: 'text-emerald-700 dark:text-emerald-300', icon: 'text-emerald-600 dark:text-emerald-400' },
+    blue: { bg: 'bg-blue-100 dark:bg-blue-500/10', border: 'border-blue-300 dark:border-blue-500/20', text: 'text-blue-700 dark:text-blue-300', icon: 'text-blue-600 dark:text-blue-400' },
+    fuchsia: { bg: 'bg-fuchsia-100 dark:bg-fuchsia-500/10', border: 'border-fuchsia-300 dark:border-fuchsia-500/20', text: 'text-fuchsia-700 dark:text-fuchsia-300', icon: 'text-fuchsia-600 dark:text-fuchsia-400' },
 };
 
 export const QUICK_ACTIONS: QuickAction[] = [
