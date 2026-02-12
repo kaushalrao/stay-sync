@@ -55,6 +55,7 @@ export interface Template {
     label: string;
     icon: string;
     content: string;
+    order?: number;
 }
 
 export type ViewState = 'home' | 'greeter' | 'settings';

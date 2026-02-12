@@ -19,7 +19,17 @@ const createFirebaseRepository = <T>(collectionName: string): Repository<T> => {
             }
 
             const unsubscribe = onSnapshot(q, (snapshot) => {
-                const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as T));
+                let items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as T));
+
+                if (collectionName === 'templates') {
+                    // Client-side sort to handle items without 'order' field
+                    items = items.sort((a: any, b: any) => {
+                        const orderA = a.order ?? Number.MAX_SAFE_INTEGER;
+                        const orderB = b.order ?? Number.MAX_SAFE_INTEGER;
+                        return orderA - orderB;
+                    });
+                }
+
                 onSuccess(items);
             }, onError);
 
