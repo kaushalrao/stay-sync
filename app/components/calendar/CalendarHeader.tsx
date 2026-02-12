@@ -8,18 +8,18 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({ currentMonth, on
         <button
             onClick={onPrev}
             type="button"
-            className="p-1 hover:bg-white/10 rounded-lg transition-colors text-white"
+            className="p-1 hover:bg-slate-200 dark:hover:bg-white/10 rounded-lg transition-colors text-slate-900 dark:text-white"
             aria-label="Previous Month"
         >
             <ChevronLeft size={20} />
         </button>
-        <span className="text-white font-bold text-sm">
+        <span className="text-slate-900 dark:text-white font-bold text-sm">
             {format(currentMonth, 'MMMM yyyy')}
         </span>
         <button
             onClick={onNext}
             type="button"
-            className="p-1 hover:bg-white/10 rounded-lg transition-colors text-white"
+            className="p-1 hover:bg-slate-200 dark:hover:bg-white/10 rounded-lg transition-colors text-slate-900 dark:text-white"
             aria-label="Next Month"
         >
             <ChevronRight size={20} />

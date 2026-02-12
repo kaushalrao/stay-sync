@@ -43,9 +43,9 @@ export const GuestForm: React.FC<GuestFormProps> = ({ details, onChange, templat
                         value={details.guestName}
                         onChange={(e) => update('guestName', e.target.value)}
                         placeholder="Guest Name"
-                        className="w-full px-4 py-3 md:px-5 md:py-4 pl-4 md:pl-5 text-base md:text-lg font-bold text-white bg-black/20 border border-white/5 rounded-2xl outline-none transition-all focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/10 focus:bg-black/30 placeholder:text-slate-600"
+                        className="w-full px-4 py-3 md:px-5 md:py-4 pl-4 md:pl-5 text-base md:text-lg font-bold text-slate-900 dark:text-white bg-slate-100 dark:bg-black/20 border border-slate-300 dark:border-white/5 rounded-2xl outline-none transition-all focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/10 focus:bg-slate-200 dark:focus:bg-black/30 placeholder:text-slate-400 dark:placeholder:text-slate-600"
                     />
-                    <div className="absolute right-4 md:right-5 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-orange-400 transition-colors">
+                    <div className="absolute right-4 md:right-5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-600 group-focus-within:text-orange-400 transition-colors">
                         <Edit3 size={16} />
                     </div>
                 </div>
@@ -55,14 +55,14 @@ export const GuestForm: React.FC<GuestFormProps> = ({ details, onChange, templat
                         value={details.phoneNumber || ''}
                         onChange={(e) => update('phoneNumber', e.target.value.replace(/[^0-9+\-\(\)\s]/g, ''))}
                         placeholder="Phone Number"
-                        className="w-full px-4 py-3 md:px-5 md:py-3.5 pl-4 md:pl-5 text-sm md:text-base font-medium text-white bg-black/20 border border-white/5 rounded-2xl outline-none transition-all focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/10 focus:bg-black/30 placeholder:text-slate-600"
+                        className="w-full px-4 py-3 md:px-5 md:py-3.5 pl-4 md:pl-5 text-sm md:text-base font-medium text-slate-900 dark:text-white bg-slate-100 dark:bg-black/20 border border-slate-300 dark:border-white/5 rounded-2xl outline-none transition-all focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/10 focus:bg-slate-200 dark:focus:bg-black/30 placeholder:text-slate-400 dark:placeholder:text-slate-600"
                     />
                 </div>
 
                 <div className="space-y-3 md:space-y-4">
                     {(templateContent.includes('{{checkIn') || templateContent.includes('{{nights') || templateContent.includes('{{totalAmount')) && (
                         <div className="grid grid-cols-2 gap-3 md:gap-4">
-                            <div className="group bg-black/20 p-3 md:p-4 rounded-2xl border border-white/5 focus-within:border-orange-500/50 focus-within:ring-2 focus-within:ring-orange-500/10 transition-all">
+                            <div className="group bg-slate-100 dark:bg-black/20 p-3 md:p-4 rounded-2xl border border-slate-300 dark:border-white/5 focus-within:border-orange-500/50 focus-within:ring-2 focus-within:ring-orange-500/10 transition-all">
                                 <DatePicker
                                     label="Check-in"
                                     variant="check-in"
@@ -73,7 +73,7 @@ export const GuestForm: React.FC<GuestFormProps> = ({ details, onChange, templat
                                     icalFeeds={icalFeeds}
                                 />
                             </div>
-                            <div className="group bg-black/20 p-3 md:p-4 rounded-2xl border border-white/5 focus-within:border-orange-500/50 focus-within:ring-2 focus-within:ring-orange-500/10 transition-all">
+                            <div className="group bg-slate-100 dark:bg-black/20 p-3 md:p-4 rounded-2xl border border-slate-300 dark:border-white/5 focus-within:border-orange-500/50 focus-within:ring-2 focus-within:ring-orange-500/10 transition-all">
                                 <DatePicker
                                     label="Check-out"
                                     variant="check-out"
@@ -101,7 +101,7 @@ export const GuestForm: React.FC<GuestFormProps> = ({ details, onChange, templat
                                     update('numberOfGuests', isNaN(val) ? 0 : val);
                                 }}
                                 placeholder="Guests"
-                                className="text-sm md:text-base font-bold bg-black/20"
+                                className="text-sm md:text-base font-bold bg-slate-100 dark:bg-black/20"
                             />
                         </div>
                     )}
@@ -119,7 +119,7 @@ export const GuestForm: React.FC<GuestFormProps> = ({ details, onChange, templat
                                     update('advancePaid', isNaN(val) ? 0 : val);
                                 }}
                                 placeholder="₹0"
-                                className="text-sm md:text-base font-bold bg-black/20"
+                                className="text-sm md:text-base font-bold bg-slate-100 dark:bg-black/20"
                             />
                             <Input
                                 type="number"
@@ -133,7 +133,7 @@ export const GuestForm: React.FC<GuestFormProps> = ({ details, onChange, templat
                                     update('discount', isNaN(val) ? 0 : val);
                                 }}
                                 placeholder="₹0"
-                                className="text-sm md:text-base font-bold bg-black/20"
+                                className="text-sm md:text-base font-bold bg-slate-100 dark:bg-black/20"
                             />
                         </div>
                     )}
@@ -143,7 +143,7 @@ export const GuestForm: React.FC<GuestFormProps> = ({ details, onChange, templat
                             <button
                                 type="button"
                                 onClick={onOpenDirectory}
-                                className="w-full h-[54px] bg-gradient-to-br from-slate-800 to-slate-900 text-slate-300 rounded-xl hover:text-white hover:from-slate-700 hover:to-slate-800 transition-all text-xs md:text-sm font-bold uppercase tracking-wider flex items-center justify-center gap-2 border border-white/10 hover:border-white/20 shadow-lg active:scale-95 group"
+                                className="w-full h-[54px] bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-800 dark:to-slate-900 text-slate-800 dark:text-slate-300 rounded-xl hover:text-slate-900 dark:hover:text-white hover:from-slate-300 hover:to-slate-400 dark:hover:from-slate-700 dark:hover:to-slate-800 transition-all text-xs md:text-sm font-bold uppercase tracking-wider flex items-center justify-center gap-2 border border-slate-300 dark:border-white/10 hover:border-slate-400 dark:hover:border-white/20 shadow-lg active:scale-95 group"
                             >
                                 <Users size={16} className="text-indigo-400 group-hover:text-indigo-300 transition-colors" /> Directory
                             </button>
@@ -158,7 +158,7 @@ export const GuestForm: React.FC<GuestFormProps> = ({ details, onChange, templat
                                     disabled={!isValid}
                                     className={`w-full h-[54px] rounded-xl transition-all text-xs md:text-sm font-bold uppercase tracking-wider flex items-center justify-center gap-2 border active:scale-95 shadow-lg ${isValid
                                         ? 'bg-gradient-to-br from-orange-500 to-red-600 text-white border-orange-400/20 hover:shadow-orange-500/25 hover:from-orange-400 hover:to-red-500'
-                                        : 'bg-slate-800 text-slate-500 border-white/5 cursor-not-allowed opacity-50 shadow-none'
+                                        : 'bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-500 border-slate-300 dark:border-white/5 cursor-not-allowed opacity-60 shadow-none'
                                         }`}
                                 >
                                     <CalendarCheck size={16} className={isValid ? "text-orange-100" : ""} /> Save Guest

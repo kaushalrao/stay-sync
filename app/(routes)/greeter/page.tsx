@@ -318,13 +318,13 @@ function GreeterContent() {
     }
 
     return (
-        <div className="px-4 md:px-8 pb-24 md:pb-0 flex flex-col gap-6 md:gap-10 h-full relative">
+        <div className="px-4 md:px-8 pb-24 md:pb-0 flex flex-col md:gap-10 h-full relative">
             <div className="hidden lg:block mt-8 animate-fade-in">
                 <PropertyDock properties={properties} selectedId={selectedPropId} onSelect={setSelectedPropId} />
             </div>
 
             {/* Mobile Header Controls */}
-            <div className="lg:hidden w-[calc(100%+2rem)] -mx-4 sticky top-[72px] z-30 bg-[#0f172a]/95 backdrop-blur-xl -mt-4 py-3 px-4 border-b border-white/5 animate-fade-in">
+            <div className="lg:hidden w-[calc(100%+2rem)] -mx-4 sticky top-16 z-30 bg-white/95 dark:bg-[#0f172a]/95 backdrop-blur-xl py-2 px-4 border-b border-slate-200 dark:border-white/5 animate-fade-in mb-4">
                 <PropertyDock properties={properties} selectedId={selectedPropId} onSelect={setSelectedPropId} />
             </div>
 
@@ -362,12 +362,12 @@ function GreeterContent() {
                 {isGuestbookOpen && (
                     <Portal>
                         <div className="fixed inset-0 z-[100] flex justify-end">
-                            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={() => setIsGuestbookOpen(false)} />
+                            <div className="absolute inset-0 bg-black/60 dark:bg-black/60 backdrop-blur-sm transition-opacity" onClick={() => setIsGuestbookOpen(false)} />
 
-                            <div className="relative w-full max-w-md h-full bg-slate-900 border-l border-white/10 shadow-2xl p-6 flex flex-col animate-slide-left">
+                            <div className="relative w-full max-w-md h-full bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-white/10 shadow-2xl p-6 flex flex-col animate-slide-left">
                                 <div className="flex justify-between items-center mb-6 shrink-0">
-                                    <h3 className="text-xl font-bold text-white flex items-center gap-2">Guest Directory</h3>
-                                    <button onClick={() => setIsGuestbookOpen(false)} className="p-2 bg-slate-800 rounded-lg text-slate-400 hover:text-white">
+                                    <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">Guest Directory</h3>
+                                    <button onClick={() => setIsGuestbookOpen(false)} className="p-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
                                         <X size={20} />
                                     </button>
                                 </div>
@@ -382,12 +382,12 @@ function GreeterContent() {
             </div>
 
             {/* Mobile Bottom Navigation Bar */}
-            <div className="lg:hidden fixed bottom-0 left-0 w-full bg-[#0f172a]/95 backdrop-blur-xl border-t border-white/10 p-2 z-30 safe-area-bottom">
+            <div className="lg:hidden fixed bottom-0 left-0 w-full bg-white/95 dark:bg-[#0f172a]/95 backdrop-blur-xl border-t border-slate-200 dark:border-white/10 p-2 z-30 safe-area-bottom">
                 <div className="grid grid-cols-4 gap-2 h-14">
                     {/* Editor Tab */}
                     <button
                         onClick={() => setMobileTab('edit')}
-                        className={`flex flex-col items-center justify-center rounded-xl transition-all ${mobileTab === 'edit' ? 'text-indigo-400 bg-indigo-500/10' : 'text-slate-400 hover:text-white'}`}
+                        className={`flex flex-col items-center justify-center rounded-xl transition-all ${mobileTab === 'edit' ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-500/10' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
                     >
                         <PenTool size={20} />
                         <span className="text-[10px] font-medium mt-1">Editor</span>
@@ -396,7 +396,7 @@ function GreeterContent() {
                     {/* Preview Tab */}
                     <button
                         onClick={() => setMobileTab('preview')}
-                        className={`flex flex-col items-center justify-center rounded-xl transition-all ${mobileTab === 'preview' ? 'text-indigo-400 bg-indigo-500/10' : 'text-slate-400 hover:text-white'}`}
+                        className={`flex flex-col items-center justify-center rounded-xl transition-all ${mobileTab === 'preview' ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-500/10' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
                     >
                         <Eye size={20} />
                         <span className="text-[10px] font-medium mt-1">Preview</span>
@@ -405,7 +405,7 @@ function GreeterContent() {
                     {/* Copy Action */}
                     <button
                         onClick={handleCopy}
-                        className="flex flex-col items-center justify-center rounded-xl text-slate-400 hover:text-white active:scale-95 transition-all"
+                        className="flex flex-col items-center justify-center rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white active:scale-95 transition-all"
                     >
                         {copied ? <Check size={20} className="text-green-400" /> : <Copy size={20} />}
                         <span className="text-[10px] font-medium mt-1">Copy</span>
@@ -414,7 +414,7 @@ function GreeterContent() {
                     {/* WhatsApp Action */}
                     <button
                         onClick={handleWhatsApp}
-                        className="flex flex-col items-center justify-center rounded-xl text-slate-400 hover:text-green-400 active:scale-95 transition-all"
+                        className="flex flex-col items-center justify-center rounded-xl text-slate-600 dark:text-slate-400 hover:text-green-600 dark:hover:text-green-400 active:scale-95 transition-all"
                     >
                         <MessageCircle size={20} />
                         <span className="text-[10px] font-medium mt-1">Send</span>

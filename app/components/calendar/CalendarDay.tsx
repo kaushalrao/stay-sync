@@ -52,17 +52,17 @@ export const CalendarDay: React.FC<CalendarDayProps> = ({
 
         // BLOCKED
         if (isBlocked) {
-            return `${base} text-slate-700 cursor-not-allowed`;
+            return `${base} text-slate-500 dark:text-slate-700 cursor-not-allowed`;
         }
 
         // RANGE (Middle)
         if (inRange) {
-            return `${base} bg-orange-500/20 text-white rounded-none`;
+            return `${base} bg-orange-500/20 text-slate-900 dark:text-white rounded-none`;
         }
 
         // RANGE (Endpoints Connections)
-        if (isRangeStart && comparisonDate) return `${base} bg-orange-500/20 text-white rounded-l-lg rounded-r-none`;
-        if (isRangeEnd && comparisonDate) return `${base} bg-orange-500/20 text-white rounded-l-none rounded-r-lg`;
+        if (isRangeStart && comparisonDate) return `${base} bg-orange-500/20 text-slate-900 dark:text-white rounded-l-lg rounded-r-none`;
+        if (isRangeEnd && comparisonDate) return `${base} bg-orange-500/20 text-slate-900 dark:text-white rounded-l-none rounded-r-lg`;
 
         // TURNOVER (Half-blocked visually if needed, but here simple text)
         if (isTurnover) {
@@ -70,7 +70,7 @@ export const CalendarDay: React.FC<CalendarDayProps> = ({
         }
 
         // DEFAULT
-        return `${base} text-white hover:bg-slate-800`;
+        return `${base} text-slate-900 dark:text-white hover:bg-slate-200 dark:hover:bg-slate-800`;
     };
 
     const className = getStyles();
