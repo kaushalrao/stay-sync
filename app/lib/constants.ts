@@ -104,7 +104,7 @@ export const QUICK_ACTIONS: QuickAction[] = [
         label: 'Add Booking',
         subtitle: 'New reservation',
         icon: PlusCircle,
-        color: 'text-blue-400',
+        color: 'text-blue-600 dark:text-blue-400',
         bgColor: 'bg-blue-500/10',
         href: '/greeter'
     },
@@ -112,7 +112,7 @@ export const QUICK_ACTIONS: QuickAction[] = [
         label: 'Guests',
         subtitle: 'View guests',
         icon: Users,
-        color: 'text-purple-400',
+        color: 'text-purple-600 dark:text-purple-400',
         bgColor: 'bg-purple-500/10',
         href: '/guests'
     },
@@ -120,7 +120,7 @@ export const QUICK_ACTIONS: QuickAction[] = [
         label: 'Properties',
         subtitle: 'Manage listings',
         icon: Home,
-        color: 'text-orange-400',
+        color: 'text-orange-600 dark:text-orange-400',
         bgColor: 'bg-orange-500/10',
         href: '/settings'
     },
@@ -128,7 +128,7 @@ export const QUICK_ACTIONS: QuickAction[] = [
         label: 'Analytics',
         subtitle: 'View insights',
         icon: BarChart3,
-        color: 'text-pink-400',
+        color: 'text-pink-600 dark:text-pink-400',
         bgColor: 'bg-pink-500/10',
         href: '/analytics'
     },
@@ -136,7 +136,7 @@ export const QUICK_ACTIONS: QuickAction[] = [
         label: 'Maintenance',
         subtitle: 'Report issues',
         icon: Wrench,
-        color: 'text-red-400',
+        color: 'text-red-600 dark:text-red-400',
         bgColor: 'bg-red-500/10',
         href: '/maintenance'
     },
@@ -144,7 +144,7 @@ export const QUICK_ACTIONS: QuickAction[] = [
         label: 'Settings',
         subtitle: 'Configure app',
         icon: Settings,
-        color: 'text-slate-400',
+        color: 'text-slate-600 dark:text-slate-400',
         bgColor: 'bg-slate-500/10',
         href: '/settings'
     }

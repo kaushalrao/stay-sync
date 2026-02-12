@@ -1,3 +1,5 @@
+"use client";
+
 import { SidebarLayout } from '@components/layout/SidebarLayout';
 
 export default function RoutesLayout({

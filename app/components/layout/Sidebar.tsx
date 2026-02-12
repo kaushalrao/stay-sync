@@ -6,28 +6,32 @@ import { usePathname } from 'next/navigation';
 import {
     Menu,
     X,
-    LogOut
+    LogOut,
+    Sun,
+    Moon
 } from 'lucide-react';
 import { signOut } from "firebase/auth";
 import { auth } from '@lib/firebase';
 import { SIDEBAR_NAV_ITEMS } from '@/app/lib/constants';
+import { useTheme } from '@/app/components/providers/ThemeProvider';
 
 export function Sidebar() {
     const pathname = usePathname();
     const [isOpen, setIsOpen] = React.useState(false);
+    const { theme, toggleTheme } = useTheme();
 
     return (
         <>
             {/* Mobile Header */}
-            <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-slate-900 border-b border-white/10 z-50 flex items-center px-4 justify-between">
+            <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-white/10 z-50 flex items-center px-4 justify-between">
                 <button
                     onClick={() => setIsOpen(!isOpen)}
-                    className="p-2 -ml-2 text-slate-400 hover:text-white transition-colors"
+                    className="p-2 -ml-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
                 >
                     {isOpen ? <X size={24} /> : <Menu size={24} />}
                 </button>
 
-                <span className="font-bold text-lg text-white">StaySync</span>
+                <span className="font-bold text-lg text-slate-900 dark:text-white">StaySync</span>
 
                 <div className="w-8" /> {/* Spacer for centering */}
             </div>
@@ -35,7 +39,7 @@ export function Sidebar() {
             {/* Overlay for mobile */}
             {isOpen && (
                 <div
-                    className="lg:hidden fixed inset-0 bg-black/70 z-30"
+                    className="lg:hidden fixed inset-0 bg-black/50 dark:bg-black/70 z-30"
                     onClick={() => setIsOpen(false)}
                 />
             )}
@@ -43,21 +47,21 @@ export function Sidebar() {
             {/* Sidebar */}
             <aside
                 className={`
-      fixed top-16 lg:top-0 left-0 h-[calc(100vh-4rem)] lg:h-screen bg-slate-900 z-40
+      fixed top-16 lg:top-0 left-0 h-[calc(100vh-4rem)] lg:h-screen bg-white dark:bg-slate-900 z-40
       transition-transform duration-300 ease-in-out
       ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-      w-64 flex flex-col shadow-xl border-r border-slate-800
+      w-64 flex flex-col shadow-xl border-r border-slate-200 dark:border-slate-800
     `}
             >
                 {/* Logo */}
-                <div className="hidden lg:block p-6 border-b border-slate-800">
+                <div className="hidden lg:block p-6 border-b border-slate-200 dark:border-slate-800">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
                             <span className="text-white font-bold text-xl">S</span>
                         </div>
                         <div>
-                            <h1 className="text-lg font-bold text-white">StaySync</h1>
-                            <p className="text-xs text-slate-400">Property Manager</p>
+                            <h1 className="text-lg font-bold text-slate-900 dark:text-white">StaySync</h1>
+                            <p className="text-xs text-slate-600 dark:text-slate-400">Property Manager</p>
                         </div>
                     </div>
                 </div>
@@ -79,7 +83,7 @@ export function Sidebar() {
                   transition-all duration-200 group
                   ${isActive
                                         ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-md'
-                                        : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
+                                        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200'
                                     }
                 `}
                             >
@@ -94,14 +98,37 @@ export function Sidebar() {
                 </nav>
 
                 {/* Footer */}
-                <button
-                    onClick={() => signOut(auth)}
-                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-red-500/10 hover:text-red-400 transition-all duration-200 mt-2"
-                >
-                    <LogOut size={20} />
-                    <span className="font-medium text-sm">Sign Out</span>
-                </button>
-                <div className="text-xs text-slate-600 text-center mt-4">
+                <div className="p-4 space-y-2 border-t border-slate-200 dark:border-slate-800">
+                    {/* Theme Toggle */}
+                    <button
+                        onClick={toggleTheme}
+                        className="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200 transition-all duration-200 group"
+                    >
+                        <div className="flex items-center gap-3">
+                            {theme === 'dark' ? (
+                                <Moon size={20} className="text-indigo-400" />
+                            ) : (
+                                <Sun size={20} className="text-amber-400" />
+                            )}
+                            <span className="font-medium text-sm">Theme</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-500">
+                            <span className="capitalize">{theme}</span>
+                        </div>
+                    </button>
+
+                    {/* Sign Out */}
+                    <button
+                        onClick={() => signOut(auth)}
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-red-500/10 hover:text-red-500 dark:hover:text-red-400 transition-all duration-200"
+                    >
+                        <LogOut size={20} />
+                        <span className="font-medium text-sm">Sign Out</span>
+                    </button>
+                </div>
+
+                {/* Copyright */}
+                <div className="text-xs text-slate-500 dark:text-slate-600 text-center py-4">
                     © 2026 StaySync
                 </div>
             </aside>

@@ -92,15 +92,24 @@ export function DashboardHome() {
                     return (
                         <div
                             key={index}
-                            className="bg-slate-800/50 backdrop-blur-xl rounded-2xl p-5 shadow-lg border border-slate-700/50 hover:shadow-xl transition-all hover:scale-105"
+                            className="group relative bg-white dark:bg-slate-800/50 backdrop-blur-xl rounded-2xl p-6 shadow-lg hover:shadow-2xl border border-slate-200/80 dark:border-slate-700/50 hover:border-slate-300 dark:hover:border-slate-600 transition-all duration-300 hover:scale-105 overflow-hidden"
                         >
-                            <div className="flex items-start justify-between mb-4">
-                                <div className={`p-3 rounded-xl bg-slate-700/50 ${stat.iconBg}`}>
-                                    <Icon className={stat.iconColor} size={24} />
+                            {/* Gradient background overlay */}
+                            <div className={`absolute inset-0 bg-gradient-to-br ${stat.gradient} opacity-0 group-hover:opacity-5 dark:group-hover:opacity-10 transition-opacity duration-500`} />
+
+                            {/* Content */}
+                            <div className="relative z-10">
+                                <div className="flex items-start justify-between mb-4">
+                                    <div className={`p-3 rounded-xl ${stat.iconBg} dark:bg-slate-700/50 shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300`}>
+                                        <Icon className={`${stat.iconColor} dark:text-slate-300 group-hover:rotate-12 transition-transform duration-300`} size={24} />
+                                    </div>
                                 </div>
+                                <p className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">{stat.label}</p>
+                                <p className="text-3xl font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{stat.value}</p>
                             </div>
-                            <p className="text-sm text-slate-400 mb-1">{stat.label}</p>
-                            <p className="text-2xl font-bold text-white">{stat.value}</p>
+
+                            {/* Subtle shine effect */}
+                            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-white/30 to-transparent dark:from-white/10 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                         </div>
                     );
                 })}
