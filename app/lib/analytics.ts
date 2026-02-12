@@ -1,4 +1,4 @@
-import { Guest, Property, DashboardStats, RevenueData } from './types';
+import { Guest, Property, RevenueData } from './types';
 import { getMonth, parseISO, isSameYear, differenceInDays } from 'date-fns';
 
 export const calculateDashboardMetrics = (
@@ -74,4 +74,137 @@ export const calculateDashboardMetrics = (
         chartData,
         upcomingGuests
     };
+};
+
+// Get current month statistics
+export const getCurrentMonthStats = (
+    guests: Guest[],
+    properties: Property[],
+    selectedProperty: string = 'all'
+) => {
+    // Safety check
+    if (!guests || guests.length === 0) {
+        return {
+            totalRevenue: 0,
+            totalBookings: 0,
+            avgNightlyRate: 0,
+        };
+    }
+
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    const filteredByProp = selectedProperty === 'all'
+        ? guests
+        : guests.filter(g => {
+            const prop = properties.find(p => p.id === selectedProperty);
+            return prop && g.propName === prop.name;
+        });
+
+    const currentMonthGuests = filteredByProp.filter(g => {
+        if (!g.checkInDate) return false;
+        const checkIn = parseISO(g.checkInDate);
+        return getMonth(checkIn) === currentMonth && isSameYear(checkIn, now);
+    });
+
+    let totalRevenue = 0;
+    let totalNights = 0;
+
+    currentMonthGuests.forEach(g => {
+        totalRevenue += g.totalAmount || 0;
+        if (g.checkInDate && g.checkOutDate) {
+            const nights = differenceInDays(parseISO(g.checkOutDate), parseISO(g.checkInDate));
+            totalNights += Math.max(1, nights);
+        }
+    });
+
+    return {
+        totalRevenue,
+        totalBookings: currentMonthGuests.length,
+        avgNightlyRate: totalNights > 0 ? totalRevenue / totalNights : 0,
+        totalGuests: currentMonthGuests.length,
+    };
+};
+
+// Get upcoming bookings (next 5)
+export const getUpcomingBookings = (
+    guests: Guest[],
+    properties: Property[],
+    selectedProperty: string = 'all',
+    limit: number = 5
+) => {
+    // Safety check
+    if (!guests || guests.length === 0) {
+        return [];
+    }
+
+    const filteredByProp = selectedProperty === 'all'
+        ? guests
+        : guests.filter(g => {
+            const prop = properties.find(p => p.id === selectedProperty);
+            return prop && g.propName === prop.name;
+        });
+
+    return filteredByProp
+        .filter(g => g.status === 'upcoming' || g.status === 'active')
+        .sort((a, b) => new Date(a.checkInDate).getTime() - new Date(b.checkInDate).getTime())
+        .slice(0, limit);
+};
+
+// Get revenue sparkline data (last 6 months)
+export const getRevenueSparkline = (
+    guests: Guest[],
+    properties: Property[],
+    selectedProperty: string
+) => {
+    const now = new Date();
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const sparklineData = [];
+
+    // Safety check
+    if (!guests || guests.length === 0) {
+        // Return empty data for last 6 months
+        for (let i = 5; i >= 0; i--) {
+            const targetDate = new Date(now.getFullYear(), now.getMonth() - i, 1);
+            const monthIdx = targetDate.getMonth();
+            const year = targetDate.getFullYear();
+            sparklineData.push({
+                month: months[monthIdx],
+                revenue: 0,
+                isCurrent: monthIdx === now.getMonth() && year === now.getFullYear()
+            });
+        }
+        return sparklineData;
+    }
+
+    const filteredByProp = selectedProperty === 'all'
+        ? guests
+        : guests.filter(g => {
+            const prop = properties.find(p => p.id === selectedProperty);
+            return prop && g.propName === prop.name;
+        });
+
+    // Get last 6 months
+    for (let i = 5; i >= 0; i--) {
+        const targetDate = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const monthIdx = targetDate.getMonth();
+        const year = targetDate.getFullYear();
+
+        const monthRevenue = filteredByProp
+            .filter(g => {
+                if (!g.checkInDate) return false;
+                const checkIn = parseISO(g.checkInDate);
+                return getMonth(checkIn) === monthIdx && isSameYear(checkIn, targetDate);
+            })
+            .reduce((sum, g) => sum + (g.totalAmount || 0), 0);
+
+        sparklineData.push({
+            month: months[monthIdx],
+            revenue: monthRevenue,
+            isCurrent: monthIdx === now.getMonth() && year === now.getFullYear()
+        });
+    }
+
+    return sparklineData;
 };

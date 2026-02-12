@@ -198,3 +198,33 @@ export interface ActivityItemProps {
     guest: Guest;
     onClick: () => void;
 }
+
+export interface QuickAction {
+    label: string;
+    subtitle: string;
+    icon: React.ElementType;
+    color: string;
+    bgColor: string;
+    href: string;
+}
+
+export interface UpcomingBookingsWidgetProps {
+    bookings: Guest[];
+    loading?: boolean;
+}
+
+export interface HeroBannerProps {
+    userName: string;
+    bookingsToday?: number;
+    upcomingCount?: number;
+}
+
+export interface NavItem {
+    label: string;
+    href: string;
+    icon: React.ElementType;
+}
+
+export interface SidebarLayoutProps {
+    children: React.ReactNode;
+}

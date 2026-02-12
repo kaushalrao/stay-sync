@@ -318,13 +318,13 @@ function GreeterContent() {
     }
 
     return (
-        <div className="pb-24 md:pb-0 flex flex-col gap-6 md:gap-10 h-full relative">
+        <div className="px-4 md:px-8 pb-24 md:pb-0 flex flex-col gap-6 md:gap-10 h-full relative">
             <div className="hidden lg:block mt-8 animate-fade-in">
                 <PropertyDock properties={properties} selectedId={selectedPropId} onSelect={setSelectedPropId} />
             </div>
 
             {/* Mobile Header Controls */}
-            <div className="lg:hidden w-[calc(100%+2rem)] -mx-4 sticky top-[72px] z-40 bg-[#0f172a]/95 backdrop-blur-xl -mt-4 py-3 px-4 border-b border-white/5 animate-fade-in">
+            <div className="lg:hidden w-[calc(100%+2rem)] -mx-4 sticky top-[72px] z-30 bg-[#0f172a]/95 backdrop-blur-xl -mt-4 py-3 px-4 border-b border-white/5 animate-fade-in">
                 <PropertyDock properties={properties} selectedId={selectedPropId} onSelect={setSelectedPropId} />
             </div>
 
@@ -382,7 +382,7 @@ function GreeterContent() {
             </div>
 
             {/* Mobile Bottom Navigation Bar */}
-            <div className="lg:hidden fixed bottom-0 left-0 w-full bg-[#0f172a]/95 backdrop-blur-xl border-t border-white/10 p-2 z-50 safe-area-bottom">
+            <div className="lg:hidden fixed bottom-0 left-0 w-full bg-[#0f172a]/95 backdrop-blur-xl border-t border-white/10 p-2 z-30 safe-area-bottom">
                 <div className="grid grid-cols-4 gap-2 h-14">
                     {/* Editor Tab */}
                     <button

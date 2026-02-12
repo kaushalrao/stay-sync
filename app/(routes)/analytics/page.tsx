@@ -5,14 +5,12 @@ import { useRouter } from 'next/navigation';
 import { useApp } from '@components/providers/AppProvider';
 import { dataService } from '@/app/services';
 import { Guest } from '@/app/lib/types';
-import { ChevronLeft } from 'lucide-react';
 import { DashboardHeader } from '@components/analytics/DashboardHeader';
 import { StatsGrid } from '@components/analytics/StatsGrid';
 import { RevenueChart } from '@components/analytics/RevenueChart';
 import { RecentActivity } from '@components/analytics/RecentActivity';
 import { calculateDashboardMetrics } from '@/app/lib/analytics';
 import { Loader } from '@components/ui/Loader';
-
 
 export default function AnalyticsPage() {
     const { user, properties, loading: appLoading } = useApp();
@@ -56,14 +54,7 @@ export default function AnalyticsPage() {
     }
 
     return (
-        <div className="animate-fade-in max-w-7xl mx-auto w-full px-4 py-8 md:py-10 pb-24">
-            <button
-                onClick={() => router.push('/')}
-                className="mb-8 flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm font-bold uppercase tracking-wider"
-            >
-                <ChevronLeft size={16} /> Back to Dashboard
-            </button>
-
+        <div className="animate-fade-in mx-auto w-full px-6 py-8 md:py-10 pb-24">
             {/* Header */}
             <DashboardHeader
                 userName={user.displayName || 'Host'}

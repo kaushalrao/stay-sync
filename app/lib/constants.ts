@@ -1,7 +1,13 @@
-import { GuestDetails } from './types';
+import { GuestDetails, NavItem, QuickAction } from './types';
 import {
     CalendarCheck, MapPin, Coffee, Wifi,
-    Utensils, MessageCircle, LogOut, Home, FileText, Mountain
+    Utensils, MessageCircle, LogOut, Home, FileText, Mountain,
+    PlusCircle,
+    Users,
+    BarChart3,
+    Settings,
+    Wrench,
+    LayoutDashboard
 } from 'lucide-react';
 import React from 'react';
 
@@ -92,3 +98,62 @@ export const COLOR_VARIANTS: Record<string, { bg: string, border: string, text: 
     blue: { bg: 'bg-blue-500/10', border: 'border-blue-500/20', text: 'text-blue-300', icon: 'text-blue-400' },
     fuchsia: { bg: 'bg-fuchsia-500/10', border: 'border-fuchsia-500/20', text: 'text-fuchsia-300', icon: 'text-fuchsia-400' },
 };
+
+export const QUICK_ACTIONS: QuickAction[] = [
+    {
+        label: 'Add Booking',
+        subtitle: 'New reservation',
+        icon: PlusCircle,
+        color: 'text-blue-400',
+        bgColor: 'bg-blue-500/10',
+        href: '/greeter'
+    },
+    {
+        label: 'Guests',
+        subtitle: 'View guests',
+        icon: Users,
+        color: 'text-purple-400',
+        bgColor: 'bg-purple-500/10',
+        href: '/guests'
+    },
+    {
+        label: 'Properties',
+        subtitle: 'Manage listings',
+        icon: Home,
+        color: 'text-orange-400',
+        bgColor: 'bg-orange-500/10',
+        href: '/settings'
+    },
+    {
+        label: 'Analytics',
+        subtitle: 'View insights',
+        icon: BarChart3,
+        color: 'text-pink-400',
+        bgColor: 'bg-pink-500/10',
+        href: '/analytics'
+    },
+    {
+        label: 'Maintenance',
+        subtitle: 'Report issues',
+        icon: Wrench,
+        color: 'text-red-400',
+        bgColor: 'bg-red-500/10',
+        href: '/maintenance'
+    },
+    {
+        label: 'Settings',
+        subtitle: 'Configure app',
+        icon: Settings,
+        color: 'text-slate-400',
+        bgColor: 'bg-slate-500/10',
+        href: '/settings'
+    }
+];
+
+export const SIDEBAR_NAV_ITEMS: NavItem[] = [
+    { label: 'Dashboard', href: '/', icon: LayoutDashboard },
+    { label: 'Guests', href: '/guests', icon: Users },
+    { label: 'Maintenance', href: '/maintenance', icon: Wrench },
+    { label: 'Analytics', href: '/analytics', icon: BarChart3 },
+    { label: 'Settings', href: '/settings', icon: Settings },
+];

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { AppProvider } from "./components/providers/AppProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,9 +17,6 @@ export const viewport = {
   viewportFit: "cover",
 };
 
-import { AppProvider } from "./components/providers/AppProvider";
-import { Header } from "./components/layout/Header";
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -33,8 +31,7 @@ export default function RootLayout({
               <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-orange-600/10 rounded-full blur-[100px] will-change-transform" />
               <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-pink-600/10 rounded-full blur-[100px] will-change-transform" />
             </div>
-            <Header />
-            <main className="flex-1 px-4 lg:px-8 relative z-10 pb-10 w-full max-w-7xl mx-auto">
+            <main className="flex-1 relative z-10 w-full">
               {children}
             </main>
           </div>

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { Users, ChevronLeft } from 'lucide-react';
+import { Users } from 'lucide-react';
 import { useApp } from '@components/providers/AppProvider';
 import { GuestDirectory } from '@components/guests/GuestDirectory';
 
@@ -20,14 +20,8 @@ export default function GuestsPage() {
     if (!user) return null;
 
     return (
-        <div className="animate-fade-in max-w-5xl mx-auto w-full pb-20 relative px-0 md:px-0 pt-4 md:pt-8 safe-area-top">
+        <div className="animate-fade-in mx-auto w-full pb-20 px-6 pt-4 md:pt-8 safe-area-top">
             <div className="px-4 md:px-0">
-                <button
-                    onClick={() => router.push('/')}
-                    className="mb-4 md:mb-6 flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-xs md:text-sm font-bold uppercase tracking-wider"
-                >
-                    <ChevronLeft size={16} /> Back to Dashboard
-                </button>
 
                 <div className="flex items-center gap-3 md:gap-4 mb-6 md:mb-8">
                     <div className="p-2 md:p-3 bg-indigo-500/10 rounded-2xl text-indigo-400 border border-indigo-500/10">

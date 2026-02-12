@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useApp } from '@components/providers/AppProvider';
 import { useRouter } from 'next/navigation';
-import { Wrench, Plus, CheckCircle2, Circle, AlertTriangle, Trash2, Filter, Home, ChevronDown } from 'lucide-react';
+import { Wrench, Plus, CheckCircle2, Circle, Trash2, Filter, Home, ChevronDown } from 'lucide-react';
 import { Button } from '@components/ui/Button';
 import { Input } from '@components/ui/Input';
 import { addDoc, collection, deleteDoc, doc, updateDoc } from 'firebase/firestore';
@@ -83,7 +83,7 @@ export default function MaintenancePage() {
     }).sort((a, b) => b.createdAt - a.createdAt);
 
     return (
-        <div className="animate-fade-in pb-20 pt-6 max-w-4xl mx-auto">
+        <div className="animate-fade-in mx-auto w-full pb-20 px-6 pt-4 md:pt-8 safe-area-top">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                 <div>
                     <h1 className="text-3xl font-bold text-white mb-2 flex items-center gap-3">

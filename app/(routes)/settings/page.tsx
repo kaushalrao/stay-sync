@@ -22,8 +22,14 @@ export default function SettingsPage() {
     if (!user) return null;
 
     return (
-        <div className="animate-fade-in space-y-8 max-w-5xl mx-auto w-full pb-20 relative">
-            <div className="sticky top-[72px] z-40 bg-[#0f172a]/95 backdrop-blur-xl w-[calc(100%+2rem)] -mx-4 px-4 py-3 border-b border-white/5 lg:static lg:bg-transparent lg:border-none lg:w-auto lg:mx-0 lg:p-0 flex justify-center transition-all mb-8 lg:mb-8 -mt-4 pt-4 lg:mt-0 lg:pt-0">
+        <div className="animate-fade-in space-y-8 w-full pb-20 pt-8 px-4 md:px-8 relative">
+            {/* Page Header */}
+            <div className="flex flex-col gap-1">
+                <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">Settings</h1>
+                <p className="text-slate-400 text-sm md:text-base">Manage your properties and preferences</p>
+            </div>
+
+            <div className="sticky top-16 z-30 bg-[#0f172a]/95 backdrop-blur-xl w-[calc(100%+4rem)] -mx-8 px-8 py-3 border-y border-white/5 lg:static lg:bg-transparent lg:border-none lg:w-auto lg:mx-0 lg:p-0 flex justify-start lg:justify-start transition-all">
                 <TabControl
                     options={[
                         { id: 'properties', label: 'Properties' },
