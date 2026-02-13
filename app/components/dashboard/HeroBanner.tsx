@@ -4,6 +4,8 @@ import React from 'react';
 import { ArrowRight, Sparkles, TrendingUp } from 'lucide-react';
 import { HeroBannerProps } from '@/app/lib/types';
 import { useRouter } from 'next/navigation';
+import Lottie from "lottie-react";
+import businessmanAnimation from "@/app/assets/Businessman.json";
 
 export function HeroBanner({ userName, bookingsToday = 0, upcomingCount = 0 }: HeroBannerProps) {
     const getGreeting = () => {
@@ -32,14 +34,6 @@ export function HeroBanner({ userName, bookingsToday = 0, upcomingCount = 0 }: H
                 {/* Decorative background elements */}
                 <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-indigo-500/5 via-purple-500/5 to-pink-500/5 dark:from-indigo-500/10 dark:via-purple-500/10 dark:to-pink-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
                 <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-purple-500/5 to-indigo-500/5 dark:from-purple-500/10 dark:to-indigo-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
-
-                {/* Floating sparkles - hidden on mobile */}
-                <div className="hidden md:block absolute top-8 right-20 animate-pulse">
-                    <Sparkles className="text-yellow-400/30" size={20} />
-                </div>
-                <div className="hidden md:block absolute bottom-12 right-32 animate-pulse delay-300">
-                    <Sparkles className="text-pink-400/30" size={16} />
-                </div>
 
                 <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 md:gap-8">
                     {/* Text Content */}
@@ -81,30 +75,9 @@ export function HeroBanner({ userName, bookingsToday = 0, upcomingCount = 0 }: H
                         </div>
                     </div>
 
-                    {/* Illustration - Premium version - hidden on mobile and tablet */}
-                    <div className="hidden xl:block relative">
-                        <div className="relative w-48 h-48">
-                            {/* Glow effect */}
-                            <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-full blur-2xl animate-pulse" />
-
-                            {/* Main circle */}
-                            <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="relative">
-                                    {/* Center icon container */}
-                                    <div className="w-32 h-32 bg-gradient-to-br from-slate-800/80 to-slate-700/80 rounded-3xl backdrop-blur-sm flex items-center justify-center border border-slate-600/50 shadow-2xl">
-                                        <div className="text-6xl">💼</div>
-                                    </div>
-
-                                    {/* Floating elements with premium styling */}
-                                    <div className="absolute -top-4 -right-4 w-12 h-12 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl animate-bounce shadow-lg shadow-yellow-500/50 flex items-center justify-center">
-                                        <Sparkles className="text-white" size={20} />
-                                    </div>
-                                    <div className="absolute -bottom-2 -left-2 w-10 h-10 bg-gradient-to-br from-emerald-400 to-green-500 rounded-2xl animate-pulse shadow-lg shadow-emerald-500/50 flex items-center justify-center">
-                                        <TrendingUp className="text-white" size={18} />
-                                    </div>
-                                    <div className="absolute top-1/2 -right-6 w-8 h-8 bg-gradient-to-br from-pink-400 to-purple-500 rounded-xl animate-ping opacity-75" />
-                                </div>
-                            </div>
+                    <div className="hidden xl:block absolute right-0 top-1/2 -translate-y-1/2 mr-8 pointer-events-none">
+                        <div className="w-86 h-86">
+                            <Lottie animationData={businessmanAnimation} loop={true} className="w-full h-full" />
                         </div>
                     </div>
                 </div>
