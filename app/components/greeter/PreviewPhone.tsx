@@ -10,7 +10,7 @@ export const PreviewPhone: React.FC<{
 }> = ({ message, onSend, onCopy, copied }) => (
     <div className="relative rounded-[2.5rem] overflow-hidden border-2 border-slate-200 dark:border-slate-700 shadow-2xl bg-white dark:bg-[#000] ring-4 ring-slate-200/50 dark:ring-slate-800/50">
         {/* Header */}
-        <div className="bg-slate-50 dark:from-[#1f2937] dark:to-[#1a2332] p-4 flex items-center justify-between border-b border-slate-100 dark:border-white/5">
+        <div className="bg-slate-50 dark:bg-slate-800 p-4 flex items-center justify-between border-b border-slate-100 dark:border-white/5">
             <div className="flex items-center gap-3">
                 <div className="relative">
                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white font-bold shadow-lg ring-2 ring-green-400/30">
@@ -40,7 +40,7 @@ export const PreviewPhone: React.FC<{
         </div>
 
         {/* Chat Background */}
-        <div className="relative bg-[#e5ddd5] dark:bg-[#0b141a] min-h-[350px] lg:min-h-[400px] p-4 dark:bg-[url('https://i.pinimg.com/originals/97/c0/07/97c00759d90d786d9b6096d274ad3e07.png')] dark:bg-opacity-10 dark:bg-contain">
+        <div className="relative flex-1 w-full bg-[#e5ddd5] dark:bg-[#0b141a] p-4 dark:bg-[url('https://i.pinimg.com/originals/97/c0/07/97c00759d90d786d9b6096d274ad3e07.png')] dark:bg-opacity-10 dark:bg-contain overflow-y-auto custom-scrollbar">
             {/* Message Bubble */}
             <div className="relative max-w-[90%] animate-fade-in">
                 <div className="bg-white dark:bg-[#005c4b] p-4 rounded-2xl text-slate-900 dark:text-white text-sm leading-relaxed shadow-lg dark:shadow-xl relative border border-slate-200/50 dark:border-transparent">
@@ -60,7 +60,7 @@ export const PreviewPhone: React.FC<{
         </div>
 
         {/* Desktop Action Bar */}
-        <div className="p-4 bg-white dark:from-[#1a2332] dark:to-[#1f2937] border-t border-slate-100 dark:border-white/5 hidden lg:block">
+        <div className="p-4 bg-white dark:bg-slate-800 border-t border-slate-100 dark:border-white/5 hidden lg:block w-full z-20">
             <Button
                 onClick={onSend}
                 disabled={!message}

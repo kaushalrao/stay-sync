@@ -152,6 +152,7 @@ export const QUICK_ACTIONS: QuickAction[] = [
 
 export const SIDEBAR_NAV_ITEMS: NavItem[] = [
     { label: 'Dashboard', href: '/', icon: LayoutDashboard },
+    { label: 'New Guest', href: '/greeter', icon: PlusCircle },
     { label: 'Guests', href: '/guests', icon: Users },
     { label: 'Maintenance', href: '/maintenance', icon: Wrench },
     { label: 'Analytics', href: '/analytics', icon: BarChart3 },
