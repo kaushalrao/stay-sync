@@ -189,9 +189,12 @@ export interface StatCardProps {
     label: string;
     value: string | number;
     icon: LucideIcon;
-    color: string;
-    bg: string;
-    border: string;
+    color?: string;
+    bg?: string;
+    border?: string;
+    gradient?: string;
+    iconBg?: string;
+    iconColor?: string;
 }
 
 export interface ActivityItemProps {

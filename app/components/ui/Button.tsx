@@ -2,7 +2,7 @@ import React from 'react';
 import { Loader2 } from 'lucide-react';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-    variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
+    variant?: 'primary' | 'secondary' | 'danger' | 'ghost' | 'purple';
     isLoading?: boolean;
 }
 
@@ -11,7 +11,8 @@ export const Button: React.FC<ButtonProps> = ({ children, className = '', varian
         primary: "bg-gradient-to-r from-orange-500 to-pink-600 text-white shadow-lg shadow-orange-500/20 hover:opacity-90 disabled:opacity-50",
         secondary: "bg-slate-300 dark:bg-slate-700/50 text-slate-900 dark:text-slate-200 hover:bg-slate-400 dark:hover:bg-slate-700 border border-slate-400 dark:border-white/5",
         danger: "bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20",
-        ghost: "bg-transparent text-slate-400 hover:text-white"
+        ghost: "bg-transparent text-slate-400 hover:text-white",
+        purple: "bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-500/20 hover:bg-purple-100 hover:border-purple-300 shadow-sm"
     };
     return (
         <button className={`py-3 px-4 rounded-xl font-bold transition-all active:scale-95 flex items-center justify-center gap-2 ${variants[variant]} ${className}`} disabled={isLoading || props.disabled} {...props}>

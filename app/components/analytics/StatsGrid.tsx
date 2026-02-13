@@ -9,33 +9,33 @@ export const StatsGrid: React.FC<StatsGridProps> = ({ stats, loading }) => {
             label: "Total Revenue",
             value: `₹${stats.totalRevenue.toLocaleString()}`,
             icon: IndianRupee,
-            color: "text-emerald-400",
-            bg: "bg-emerald-500/10",
-            border: "border-emerald-500/20"
+            gradient: 'from-emerald-400 to-green-500',
+            iconBg: 'bg-emerald-50',
+            iconColor: 'text-emerald-600'
         },
         {
             label: "Occupancy Rate",
             value: `${stats.occupancyRate}%`,
             icon: Home,
-            color: "text-blue-400",
-            bg: "bg-blue-500/10",
-            border: "border-blue-500/20"
+            gradient: 'from-blue-400 to-indigo-500',
+            iconBg: 'bg-blue-50',
+            iconColor: 'text-blue-600'
         },
         {
             label: "Total Bookings",
             value: stats.totalBookings,
             icon: CalendarCheck,
-            color: "text-orange-400",
-            bg: "bg-orange-500/10",
-            border: "border-orange-500/20"
+            gradient: 'from-orange-400 to-rose-500',
+            iconBg: 'bg-orange-50',
+            iconColor: 'text-orange-600'
         },
         {
             label: "Avg. Daily Rate",
             value: `₹${Math.round(stats.avgNightlyRate).toLocaleString()}`,
             icon: TrendingUp,
-            color: "text-purple-400",
-            bg: "bg-purple-500/10",
-            border: "border-purple-500/20"
+            gradient: 'from-purple-400 to-pink-500',
+            iconBg: 'bg-purple-50',
+            iconColor: 'text-purple-600'
         }
     ];
 

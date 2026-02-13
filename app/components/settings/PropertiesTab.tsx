@@ -109,7 +109,7 @@ export function PropertiesTab() {
                                 </div>
 
                                 <div>
-                                    <h3 className="font-bold text-slate-900 dark:text-white text-xl tracking-tight leading-tight mb-1">{p.name}</h3>
+                                    <h3 className="font-bold text-slate-900 dark:text-white text-lg md:text-xl tracking-tight leading-tight mb-1">{p.name}</h3>
                                     <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">₹ {p.basePrice}/night</p>
                                 </div>
 
@@ -141,7 +141,7 @@ export function PropertiesTab() {
             ) : (
                 <form onSubmit={handleSaveProperty} className="bg-slate-100/80 dark:bg-slate-900/40 backdrop-blur-2xl p-8 rounded-[2.5rem] border border-slate-300 dark:border-white/10 max-w-4xl mx-auto animate-fade-in shadow-2xl ring-1 ring-slate-300/50 dark:ring-white/5">
                     <div className="flex justify-between items-center mb-8 pb-6 border-b border-slate-300 dark:border-white/5">
-                        <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">{editingProp.id ? 'Edit Property' : 'Add Property'}</h3>
+                        <h3 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white mb-1">{editingProp.id ? 'Edit Property' : 'Add Property'}</h3>
                         <button type="button" onClick={() => setEditingProp(null)} className="p-3 bg-slate-300 dark:bg-slate-700/50 rounded-full text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"><ArrowLeft size={20} /></button>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">

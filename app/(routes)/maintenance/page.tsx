@@ -86,7 +86,7 @@ export default function MaintenancePage() {
         <div className="animate-fade-in mx-auto w-full pb-20 px-6 pt-4 md:pt-8 safe-area-top">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-3">
+                    <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-3">
                         <Wrench className="text-orange-500" /> Maintenance
                     </h1>
                     <p className="text-slate-500 dark:text-slate-400">Track repairs and tasks across your properties.</p>
