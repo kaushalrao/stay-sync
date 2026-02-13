@@ -15,7 +15,11 @@ import { auth } from '@lib/firebase';
 import { SIDEBAR_NAV_ITEMS } from '@/app/lib/constants';
 import { useTheme } from '@/app/components/providers/ThemeProvider';
 
-export function Sidebar() {
+interface SidebarProps {
+    onNavigate?: () => void;
+}
+
+export function Sidebar({ onNavigate }: SidebarProps) {
     const pathname = usePathname();
     const [isOpen, setIsOpen] = React.useState(false);
     const { theme, toggleTheme } = useTheme();
@@ -77,7 +81,12 @@ export function Sidebar() {
                             <Link
                                 key={item.href}
                                 href={item.href}
-                                onClick={() => setIsOpen(false)}
+                                onClick={() => {
+                                    setIsOpen(false);
+                                    if (pathname !== item.href && onNavigate) {
+                                        onNavigate();
+                                    }
+                                }}
                                 className={`
                   flex items-center gap-3 px-4 py-3 rounded-xl
                   transition-all duration-200 group
