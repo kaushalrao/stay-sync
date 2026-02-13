@@ -18,6 +18,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     // Initialize theme on mount
     useEffect(() => {
         setMounted(true);
+        const storedTheme = localStorage.getItem('theme') as Theme | null;
+        if (storedTheme === 'light' || storedTheme === 'dark') {
+            setTheme(storedTheme);
+        }
     }, []);
 
     // Update document class when theme changes
@@ -26,6 +30,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
             const root = document.documentElement;
             root.classList.remove('light', 'dark');
             root.classList.add(theme);
+            localStorage.setItem('theme', theme);
         }
     }, [theme, mounted]);
 
