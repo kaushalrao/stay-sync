@@ -43,14 +43,14 @@ export const StatsGrid: React.FC<StatsGridProps> = ({ stats, loading }) => {
         return (
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-8">
                 {[1, 2, 3, 4].map(i => (
-                    <div key={i} className="relative overflow-hidden rounded-[1.5rem] md:rounded-[2rem] p-4 md:p-6 bg-slate-900/40 backdrop-blur-xl border border-white/5 shadow-xl h-32 md:h-40 animate-pulse flex flex-col justify-between">
+                    <div key={i} className="relative overflow-hidden rounded-[1.5rem] md:rounded-[2rem] p-4 md:p-6 bg-white dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200 dark:border-white/5 shadow-xl md:shadow-2xl dark:shadow-xl h-32 md:h-40 animate-pulse flex flex-col justify-between">
                         <div className="flex justify-between items-start">
-                            <div className="w-10 h-10 rounded-2xl bg-slate-800"></div>
-                            <div className="w-16 h-5 rounded-full bg-slate-800/50"></div>
+                            <div className="w-10 h-10 rounded-2xl bg-slate-200 dark:bg-slate-800"></div>
+                            <div className="w-16 h-5 rounded-full bg-slate-200 dark:bg-slate-800/50"></div>
                         </div>
                         <div>
-                            <div className="h-8 w-24 bg-slate-800 rounded-lg mb-2"></div>
-                            <div className="h-3 w-20 bg-slate-800/50 rounded-lg"></div>
+                            <div className="h-8 w-24 bg-slate-200 dark:bg-slate-800 rounded-lg mb-2"></div>
+                            <div className="h-3 w-20 bg-slate-200 dark:bg-slate-800/50 rounded-lg"></div>
                         </div>
                     </div>
                 ))}

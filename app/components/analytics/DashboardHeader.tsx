@@ -24,10 +24,10 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
     return (
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
             <div>
-                <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight mb-1">
+                <h1 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tight mb-1">
                     {getGreeting()}, {userName?.split(' ')[0] || 'User'}
                 </h1>
-                <p className="text-slate-400 text-sm">Here&apos;s what&apos;s happening today.</p>
+                <p className="text-slate-500 dark:text-slate-400 text-sm">Here&apos;s what&apos;s happening today.</p>
             </div>
 
             <DashboardFilters
