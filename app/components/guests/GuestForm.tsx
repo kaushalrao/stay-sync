@@ -34,7 +34,7 @@ export const GuestForm: React.FC<GuestFormProps> = ({ details, onChange, templat
     };
 
     return (
-        <Card className="!p-4 md:!p-8 relative">
+        <Card className="!p-4 md:!p-8 relative !bg-white dark:!bg-slate-900/40 !border-slate-200 dark:!border-white/5 !shadow-2xl">
             <SectionHeader title="Guest Details" icon={<Users size={16} />} />
 
             <div className="space-y-4 md:space-y-6">
@@ -143,9 +143,9 @@ export const GuestForm: React.FC<GuestFormProps> = ({ details, onChange, templat
                             <button
                                 type="button"
                                 onClick={onOpenDirectory}
-                                className="w-full h-[54px] bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-800 dark:to-slate-900 text-slate-800 dark:text-slate-300 rounded-xl hover:text-slate-900 dark:hover:text-white hover:from-slate-300 hover:to-slate-400 dark:hover:from-slate-700 dark:hover:to-slate-800 transition-all text-xs md:text-sm font-bold uppercase tracking-wider flex items-center justify-center gap-2 border border-slate-300 dark:border-white/10 hover:border-slate-400 dark:hover:border-white/20 shadow-lg active:scale-95 group"
+                                className="w-full h-[54px] bg-purple-50 dark:from-slate-800 dark:to-slate-900 text-purple-700 dark:text-slate-300 rounded-xl hover:bg-purple-100 dark:hover:text-white hover:from-purple-100 hover:to-purple-200 dark:hover:from-slate-700 dark:hover:to-slate-800 transition-all text-xs md:text-sm font-bold uppercase tracking-wider flex items-center justify-center gap-2 border border-purple-200 dark:border-white/10 hover:border-purple-300 dark:hover:border-white/20 shadow-lg active:scale-95 group"
                             >
-                                <Users size={16} className="text-indigo-400 group-hover:text-indigo-300 transition-colors" /> Directory
+                                <Users size={16} className="text-purple-700 group-hover:text-purple-800 transition-colors" /> Directory
                             </button>
                         )}
                         {onSaveGuest && (() => {

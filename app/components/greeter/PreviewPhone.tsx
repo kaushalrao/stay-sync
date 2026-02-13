@@ -8,16 +8,15 @@ export const PreviewPhone: React.FC<{
     onCopy: () => void;
     copied: boolean;
 }> = ({ message, onSend, onCopy, copied }) => (
-    <div className="relative rounded-[2.5rem] overflow-hidden border-2 border-slate-300 dark:border-slate-700 shadow-2xl bg-slate-100 dark:bg-[#000] ring-4 ring-slate-300/50 dark:ring-slate-800/50">
+    <div className="relative rounded-[2.5rem] overflow-hidden border-2 border-slate-200 dark:border-slate-700 shadow-2xl bg-white dark:bg-[#000] ring-4 ring-slate-200/50 dark:ring-slate-800/50">
         {/* Header */}
-        <div className="bg-gradient-to-b from-slate-200 to-slate-100 dark:from-[#1f2937] dark:to-[#1a2332] p-4 flex items-center justify-between border-b border-slate-300 dark:border-white/5">
+        <div className="bg-slate-50 dark:from-[#1f2937] dark:to-[#1a2332] p-4 flex items-center justify-between border-b border-slate-100 dark:border-white/5">
             <div className="flex items-center gap-3">
                 <div className="relative">
                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white font-bold shadow-lg ring-2 ring-green-400/30">
                         <Smartphone size={18} />
                     </div>
-                    {/* Online status dot */}
-                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-400 rounded-full border-2 border-slate-200 dark:border-[#1f2937]"></div>
+
                 </div>
                 <div>
                     <div className="text-sm font-bold text-slate-900 dark:text-white">Guest</div>
@@ -61,7 +60,7 @@ export const PreviewPhone: React.FC<{
         </div>
 
         {/* Desktop Action Bar */}
-        <div className="p-4 bg-gradient-to-b from-slate-100 to-slate-200 dark:from-[#1a2332] dark:to-[#1f2937] border-t border-slate-300 dark:border-white/5 hidden lg:block">
+        <div className="p-4 bg-white dark:from-[#1a2332] dark:to-[#1f2937] border-t border-slate-100 dark:border-white/5 hidden lg:block">
             <Button
                 onClick={onSend}
                 disabled={!message}

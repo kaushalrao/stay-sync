@@ -100,12 +100,12 @@ export function PropertiesTab() {
                             <p>No properties found. Add your first property!</p>
                         </div>
                     ) : properties.map(p => (
-                        <div key={p.id} className="relative bg-slate-200/80 dark:bg-slate-800/30 backdrop-blur-xl p-5 rounded-[2rem] border border-slate-300 dark:border-white/10 shadow-xl flex flex-col justify-between group min-h-[220px] hover:shadow-2xl dark:hover:bg-slate-800/50 transition-all overflow-hidden ring-1 ring-slate-300/50 dark:ring-white/5 hover:ring-slate-400 dark:hover:ring-white/10 hover:scale-[1.02] hover:-translate-y-1">
+                        <div key={p.id} className="relative bg-white dark:bg-slate-800/30 backdrop-blur-xl p-5 rounded-[2rem] border border-slate-200 dark:border-white/10 shadow-xl flex flex-col justify-between group min-h-[220px] hover:shadow-2xl dark:hover:bg-slate-800/50 transition-all overflow-hidden ring-1 ring-slate-200 dark:ring-white/5 hover:ring-slate-300 dark:hover:ring-white/10 hover:scale-[1.02] hover:-translate-y-1">
                             <div className="absolute inset-0 opacity-20 mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')] pointer-events-none"></div>
                             <div className="relative z-10 space-y-4">
                                 <div className="flex justify-between items-start">
                                     <div className="p-3 bg-indigo-100 dark:bg-indigo-500/10 rounded-2xl text-indigo-600 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-500/10"><Home size={24} /></div>
-                                    <div className="px-3 py-1 rounded-full bg-slate-300 dark:bg-white/5 text-[10px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider backdrop-blur-md border border-slate-400 dark:border-white/5">{p.baseGuests} Guests</div>
+                                    <div className="px-3 py-1 rounded-full bg-slate-100 dark:bg-white/5 text-[10px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider backdrop-blur-md border border-slate-200 dark:border-white/5">{p.baseGuests} Guests</div>
                                 </div>
 
                                 <div>
@@ -113,7 +113,7 @@ export function PropertiesTab() {
                                     <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">₹ {p.basePrice}/night</p>
                                 </div>
 
-                                <div className="space-y-2 pt-2 border-t border-slate-300 dark:border-white/5">
+                                <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-white/5">
                                     <div className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400">
                                         <Clock size={12} className="text-indigo-500 dark:text-indigo-400" />
                                         <span>{p.checkInTime || '13:00'} - {p.checkOutTime || '11:00'}</span>
@@ -128,7 +128,7 @@ export function PropertiesTab() {
                             </div>
 
                             <div className="flex gap-2 pt-6 mt-auto relative z-10">
-                                <Button variant="secondary" className="flex-1 !py-2.5 text-sm rounded-xl bg-slate-300 dark:bg-white/5 border-slate-400 dark:border-white/10 text-slate-900 dark:text-slate-300 hover:bg-slate-400 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white" onClick={() => setEditingProp(p)}><Edit3 size={16} /> Edit</Button>
+                                <Button variant="secondary" className="flex-1 !py-2.5 text-sm rounded-xl bg-slate-900 dark:bg-white/5 border-transparent dark:border-white/10 text-white dark:text-slate-300 hover:bg-slate-800 dark:hover:bg-white/10 hover:text-white dark:hover:text-white shadow-lg shadow-slate-900/20 dark:shadow-none" onClick={() => setEditingProp(p)}><Edit3 size={16} /> Edit</Button>
                                 <Button variant="danger" className="!p-2.5 rounded-xl bg-rose-100 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-300 dark:border-rose-500/20 hover:bg-rose-500 hover:text-white hover:border-transparent" onClick={() => handleDeleteProperty(p.id)}><Trash2 size={18} /></Button>
                             </div>
                         </div>

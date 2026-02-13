@@ -13,7 +13,7 @@ export const GuestCard: React.FC<GuestCardProps> = ({ guest, mode, onSelect, onD
         <div
             onClick={() => onSelect && onSelect(guest)}
             className={`
-                group relative bg-slate-200/80 dark:bg-slate-800/40 border border-slate-300 dark:border-white/5 rounded-2xl md:rounded-3xl p-5 md:p-6 transition-all hover:shadow-lg hover:border-slate-400 dark:hover:bg-slate-800/60 dark:hover:border-white/10
+                group relative bg-white dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 rounded-2xl md:rounded-3xl p-5 md:p-6 transition-all shadow-lg hover:shadow-xl hover:border-slate-300 dark:hover:bg-slate-800/60 dark:hover:border-white/10
                 ${onSelect ? 'cursor-pointer hover:scale-[1.02] active:scale-95 hover:z-10' : ''}
                 ${mode === 'page' ? 'flex flex-col justify-between min-h-[180px]' : ''}
             `}
@@ -21,7 +21,7 @@ export const GuestCard: React.FC<GuestCardProps> = ({ guest, mode, onSelect, onD
             {/* Header with Avatar and Actions */}
             <div className="flex justify-between items-start mb-4">
                 <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-full bg-indigo-500/30 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 flex items-center justify-center font-bold text-lg border-2 border-indigo-500/20 dark:border-indigo-500/10">
+                    <div className="w-11 h-11 rounded-full bg-indigo-50 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 flex items-center justify-center font-bold text-lg border-2 border-indigo-100 dark:border-indigo-500/10">
                         {guest.guestName.charAt(0).toUpperCase()}
                     </div>
                     <div>
@@ -79,7 +79,7 @@ export const GuestCard: React.FC<GuestCardProps> = ({ guest, mode, onSelect, onD
 
             {/* Financials & Property - Page Mode */}
             {mode === 'page' && (
-                <div className="mt-auto pt-4 border-t border-slate-300 dark:border-white/5 flex flex-col gap-4">
+                <div className="mt-auto pt-4 border-t border-slate-100 dark:border-white/5 flex flex-col gap-4">
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <p className="text-slate-600 dark:text-slate-500 text-[10px] uppercase font-bold tracking-wider mb-1">Total</p>
@@ -110,7 +110,7 @@ export const GuestCard: React.FC<GuestCardProps> = ({ guest, mode, onSelect, onD
 
             {/* Property Chip - Picker Mode */}
             {mode !== 'page' && propertyName && (
-                <div className="mt-3 border-t border-slate-300 dark:border-white/5 pt-3 flex justify-start">
+                <div className="mt-3 border-t border-slate-100 dark:border-white/5 pt-3 flex justify-start">
                     <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border text-[11px] font-bold tracking-wide uppercase ${styles.bg} ${styles.border} ${styles.text}`}>
                         <Home size={12} className={styles.icon} />
                         {propertyName}
