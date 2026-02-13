@@ -9,6 +9,7 @@ import { IndianRupee, Calendar, TrendingUp, Users } from 'lucide-react';
 import { UpcomingBookingsWidget } from './UpcomingBookingsWidget';
 import { HeroBanner } from './HeroBanner';
 import { QuickActionCards } from './QuickActionCards';
+import { updateWidgetData } from '@lib/widget';
 
 export function DashboardHome() {
     const { properties, user } = useApp();
@@ -35,6 +36,21 @@ export function DashboardHome() {
             upcomingBookings: getUpcomingBookings(guests, properties, selectedProperty, 5),
         };
     }, [guests, properties]);
+
+    // Sync to Android Widget
+    useEffect(() => {
+        if (upcomingBookings.length > 0) {
+            const guest = upcomingBookings[0];
+            // Find property for time details
+            // We need to match by name as guest.propName might be the only link if propertyId isn't on guest (it usually is though? type says propName?)
+            // Guest type has propertyId? Let's check types.ts. Guest has propName.
+            // But usually we can find it.
+            const statsProperty = properties.find(p => p.name === guest.propName);
+            updateWidgetData(guest, statsProperty);
+        } else {
+            updateWidgetData(null);
+        }
+    }, [upcomingBookings, properties]);
 
     const statCards = [
         {
