@@ -80,7 +80,24 @@ export default function MaintenancePage() {
         if (filterStatus === 'pending' && issue.status === 'in-progress') return true; // Show in-progress in pending view
         if (filterProp !== 'all' && issue.propertyId !== filterProp) return false;
         return true;
-    }).sort((a, b) => b.createdAt - a.createdAt);
+    }).sort((a, b) => {
+        // 1. Sort by Status: Pending/In-progress first, Fixed last
+        const statusRank = (status: string) => (status === 'fixed' ? 1 : 0);
+        const statusDiff = statusRank(a.status) - statusRank(b.status);
+        if (statusDiff !== 0) return statusDiff;
+
+        // 2. Sort by Priority: High > Medium > Low
+        const priorityRank = (priority: string) => {
+            if (priority === 'high') return 3;
+            if (priority === 'medium') return 2;
+            return 1; // low
+        };
+        const priorityDiff = priorityRank(b.priority) - priorityRank(a.priority);
+        if (priorityDiff !== 0) return priorityDiff;
+
+        // 3. Sort by Date: Newest first
+        return b.createdAt - a.createdAt;
+    });
 
     return (
         <div className="animate-fade-in mx-auto w-full pb-20 px-6 pt-4 md:pt-8 safe-area-top">
