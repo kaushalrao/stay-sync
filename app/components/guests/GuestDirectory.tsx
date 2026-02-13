@@ -114,7 +114,7 @@ export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode =
     });
 
     return (
-        <div className={`flex flex-col h-full ${className}`}>
+        <div className={`flex flex-col h-full p-4 md:p-0 ${className}`}>
             {/* Header / Search */}
             <GuestFilters
                 search={search}
@@ -129,7 +129,7 @@ export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode =
             />
 
             {/* List */}
-            <div className={`flex-1 overflow-y-auto custom-scrollbar p-2 ${mode === 'page' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-20' : 'space-y-3 pb-4'}`}>
+            <div className={`flex-1 overflow-y-auto custom-scrollbar p-2 ${mode === 'page' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-20 items-start' : 'space-y-3 pb-4'}`}>
                 {loading ? (
                     <div className="text-center py-10 text-slate-500 col-span-full">Loading guests...</div>
                 ) : filteredGuests.length === 0 ? (

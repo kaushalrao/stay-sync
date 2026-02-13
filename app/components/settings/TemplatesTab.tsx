@@ -206,8 +206,8 @@ export function TemplatesTab() {
                                 />
                             </div>
                         </div>
-                        <div className="hidden lg:flex bg-slate-200 dark:bg-slate-900/30 rounded-3xl border border-slate-300 dark:border-white/5 sticky top-8 h-fit max-h-[600px] flex-col shadow-xl">
-                            <div className="bg-slate-300 dark:bg-slate-900/95 backdrop-blur-xl z-10 px-6 py-4 border-b border-slate-400 dark:border-white/5 rounded-t-3xl shrink-0">
+                        <div className="hidden lg:flex bg-white dark:bg-slate-900/30 rounded-3xl border border-slate-200 dark:border-white/5 sticky top-8 h-fit max-h-[600px] flex-col shadow-xl">
+                            <div className="bg-slate-100 dark:bg-slate-900/95 backdrop-blur-xl z-10 px-6 py-4 border-b border-slate-200 dark:border-white/5 rounded-t-3xl shrink-0">
                                 <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-widest flex items-center gap-2">
                                     <Sparkles size={14} className="text-orange-400" /> Click to Insert
                                 </h4>
@@ -218,27 +218,21 @@ export function TemplatesTab() {
                             </div>
                         </div>
 
-                        {isDrawerOpen && (
-                            <div className="fixed inset-0 z-[100] lg:hidden">
-                                <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={() => setIsDrawerOpen(false)} />
-                                <div className="absolute bottom-0 left-0 right-0 bg-slate-900 border-t border-white/10 rounded-t-3xl p-6 max-h-[70vh] overflow-y-auto animate-slide-up shadow-2xl">
-                                    <div className="flex justify-between items-center mb-6 sticky top-0 bg-slate-900 z-10 pb-2 border-b border-white/5">
-                                        <h3 className="text-lg font-bold text-white flex items-center gap-2"><Sparkles size={18} className="text-orange-400" /> Insert Variable</h3>
-                                        <button type="button" onClick={() => setIsDrawerOpen(false)} className="p-2 bg-slate-800 rounded-full text-slate-400"><X size={20} /></button>
-                                    </div>
-                                    <VariableList onInsert={(tag) => {
-                                        insertVariable(tag);
-                                        setIsDrawerOpen(false);
-                                    }} />
-                                </div>
-                            </div>
-                        )}
+
                     </div>
                     <div className="flex gap-4 pt-8 mt-4 border-t border-slate-300 dark:border-white/5">
                         <Button type="button" variant="secondary" className="flex-1 py-4 rounded-2xl" onClick={() => setEditingTemp(null)}>Cancel</Button>
                         <Button type="submit" className="flex-1 py-4 rounded-2xl">Save Template</Button>
                     </div>
 
+
+
+                </form>
+            )}
+
+            {editingTemp && (
+                <>
+                    {/* FAB Button */}
                     <div className="lg:hidden fixed bottom-6 right-6 z-50">
                         <button
                             type="button"
@@ -249,7 +243,23 @@ export function TemplatesTab() {
                         </button>
                     </div>
 
-                </form>
+                    {/* Variable Drawer */}
+                    {isDrawerOpen && (
+                        <div className="fixed inset-0 z-[100] lg:hidden">
+                            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={() => setIsDrawerOpen(false)} />
+                            <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-white/10 rounded-t-3xl p-6 max-h-[70vh] overflow-y-auto animate-slide-up shadow-2xl safe-area-bottom">
+                                <div className="flex justify-between items-center mb-6 sticky top-0 bg-white dark:bg-slate-900 z-10 pb-2 border-b border-slate-200 dark:border-white/5">
+                                    <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2"><Sparkles size={18} className="text-orange-400" /> Insert Variable</h3>
+                                    <button type="button" onClick={() => setIsDrawerOpen(false)} className="p-2 bg-slate-100 dark:bg-slate-800 rounded-full text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"><X size={20} /></button>
+                                </div>
+                                <VariableList onInsert={(tag) => {
+                                    insertVariable(tag);
+                                    setIsDrawerOpen(false);
+                                }} />
+                            </div>
+                        </div>
+                    )}
+                </>
             )}
         </div>
     );

@@ -43,7 +43,7 @@ export const GuestForm: React.FC<GuestFormProps> = ({ details, onChange, templat
                         value={details.guestName}
                         onChange={(e) => update('guestName', e.target.value)}
                         placeholder="Guest Name"
-                        className="w-full px-4 py-3 md:px-5 md:py-4 pl-4 md:pl-5 text-base md:text-lg font-bold text-slate-900 dark:text-white bg-slate-100 dark:bg-black/20 border border-slate-300 dark:border-white/5 rounded-2xl outline-none transition-all focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/10 focus:bg-slate-200 dark:focus:bg-black/30 placeholder:text-slate-400 dark:placeholder:text-slate-600"
+                        className="w-full px-4 py-3 md:px-5 md:py-4 pl-4 md:pl-5 text-base md:text-lg font-bold text-slate-900 dark:text-white bg-white dark:bg-black/20 border border-slate-300 dark:border-white/5 rounded-2xl outline-none transition-all focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/10 focus:bg-slate-50 dark:focus:bg-black/30 placeholder:text-slate-400 dark:placeholder:text-slate-600"
                     />
                     <div className="absolute right-4 md:right-5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-600 group-focus-within:text-orange-400 transition-colors">
                         <Edit3 size={16} />
@@ -55,14 +55,14 @@ export const GuestForm: React.FC<GuestFormProps> = ({ details, onChange, templat
                         value={details.phoneNumber || ''}
                         onChange={(e) => update('phoneNumber', e.target.value.replace(/[^0-9+\-\(\)\s]/g, ''))}
                         placeholder="Phone Number"
-                        className="w-full px-4 py-3 md:px-5 md:py-3.5 pl-4 md:pl-5 text-sm md:text-base font-medium text-slate-900 dark:text-white bg-slate-100 dark:bg-black/20 border border-slate-300 dark:border-white/5 rounded-2xl outline-none transition-all focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/10 focus:bg-slate-200 dark:focus:bg-black/30 placeholder:text-slate-400 dark:placeholder:text-slate-600"
+                        className="w-full px-4 py-3 md:px-5 md:py-3.5 pl-4 md:pl-5 text-sm md:text-base font-medium text-slate-900 dark:text-white bg-white dark:bg-black/20 border border-slate-300 dark:border-white/5 rounded-2xl outline-none transition-all focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/10 focus:bg-slate-50 dark:focus:bg-black/30 placeholder:text-slate-400 dark:placeholder:text-slate-600"
                     />
                 </div>
 
                 <div className="space-y-3 md:space-y-4">
                     {(templateContent.includes('{{checkIn') || templateContent.includes('{{nights') || templateContent.includes('{{totalAmount')) && (
                         <div className="grid grid-cols-2 gap-3 md:gap-4">
-                            <div className="group bg-slate-100 dark:bg-black/20 p-3 md:p-4 rounded-2xl border border-slate-300 dark:border-white/5 focus-within:border-orange-500/50 focus-within:ring-2 focus-within:ring-orange-500/10 transition-all">
+                            <div className="group bg-white dark:bg-black/20 p-3 md:p-4 rounded-2xl border border-slate-300 dark:border-white/5 focus-within:border-orange-500/50 focus-within:ring-2 focus-within:ring-orange-500/10 transition-all">
                                 <DatePicker
                                     label="Check-in"
                                     variant="check-in"
@@ -73,7 +73,7 @@ export const GuestForm: React.FC<GuestFormProps> = ({ details, onChange, templat
                                     icalFeeds={icalFeeds}
                                 />
                             </div>
-                            <div className="group bg-slate-100 dark:bg-black/20 p-3 md:p-4 rounded-2xl border border-slate-300 dark:border-white/5 focus-within:border-orange-500/50 focus-within:ring-2 focus-within:ring-orange-500/10 transition-all">
+                            <div className="group bg-white dark:bg-black/20 p-3 md:p-4 rounded-2xl border border-slate-300 dark:border-white/5 focus-within:border-orange-500/50 focus-within:ring-2 focus-within:ring-orange-500/10 transition-all">
                                 <DatePicker
                                     label="Check-out"
                                     variant="check-out"
@@ -101,7 +101,7 @@ export const GuestForm: React.FC<GuestFormProps> = ({ details, onChange, templat
                                     update('numberOfGuests', isNaN(val) ? 0 : val);
                                 }}
                                 placeholder="Guests"
-                                className="text-sm md:text-base font-bold bg-slate-100 dark:bg-black/20"
+                                className="text-sm md:text-base font-bold bg-white dark:bg-black/20"
                             />
                         </div>
                     )}
@@ -119,7 +119,7 @@ export const GuestForm: React.FC<GuestFormProps> = ({ details, onChange, templat
                                     update('advancePaid', isNaN(val) ? 0 : val);
                                 }}
                                 placeholder="₹0"
-                                className="text-sm md:text-base font-bold bg-slate-100 dark:bg-black/20"
+                                className="text-sm md:text-base font-bold bg-white dark:bg-black/20"
                             />
                             <Input
                                 type="number"
@@ -133,7 +133,7 @@ export const GuestForm: React.FC<GuestFormProps> = ({ details, onChange, templat
                                     update('discount', isNaN(val) ? 0 : val);
                                 }}
                                 placeholder="₹0"
-                                className="text-sm md:text-base font-bold bg-slate-100 dark:bg-black/20"
+                                className="text-sm md:text-base font-bold bg-white dark:bg-black/20"
                             />
                         </div>
                     )}

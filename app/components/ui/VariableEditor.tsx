@@ -39,19 +39,19 @@ export const VariableEditor = React.forwardRef<VariableEditorRef, {
     };
 
     return (
-        <div className={`relative w-full rounded-2xl bg-black/20 border border-white/10 group focus-within:border-orange-500/50 transition-colors overflow-hidden flex flex-col ${className}`} style={{ minHeight: '600px' }}>
+        <div className={`relative w-full rounded-2xl bg-white dark:bg-black/20 border border-slate-300 dark:border-white/10 group focus-within:border-orange-500/50 transition-colors overflow-hidden flex flex-col ${className}`} style={{ minHeight: '600px' }}>
             <textarea
                 ref={textareaRef}
                 value={value}
                 onChange={handleChange}
-                className="w-full flex-1 bg-transparent text-white caret-white outline-none resize-none p-5 font-mono text-base leading-relaxed placeholder-slate-600"
+                className="w-full flex-1 bg-transparent text-slate-900 dark:text-white caret-indigo-500 dark:caret-white outline-none resize-none p-5 font-mono text-base leading-relaxed placeholder-slate-400 dark:placeholder-slate-600"
                 placeholder="Type your message template here..."
                 style={{
                     fontSize: '16px', // Crucial: Prevents iOS zoom on focus
                 }}
             />
             {/* Simple Helper Text */}
-            <div className="absolute bottom-3 right-5 text-[10px] text-slate-500 pointer-events-none bg-black/40 px-2 py-1 rounded-lg backdrop-blur-sm">
+            <div className="absolute bottom-3 right-5 text-[10px] text-slate-500 pointer-events-none bg-slate-100 dark:bg-black/40 px-2 py-1 rounded-lg backdrop-blur-sm">
                 Use {'{{variable}}'} to insert dynamic data
             </div>
         </div>

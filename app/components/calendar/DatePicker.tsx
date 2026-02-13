@@ -62,7 +62,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
             <button
                 type="button"
                 onClick={() => setIsOpen(!isOpen)}
-                className={`w-full text-left px-4 py-3 bg-slate-100 dark:bg-slate-900/50 border border-slate-300 dark:border-white/10 rounded-xl text-xs md:text-sm font-bold text-slate-900 dark:text-white transition-all hover:bg-slate-200 dark:hover:bg-slate-800 focus:outline-none focus:border-orange-500/50 ${isOpen ? 'border-orange-500/50 ring-1 ring-orange-500/50' : ''}`}
+                className={`w-full text-left px-4 py-3 bg-white dark:bg-slate-900/50 border border-slate-300 dark:border-white/10 rounded-xl text-xs md:text-sm font-bold text-slate-900 dark:text-white transition-all hover:bg-slate-50 dark:hover:bg-slate-800 focus:outline-none focus:border-orange-500/50 ${isOpen ? 'border-orange-500/50 ring-1 ring-orange-500/50' : ''}`}
             >
                 {date ? format(parseISO(date), 'MMM dd, yyyy') : <span className="text-slate-400 dark:text-slate-600">Select Date</span>}
             </button>
