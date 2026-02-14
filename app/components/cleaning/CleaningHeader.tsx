@@ -1,38 +1,102 @@
-import React from 'react';
-import { Sparkles, Home, ChevronDown } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { ChevronDown, History, ShoppingBag, AlertCircle } from 'lucide-react';
+import { useApp } from '@components/providers/AppProvider';
+import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { db, appId } from '@lib/firebase';
 import { Property } from '@lib/types';
 
 interface CleaningHeaderProps {
     properties: Property[];
     selectedPropertyId: string;
     onPropertyChange: (id: string) => void;
+    onViewLogs: () => void;
 }
 
-export function CleaningHeader({ properties, selectedPropertyId, onPropertyChange }: CleaningHeaderProps) {
+export function CleaningHeader({ properties, selectedPropertyId, onPropertyChange, onViewLogs }: CleaningHeaderProps) {
+    const { user } = useApp();
+    const [pendingCount, setPendingCount] = useState(0);
+
+    // Listen for pending inventory needs
+    useEffect(() => {
+        if (!user || !selectedPropertyId) return;
+
+        const q = query(
+            collection(db, `artifacts/${appId}/users/${user.uid}/inventory-needs`),
+            where("propertyId", "==", selectedPropertyId),
+            where("status", "==", "pending")
+        );
+
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            setPendingCount(snapshot.docs.length);
+        });
+
+        return () => unsubscribe();
+    }, [user, selectedPropertyId]);
+
     return (
-        <div className="sticky top-0 z-30 bg-white/80 dark:bg-[#0f172a]/80 backdrop-blur-xl border-b border-slate-200 dark:border-white/5 px-4 py-3 md:px-6 md:py-4 transition-all">
-            <div className="max-w-5xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-4">
+        <div className="sticky top-0 z-10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-white/5 px-4 py-3 mb-6 transition-all duration-300">
+            <div className="max-w-5xl mx-auto flex items-center justify-between">
                 <div>
-                    <h1 className="text-lg md:text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                        <Sparkles className="text-amber-400 fill-amber-400 w-5 h-5 md:w-6 md:h-6" /> Cleaning Checklist
+                    <h1 className="text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">
+                        Cleaning Checklist
                     </h1>
-                    <p className="text-[10px] md:text-xs text-slate-500 dark:text-slate-400 font-medium">Guest Readiness Dashboard</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Guest Readiness Dashboard</p>
                 </div>
 
-                <div className="relative w-full md:w-auto">
-                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
-                        <Home size={14} />
+                <div className="flex items-center gap-3">
+                    <div className="relative group">
+                        <select
+                            value={selectedPropertyId}
+                            onChange={(e) => onPropertyChange(e.target.value)}
+                            className="appearance-none pl-4 pr-10 py-2 bg-slate-100 dark:bg-slate-800 border-none rounded-xl text-sm font-bold text-slate-700 dark:text-slate-200 cursor-pointer focus:ring-2 focus:ring-emerald-500/20 transition-all hover:bg-slate-200 dark:hover:bg-slate-700"
+                        >
+                            {properties.map(p => (
+                                <option key={p.id} value={p.id}>{p.name}</option>
+                            ))}
+                        </select>
+                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" size={16} />
                     </div>
-                    <select
-                        value={selectedPropertyId}
-                        onChange={(e) => onPropertyChange(e.target.value)}
-                        className="w-full md:w-64 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl pl-9 pr-10 py-2.5 text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 appearance-none cursor-pointer"
+
+                    <button
+                        onClick={onViewLogs}
+                        className={`relative hidden md:flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all duration-300 ${pendingCount > 0
+                            ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-500/30'
+                            : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
+                            }`}
                     >
-                        {properties.map(p => (
-                            <option key={p.id} value={p.id}>{p.name}</option>
-                        ))}
-                    </select>
-                    <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                        {pendingCount > 0 ? (
+                            <>
+                                <AlertCircle size={16} className="animate-pulse" />
+                                <span>Restock Needed</span>
+                                <span className="flex items-center justify-center w-5 h-5 rounded-full bg-amber-500 text-white text-[10px] ml-1">
+                                    {pendingCount}
+                                </span>
+                            </>
+                        ) : (
+                            <>
+                                <ShoppingBag size={16} />
+                                <span>Supplies</span>
+                            </>
+                        )}
+                    </button>
+
+                    {/* Mobile Button - simplified but consistent */}
+                    <button
+                        onClick={onViewLogs}
+                        className={`md:hidden p-2 rounded-full transition-colors ${pendingCount > 0
+                            ? 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400'
+                            : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300'
+                            }`}
+                    >
+                        {pendingCount > 0 ? (
+                            <div className="relative">
+                                <AlertCircle size={18} />
+                                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-amber-500 rounded-full border border-white dark:border-slate-900" />
+                            </div>
+                        ) : (
+                            <ShoppingBag size={18} />
+                        )}
+                    </button>
                 </div>
             </div>
         </div>

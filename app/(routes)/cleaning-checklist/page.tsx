@@ -14,6 +14,7 @@ import { RoomCard } from '@components/cleaning/RoomCard';
 import { RoomDetailModal } from '@components/cleaning/RoomDetailModal';
 import { AddTaskModal } from '@components/cleaning/AddTaskModal';
 import { ManageRoomsModal } from '@components/cleaning/ManageRoomsModal';
+import { InventoryManagerModal } from '@components/cleaning/InventoryManagerModal';
 
 export default function CleaningChecklistPage() {
     const { user, properties } = useApp();
@@ -21,6 +22,7 @@ export default function CleaningChecklistPage() {
     const [selectedRoom, setSelectedRoom] = useState<string | null>(null);
     const [isAdding, setIsAdding] = useState(false);
     const [isManagingRooms, setIsManagingRooms] = useState(false);
+    const [showLogs, setShowLogs] = useState(false);
 
     // Initialize default property/first property
     useEffect(() => {
@@ -99,6 +101,7 @@ export default function CleaningChecklistPage() {
                 properties={properties}
                 selectedPropertyId={filterProp}
                 onPropertyChange={setFilterProp}
+                onViewLogs={() => setShowLogs(true)}
             />
 
             <div className="max-w-5xl mx-auto px-6 pt-8">
@@ -143,6 +146,7 @@ export default function CleaningChecklistPage() {
                 onDeleteTask={deleteTask}
                 onAddTask={() => setIsAdding(true)} // This will open AddTaskModal on top
                 propertyName={selectedPropertyName}
+                propertyId={filterProp}
             />
 
             <AddTaskModal
@@ -162,6 +166,12 @@ export default function CleaningChecklistPage() {
                 onDeleteRoom={handleRoomDelete}
                 onAddRoom={(room) => addRoom(room, allRooms)}
                 isLoading={settingsSaving}
+            />
+
+            <InventoryManagerModal
+                isOpen={showLogs}
+                onClose={() => setShowLogs(false)}
+                propertyId={filterProp}
             />
         </div>
     );

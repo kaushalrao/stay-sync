@@ -117,7 +117,7 @@ export function ManageRoomsModal({
 
                 {editingRoomName ? (
                     <div className="flex-1 flex flex-col justify-center space-y-4">
-                        <p className="text-sm text-slate-500 dark:text-slate-400 text-center mb-2">Renaming room "{getRoomLabel(editingRoomName.original)}"</p>
+                        <p className="text-sm text-slate-500 dark:text-slate-400 text-center mb-2">Renaming room &quot;{getRoomLabel(editingRoomName.original)}&quot;</p>
                         <Input
                             label="New Room Name"
                             value={editingRoomName.current}

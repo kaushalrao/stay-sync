@@ -20,13 +20,14 @@ export const getRoomIcon = (room: string, size = 32) => {
 };
 
 export const getRoomGradient = (room: string, isDone: boolean) => {
-    if (isDone) return ROOM_STYLES.done.gradient;
+    if (isDone) return ROOM_STYLES.done;
 
-    const lower = room.toLowerCase();
-    if (lower.includes('kitchen')) return ROOM_STYLES.kitchen.gradient;
-    if (lower.includes('bedroom') || lower.includes('bed')) return ROOM_STYLES.bedroom.gradient;
-    if (lower.includes('bath') || lower.includes('toilet')) return ROOM_STYLES.bathroom.gradient;
-    if (lower.includes('living') || lower.includes('lounge')) return ROOM_STYLES.living.gradient;
+    const lower = room?.toLowerCase() || '';
+    if (lower.includes('kitchen')) return ROOM_STYLES.kitchen;
+    if (lower.includes('bedroom') || lower.includes('bed')) return ROOM_STYLES.bedroom;
+    if (lower.includes('bath') || lower.includes('toilet')) return ROOM_STYLES.bathroom;
+    if (lower.includes('living') || lower.includes('lounge')) return ROOM_STYLES.living;
+    if (lower.includes('balcony') || lower.includes('terrace')) return ROOM_STYLES.balcony;
 
-    return ROOM_STYLES.default.gradient;
+    return ROOM_STYLES.default || ROOM_STYLES.other;
 };

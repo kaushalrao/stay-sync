@@ -51,7 +51,7 @@ export function Sidebar({ onNavigate }: SidebarProps) {
             {/* Sidebar */}
             <aside
                 className={`
-      fixed top-16 lg:top-0 left-0 h-[calc(100vh-4rem)] lg:h-screen bg-white dark:bg-slate-900 z-40
+      fixed top-16 lg:top-0 left-0 h-[calc(100vh-4rem)] lg:h-screen bg-white dark:bg-slate-900 z-50
       transition-transform duration-300 ease-in-out
       ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       w-64 flex flex-col shadow-xl border-r border-slate-200 dark:border-slate-800

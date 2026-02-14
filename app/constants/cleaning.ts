@@ -1,38 +1,58 @@
-import { Bath, BedDouble, Utensils, Armchair, LayoutGrid } from 'lucide-react';
-import React from 'react';
+export const STANDARD_ROOMS = [
+    'Living', 'Kitchen', 'Bedroom 1', 'Bedroom 2', 'Bathroom 1', 'Bathroom 2', 'Balcony', 'Other'
+];
 
-export const PRESET_TASKS: Record<string, string[]> = {
-    'kitchen': ['Wipe counters', 'Clean sink', 'Empty fridge', 'Take out trash', 'Sweep floor', 'Check appliances'],
-    'bedroom': ['Change linens', 'Dust surfaces', 'Vacuum floor', 'Check closet', 'Fluff pillows'],
-    'bathroom': ['Scrub toilet', 'Clean shower/tub', 'Wipe mirror', 'Restock toilet paper', 'Replace towels', 'Empty bin'],
-    'living': ['Vacuum rugs', 'Dust TV/electronics', 'Straighten cushions', 'Wipe coffee table', 'Check windows'],
-    'other': ['Check smoke detectors', 'Water plants', 'Sweep porch', 'Check thermostat']
+export const ROOM_STYLES: Record<string, string> = {
+    living: 'from-emerald-500/10 to-teal-500/10 text-emerald-600',
+    kitchen: 'from-orange-500/10 to-amber-500/10 text-orange-600',
+    bedroom: 'from-indigo-500/10 to-violet-500/10 text-indigo-600',
+    bathroom: 'from-cyan-500/10 to-sky-500/10 text-cyan-600',
+    balcony: 'from-green-500/10 to-emerald-500/10 text-green-600',
+    other: 'from-slate-500/10 to-gray-500/10 text-slate-600',
+    done: 'from-emerald-500/20 to-teal-500/20 text-emerald-700 bg-emerald-50 dark:bg-emerald-900/20',
+    default: 'from-slate-500/10 to-gray-500/10 text-slate-600'
 };
 
-export const STANDARD_ROOMS = ['living', 'kitchen', 'bedroom', 'bathroom', 'other'];
+export const PRESET_TASKS: Record<string, string[]> = {
+    'Living': ['Dust surfaces', 'Vacuum floor', 'Arrange cushions', 'Check WiFi', 'Clean windows'],
+    'Kitchen': ['Clean sink', 'Wipe counters', 'Empty trash', 'Check fridge', 'Replenish amenities'],
+    'Bedroom 1': ['Change sheets', 'Vacuum floor', 'Dust surfaces', 'Check closet', 'Make bed'],
+    'Bedroom 2': ['Change sheets', 'Vacuum floor', 'Dust surfaces', 'Check closet', 'Make bed'],
+    'Bathroom 1': ['Clean toilet', 'Clean shower', 'Replenish soap/shampoo', 'Change towels', 'Mop floor'],
+    'Bathroom 2': ['Clean toilet', 'Clean shower', 'Replenish soap/shampoo', 'Change towels', 'Mop floor'],
+    'Balcony': ['Sweep floor', 'Wipe railing', 'Clean glass door'],
+    'Other': ['Check keys', 'Testing smoke detector']
+};
 
-export const ROOM_STYLES = {
-    kitchen: {
-        icon: Utensils,
-        gradient: "bg-gradient-to-br from-orange-400/10 to-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-200 dark:border-orange-500/20"
-    },
-    bedroom: {
-        icon: BedDouble,
-        gradient: "bg-gradient-to-br from-indigo-400/10 to-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-500/20"
-    },
-    bathroom: {
-        icon: Bath,
-        gradient: "bg-gradient-to-br from-cyan-400/10 to-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-200 dark:border-cyan-500/20"
-    },
-    living: {
-        icon: Armchair,
-        gradient: "bg-gradient-to-br from-rose-400/10 to-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-500/20"
-    },
-    default: {
-        icon: LayoutGrid,
-        gradient: "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700"
-    },
-    done: {
-        gradient: "bg-gradient-to-br from-emerald-500 to-teal-600 text-white"
-    }
-} as const;
+export const CONSUMABLE_ITEMS: Record<string, string[]> = {
+    'Kitchen': [
+        'Garbage Bags',
+        'Dish Soap',
+        'Sponge',
+        'Paper Towels',
+        'Coffee Filters',
+        'Coffee/Tea',
+        'Sugar/Creamer',
+        'Salt/Pepper',
+        'Cooking Oil'
+    ],
+    'Bathroom': [
+        'Toilet Paper',
+        'Hand Soap',
+        'Shampoo',
+        'Conditioner',
+        'Body Wash',
+        'Toothpaste',
+        'Facial Tissues',
+        'Trash Bags (Small)'
+    ],
+    'Living': [
+        'Batteries (AA)',
+        'Batteries (AAA)',
+        'Light Bulbs'
+    ],
+    'Bedroom': [
+        'Light Bulbs',
+        'Tissues'
+    ]
+};
