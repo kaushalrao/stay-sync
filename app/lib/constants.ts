@@ -7,7 +7,8 @@ import {
     BarChart3,
     Settings,
     Wrench,
-    LayoutDashboard
+    LayoutDashboard,
+    Sparkles
 } from 'lucide-react';
 import React from 'react';
 
@@ -117,6 +118,14 @@ export const QUICK_ACTIONS: QuickAction[] = [
         href: '/guests'
     },
     {
+        label: 'Cleaning',
+        subtitle: 'Room checklist',
+        icon: Sparkles,
+        color: 'text-amber-600 dark:text-amber-400',
+        bgColor: 'bg-amber-500/10',
+        href: '/cleaning-checklist'
+    },
+    {
         label: 'Properties',
         subtitle: 'Manage listings',
         icon: Home,
@@ -139,14 +148,6 @@ export const QUICK_ACTIONS: QuickAction[] = [
         color: 'text-red-600 dark:text-red-400',
         bgColor: 'bg-red-500/10',
         href: '/maintenance'
-    },
-    {
-        label: 'Settings',
-        subtitle: 'Configure app',
-        icon: Settings,
-        color: 'text-slate-600 dark:text-slate-400',
-        bgColor: 'bg-slate-500/10',
-        href: '/settings'
     }
 ];
 
@@ -154,6 +155,7 @@ export const SIDEBAR_NAV_ITEMS: NavItem[] = [
     { label: 'Dashboard', href: '/', icon: LayoutDashboard },
     { label: 'New Guest', href: '/greeter', icon: PlusCircle },
     { label: 'Guests', href: '/guests', icon: Users },
+    { label: 'Cleaning Checklist', href: '/cleaning-checklist', icon: Sparkles },
     { label: 'Maintenance', href: '/maintenance', icon: Wrench },
     { label: 'Analytics', href: '/analytics', icon: BarChart3 },
     { label: 'Settings', href: '/settings', icon: Settings },

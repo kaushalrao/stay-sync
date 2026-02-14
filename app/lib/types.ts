@@ -231,3 +231,16 @@ export interface NavItem {
 export interface SidebarLayoutProps {
     children: React.ReactNode;
 }
+
+export interface CleaningTask {
+    id: string;
+    propertyId: string;
+    title: string;
+    room: string;
+    isCompleted: boolean;
+    createdAt: number;
+}
+
+export interface RoomSettings {
+    roomOrder?: string[];
+}

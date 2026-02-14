@@ -1,0 +1,107 @@
+import React from 'react';
+import { X, CheckSquare, Trash2, Plus } from 'lucide-react';
+import { Button } from '@components/ui/Button';
+import { CleaningTask } from '@lib/types';
+import { getRoomIcon, getRoomLabel, getRoomGradient } from './utils';
+
+interface RoomDetailModalProps {
+    room: string | null;
+    tasks: CleaningTask[];
+    onClose: () => void;
+    onToggleTask: (taskId: string, currentStatus: boolean) => void;
+    onDeleteTask: (taskId: string) => void;
+    onAddTask: () => void;
+    propertyName?: string;
+}
+
+export function RoomDetailModal({
+    room,
+    tasks,
+    onClose,
+    onToggleTask,
+    onDeleteTask,
+    onAddTask,
+    propertyName
+}: RoomDetailModalProps) {
+    if (!room) return null;
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-end md:items-stretch md:justify-end">
+            {/* Backdrop */}
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-fade-in" onClick={onClose} />
+
+            {/* Drawer/Bottom Sheet Content */}
+            <div className="relative w-full md:w-[480px] bg-white dark:bg-slate-900 shadow-2xl flex flex-col
+                            h-[85vh] md:h-full rounded-t-3xl md:rounded-none md:rounded-l-3xl
+                            animate-slide-up md:animate-slide-in-right transition-all duration-300 ease-out">
+
+                {/* Mobile Drag Handle */}
+                <div className="md:hidden flex justify-center pt-3 pb-1" onClick={onClose}> {/* Click drag handle to close for convenience */}
+                    <div className="w-12 h-1.5 bg-slate-300 dark:bg-slate-700 rounded-full" />
+                </div>
+
+                <div className={`px-6 py-4 md:p-6 border-b border-slate-100 dark:border-white/5 flex items-center justify-between ${getRoomGradient(room, false).split(' ')[0]} bg-opacity-50`}>
+                    <div>
+                        <h2 className="text-xl md:text-2xl font-bold flex items-center gap-2 md:gap-3 text-slate-900 dark:text-white">
+                            {getRoomIcon(room, 24)} {getRoomLabel(room)}
+                        </h2>
+                        <p className="text-slate-500 dark:text-slate-400 text-xs md:text-sm mt-1">Checklist for {propertyName}</p>
+                    </div>
+                    <button onClick={onClose} className="p-2 bg-white/50 hover:bg-white rounded-full transition-colors dark:bg-black/20 dark:hover:bg-black/40 text-slate-900 dark:text-white">
+                        <X size={20} />
+                    </button>
+                </div>
+
+                <div className="flex-1 overflow-y-auto p-4 md:p-6 flex flex-col">
+                    {tasks.length === 0 ? (
+                        <div className="flex-1 flex flex-col items-center justify-center text-center text-slate-400 min-h-[50vh] md:min-h-0">
+                            <p className="mb-4">No tasks in this room yet.</p>
+                            <Button onClick={onAddTask} variant="secondary">Create First Task</Button>
+                        </div>
+                    ) : (
+                        <div className="space-y-3 md:space-y-4">
+                            {tasks.map(task => (
+                                <div
+                                    key={task.id}
+                                    onClick={() => onToggleTask(task.id, task.isCompleted)}
+                                    className={`
+                                    group flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-xl border border-slate-200 dark:border-white/5 cursor-pointer transition-all duration-200 active:scale-[0.98]
+                                    ${task.isCompleted
+                                            ? 'bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-100 dark:border-emerald-500/20'
+                                            : 'bg-white dark:bg-slate-800/50 hover:border-emerald-500/50'
+                                        }
+                                `}
+                                >
+                                    <div className={`
+                                    flex-shrink-0 w-5 h-5 md:w-6 md:h-6 rounded-full border-2 flex items-center justify-center transition-colors
+                                    ${task.isCompleted ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300 dark:border-slate-600 text-transparent'}
+                                `}>
+                                        <CheckSquare size={12} fill="currentColor" />
+                                    </div>
+                                    <span className={`flex-1 text-sm md:text-base font-medium ${task.isCompleted ? 'line-through text-slate-400' : 'text-slate-900 dark:text-white'}`}>
+                                        {task.title}
+                                    </span>
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); onDeleteTask(task.id); }}
+                                        className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg md:opacity-0 group-hover:opacity-100 transition-all"
+                                    >
+                                        <Trash2 size={16} />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                <div className="p-4 md:p-6 border-t border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-slate-800/30 pb-[calc(1rem+env(safe-area-inset-bottom))] md:pb-6">
+                    <Button
+                        onClick={onAddTask}
+                        className="w-full rounded-xl py-4 md:py-6 text-base md:text-lg shadow-lg shadow-emerald-500/20 bg-emerald-600 hover:bg-emerald-700 text-white border-none bg-none"
+                    >
+                        <Plus size={20} className="mr-2" /> Add Task to Room
+                    </Button>
+                </div>
+            </div>
+        </div>
+    );
+}
