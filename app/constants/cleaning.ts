@@ -1,3 +1,5 @@
+import { Armchair, Bath, BedDouble, Disc, Droplet, Key, Refrigerator, Search, Shirt, Sparkles, SprayCan, Trash2, Tv, Utensils, Wifi, Wind } from "lucide-react";
+
 export const STANDARD_ROOMS = [
     'Living', 'Kitchen', 'Bedroom 1', 'Bedroom 2', 'Bathroom 1', 'Bathroom 2', 'Balcony', 'Other'
 ];
@@ -56,3 +58,29 @@ export const CONSUMABLE_ITEMS: Record<string, string[]> = {
         'Tissues'
     ]
 };
+
+export const TASK_ICON_MAP = [
+    { keywords: ['vacuum', 'mop', 'sweep'], icon: Wind },
+    { keywords: ['dust', 'wipe', 'clean'], icon: SprayCan },
+    { keywords: ['trash', 'garbage', 'bin'], icon: Trash2 },
+    { keywords: ['scrub'], icon: Sparkles },
+    { keywords: ['bed', 'sheet', 'pillow'], icon: BedDouble },
+    { keywords: ['towel', 'laundry', 'linen'], icon: Shirt },
+    { keywords: ['fridge', 'refrigerator'], icon: Refrigerator },
+    { keywords: ['dish', 'plate', 'cutlery'], icon: Disc },
+    { keywords: ['coffee', 'tea', 'sugar'], icon: Utensils },
+    { keywords: ['wifi', 'internet'], icon: Wifi },
+    { keywords: ['tv', 'remote'], icon: Tv },
+    { keywords: ['key', 'lock'], icon: Key },
+    { keywords: ['ac', 'heat', 'fan'], icon: Wind },
+    { keywords: ['shower', 'bath', 'toilet'], icon: Bath },
+    { keywords: ['soap', 'shampoo'], icon: Droplet },
+    { keywords: ['check', 'inspect', 'test'], icon: Search },
+];
+
+export const ROOM_ICON_MAP = [
+    { keywords: ['kitchen'], icon: Utensils },
+    { keywords: ['bedroom', 'bed'], icon: BedDouble },
+    { keywords: ['bath', 'toilet', 'restroom'], icon: Bath },
+    { keywords: ['living', 'lounge', 'sitting'], icon: Armchair },
+];

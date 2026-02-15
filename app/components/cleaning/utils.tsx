@@ -1,22 +1,23 @@
-import React from 'react';
-import { Bath, BedDouble, Utensils, Armchair, LayoutGrid } from 'lucide-react';
-import { ROOM_STYLES } from '@constants/cleaning';
+import { LayoutGrid, CheckCircle } from 'lucide-react';
+import { ROOM_ICON_MAP, ROOM_STYLES, TASK_ICON_MAP } from '@constants/cleaning';
 
 export const getRoomLabel = (room: string) => {
+    if (!room) return 'Unknown Room';
     return room.charAt(0).toUpperCase() + room.slice(1);
+};
+
+export const getTaskIcon = (taskTitle: string, size = 18) => {
+    const lower = taskTitle.toLowerCase();
+    const match = TASK_ICON_MAP.find(entry => entry.keywords.some(k => lower.includes(k)));
+    const Icon = match ? match.icon : CheckCircle;
+    return <Icon size={size} />;
 };
 
 export const getRoomIcon = (room: string, size = 32) => {
     const lower = room.toLowerCase();
-
-    // Check direct matches from ROOM_STYLES keys first if we want strict mapping
-    // But currently using loose matching:
-    if (lower.includes('kitchen')) return <Utensils size={size} />;
-    if (lower.includes('bedroom') || lower.includes('bed')) return <BedDouble size={size} />;
-    if (lower.includes('bath') || lower.includes('toilet') || lower.includes('restroom')) return <Bath size={size} />;
-    if (lower.includes('living') || lower.includes('lounge') || lower.includes('sitting')) return <Armchair size={size} />;
-
-    return <LayoutGrid size={size} />;
+    const match = ROOM_ICON_MAP.find(entry => entry.keywords.some(k => lower.includes(k)));
+    const Icon = match ? match.icon : LayoutGrid;
+    return <Icon size={size} />;
 };
 
 export const getRoomGradient = (room: string, isDone: boolean) => {

@@ -44,7 +44,8 @@ export default function CleaningChecklistPage() {
         toggleTask,
         deleteTask,
         resetTasks,
-        initializePresets
+        initializePresets,
+        addRoomPresets
     } = useCleaningTasks(filterProp);
 
     const {
@@ -75,9 +76,10 @@ export default function CleaningChecklistPage() {
 
         if (roomOrder.length > 0) {
             rooms = [...roomOrder];
-            // Append missing
+            // Append missing (case insensitive check)
             roomsFromTasks.forEach(r => {
-                if (!rooms.includes(r)) rooms.push(r);
+                const exists = rooms.some(existing => existing.toLowerCase() === r.toLowerCase());
+                if (!exists) rooms.push(r);
             });
         } else {
             // Default
@@ -145,6 +147,7 @@ export default function CleaningChecklistPage() {
                 onToggleTask={toggleTask}
                 onDeleteTask={deleteTask}
                 onAddTask={() => setIsAdding(true)} // This will open AddTaskModal on top
+                onAddPresets={() => selectedRoom && addRoomPresets(selectedRoom)}
                 propertyName={selectedPropertyName}
                 propertyId={filterProp}
             />

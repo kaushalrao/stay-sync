@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { X, CheckSquare, Trash2, Plus, AlertTriangle, Package } from 'lucide-react';
+import { X, CheckSquare, Trash2, Plus, AlertTriangle, Package, Sparkles } from 'lucide-react';
 import { Button } from '@components/ui/Button';
 import { CleaningTask } from '@lib/types';
-import { getRoomIcon, getRoomLabel, getRoomGradient } from './utils';
+import { getRoomIcon, getRoomLabel, getRoomGradient, getTaskIcon } from './utils';
 import { ReportIssueModal } from './ReportIssueModal';
 import { InventoryModal } from './InventoryModal';
 
@@ -13,6 +13,7 @@ interface RoomDetailModalProps {
     onToggleTask: (taskId: string, currentStatus: boolean) => void;
     onDeleteTask: (taskId: string) => void;
     onAddTask: () => void;
+    onAddPresets?: () => void;
     propertyName?: string;
     propertyId?: string; // We need this now
 }
@@ -24,6 +25,7 @@ export function RoomDetailModal({
     onToggleTask,
     onDeleteTask,
     onAddTask,
+    onAddPresets,
     propertyName,
     propertyId // Assume this is passed now (or we can get it from context if not)
 }: RoomDetailModalProps) {
@@ -102,10 +104,13 @@ export function RoomDetailModal({
                                     `}
                                     >
                                         <div className={`
-                                        flex-shrink-0 w-5 h-5 md:w-6 md:h-6 rounded-full border-2 flex items-center justify-center transition-colors
-                                        ${task.isCompleted ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300 dark:border-slate-600 text-transparent'}
+                                        flex-shrink-0 w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center transition-all duration-300
+                                        ${task.isCompleted
+                                                ? 'bg-emerald-500 text-white scale-100 shadow-lg shadow-emerald-500/30'
+                                                : 'bg-slate-100 dark:bg-slate-800 text-slate-400 group-hover:bg-slate-200 dark:group-hover:bg-slate-700 group-hover:scale-110'
+                                            }
                                     `}>
-                                            <CheckSquare size={12} fill="currentColor" />
+                                            {getTaskIcon(task.title, 18)}
                                         </div>
                                         <span className={`flex-1 text-sm md:text-base font-medium ${task.isCompleted ? 'line-through text-slate-400' : 'text-slate-900 dark:text-white'}`}>
                                             {task.title}
@@ -136,13 +141,25 @@ export function RoomDetailModal({
                         )}
                     </div>
 
-                    <div className="p-4 md:p-6 border-t border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-slate-800/30 pb-[calc(1rem+env(safe-area-inset-bottom))] md:pb-6">
+                    <div className="p-4 md:p-6 border-t border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-slate-800/30 pb-[calc(1rem+env(safe-area-inset-bottom))] md:pb-6 flex flex-col gap-3">
                         <Button
                             onClick={onAddTask}
                             className="w-full rounded-xl py-4 md:py-6 text-base md:text-lg shadow-lg shadow-emerald-500/20 bg-emerald-600 hover:bg-emerald-700 text-white border-none bg-none"
                         >
                             <Plus size={20} className="mr-2" /> Add Task to Room
                         </Button>
+
+
+                        {tasks.length === 0 && onAddPresets && (
+                            <Button
+                                onClick={onAddPresets}
+                                variant="ghost"
+                                className="w-full group rounded-xl border-2 border-dashed border-emerald-300 dark:border-emerald-500/30 bg-emerald-50 dark:bg-emerald-900/10 hover:bg-emerald-100 dark:hover:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 py-3 gap-2"
+                            >
+                                <Sparkles size={18} className="translate-y-[-1px]" />
+                                Load Default {getRoomLabel(room)} Tasks
+                            </Button>
+                        )}
                     </div>
                 </div>
             </div>

@@ -146,6 +146,61 @@ export function useCleaningTasks(propertyId: string) {
         }
     }, [user, propertyId, showToast]);
 
+    const addRoomPresets = useCallback(async (roomName: string) => {
+        if (!user || !propertyId) return;
+
+        const lowerRoom = roomName.toLowerCase();
+        let tasksToAdd: string[] = [];
+
+        // Robust matching logic
+        if (lowerRoom.includes('living') || lowerRoom.includes('lounge')) {
+            tasksToAdd = PRESET_TASKS['Living'];
+        } else if (lowerRoom.includes('kitchen')) {
+            tasksToAdd = PRESET_TASKS['Kitchen'];
+        } else if (lowerRoom.includes('bath') || lowerRoom.includes('toilet') || lowerRoom.includes('restroom')) {
+            // Check bath first to avoid "room" matching issues if we were using it, 
+            // but mainly to be safe.
+            tasksToAdd = PRESET_TASKS['Bathroom 1'];
+        } else if (lowerRoom.includes('bedroom') || lowerRoom.includes('bed')) {
+            tasksToAdd = PRESET_TASKS['Bedroom 1'];
+        } else if (lowerRoom.includes('balcony') || lowerRoom.includes('terrace')) {
+            tasksToAdd = PRESET_TASKS['Balcony'];
+        } else {
+            // Fallback to strict matching or Other
+            const roomKey = Object.keys(PRESET_TASKS).find(key => roomName.includes(key)) || 'Other';
+            tasksToAdd = PRESET_TASKS[roomKey];
+        }
+
+        if (!tasksToAdd || tasksToAdd.length === 0) {
+            showToast('No presets found for this room', 'error');
+            return;
+        }
+
+        if (!confirm(`Add ${tasksToAdd.length} default tasks to ${roomName}?`)) return;
+
+        try {
+            const batch = writeBatch(db);
+            const collectionRef = collection(db, `artifacts/${appId}/users/${user.uid}/cleaning-tasks`);
+
+            tasksToAdd.forEach(title => {
+                const docRef = doc(collectionRef);
+                batch.set(docRef, {
+                    title,
+                    propertyId,
+                    room: roomName,
+                    isCompleted: false,
+                    createdAt: Date.now()
+                });
+            });
+
+            await batch.commit();
+            showToast(`Added default tasks for ${roomName}`, 'success');
+        } catch (error) {
+            console.error(error);
+            showToast('Failed to add room presets', 'error');
+        }
+    }, [user, propertyId, showToast]);
+
     return {
         tasks,
         isLoading,
@@ -153,6 +208,7 @@ export function useCleaningTasks(propertyId: string) {
         toggleTask,
         deleteTask,
         resetTasks,
-        initializePresets
+        initializePresets,
+        addRoomPresets
     };
 }

@@ -85,21 +85,42 @@ export function useRoomSettings(propertyId: string) {
         setIsSaving(true);
         try {
             const batch = writeBatch(db);
+            const lowerRoom = roomToDelete.toLowerCase();
 
-            // 1. Delete all tasks in this room
-            const q = query(
+            // 1. Find all tasks with this room name (case-insensitive simulation)
+            // We'll query for both the exact name and the lowercase version to cover most bases
+            const exactQuery = query(
                 collection(db, `artifacts/${appId}/users/${user.uid}/cleaning-tasks`),
                 where("propertyId", "==", propertyId),
                 where("room", "==", roomToDelete)
             );
-            const snapshot = await getDocs(q);
 
-            snapshot.docs.forEach(doc => {
+            const lowerQuery = query(
+                collection(db, `artifacts/${appId}/users/${user.uid}/cleaning-tasks`),
+                where("propertyId", "==", propertyId),
+                where("room", "==", lowerRoom)
+            );
+
+            const [exactSnap, lowerSnap] = await Promise.all([
+                getDocs(exactQuery),
+                getDocs(lowerQuery)
+            ]);
+
+            const deletedIds = new Set();
+
+            exactSnap.docs.forEach(doc => {
+                deletedIds.add(doc.id);
                 batch.delete(doc.ref);
             });
 
-            // 2. Remove from room order
-            const newOrder = currentOrder.filter(r => r !== roomToDelete);
+            lowerSnap.docs.forEach(doc => {
+                if (!deletedIds.has(doc.id)) {
+                    batch.delete(doc.ref);
+                }
+            });
+
+            // 2. Remove from room order (Case Insensitive)
+            const newOrder = currentOrder.filter(r => r.toLowerCase() !== lowerRoom);
             const settingsRef = doc(db, `artifacts/${appId}/users/${user.uid}/cleaning-settings/${propertyId}`);
             batch.set(settingsRef, { roomOrder: newOrder }, { merge: true });
 
@@ -120,7 +141,9 @@ export function useRoomSettings(propertyId: string) {
 
         const roomName = newRoom.trim();
         if (!roomName) return false;
-        if (currentOrder.includes(roomName)) {
+
+        // Case insensitive check
+        if (currentOrder.some(r => r.toLowerCase() === roomName.toLowerCase())) {
             showToast("Room already exists", "error");
             return false;
         }
