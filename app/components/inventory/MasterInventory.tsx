@@ -54,15 +54,16 @@ export function MasterInventory() {
     const categories = Object.keys(itemsByCategory).sort();
 
     return (
-        <div className="pb-20 md:pb-0 relative space-y-4">
-            <div className="flex justify-end sticky top-0 md:relative z-10 bg-slate-50 dark:bg-slate-900 py-2">
+        <div className="pb-24 md:pb-0 relative space-y-4">
+            {/* Floating Action Button for Edit Mode */}
+            <div className="fixed bottom-6 md:bottom-8 right-4 md:right-8 z-30">
                 <Button
-                    variant={isEditMode ? "primary" : "secondary"}
+                    variant={isEditMode ? "primary" : "ghost"}
                     onClick={() => setIsEditMode(!isEditMode)}
-                    className="gap-2 shadow-sm"
+                    className={`gap-2 shadow-xl rounded-full px-5 py-3 md:py-2.5 ${!isEditMode ? 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-100 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700' : ''}`}
                 >
-                    {isEditMode ? <Check size={16} /> : <Edit2 size={16} />}
-                    {isEditMode ? 'Done Editing' : 'Edit Master List'}
+                    {isEditMode ? <Check size={18} /> : <Edit2 size={18} />}
+                    {isEditMode ? 'Done Editing' : 'Edit List'}
                 </Button>
             </div>
 
