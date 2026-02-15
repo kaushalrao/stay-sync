@@ -1,6 +1,40 @@
 import { Guest, Property, RevenueData } from './types';
 import { getMonth, parseISO, isSameYear, differenceInDays } from 'date-fns';
 
+// Helper to check if guest stay is valid (not expired)
+export const isGuestStayValid = (g: Guest, properties: Property[]) => {
+    // 1. Status Check
+    if (g.status !== 'active' && g.status !== 'upcoming') return false;
+
+    // 2. Checkout Date Check
+    if (!g.checkOutDate) return true;
+
+    // 3. Time Check
+    const now = new Date();
+    const property = properties.find(p => p.name === g.propName);
+    const checkOutTime = property?.checkOutTime || '11:00';
+
+    const [year, month, day] = g.checkOutDate.split('-').map(Number);
+    const [hours, minutes] = checkOutTime.split(':').map(Number);
+
+    const checkOutDateTime = new Date(year, month - 1, day, hours, minutes);
+
+    const isValid = now <= checkOutDateTime;
+
+    if (g.guestName.toLowerCase().includes('akshay') || !isValid) {
+        console.log(`Checking validity for ${g.guestName}:`, {
+            status: g.status,
+            checkOutDate: g.checkOutDate,
+            checkOutTime,
+            checkOutDateTime: checkOutDateTime.toLocaleString(),
+            now: now.toLocaleString(),
+            isValid
+        });
+    }
+
+    return isValid;
+};
+
 export const calculateDashboardMetrics = (
     guests: Guest[],
     properties: Property[],
@@ -58,10 +92,12 @@ export const calculateDashboardMetrics = (
     }));
 
     // 5. Active/Upcoming Guests
-    const upcomingGuests = filteredByProp.filter(g => {
-        return g.status === 'upcoming' || g.status === 'active';
-    }).sort((a, b) => new Date(a.checkInDate).getTime() - new Date(b.checkInDate).getTime())
+    const upcomingGuests = filteredByProp
+        .filter(g => isGuestStayValid(g, properties))
+        .sort((a, b) => new Date(a.checkInDate).getTime() - new Date(b.checkInDate).getTime())
         .slice(0, 10);
+
+    const activeStays = filteredByProp.filter(g => g.status === 'active' && isGuestStayValid(g, properties)).length;
 
     return {
         stats: {
@@ -69,7 +105,7 @@ export const calculateDashboardMetrics = (
             totalBookings,
             occupancyRate,
             avgNightlyRate,
-            activeStays: 0
+            activeStays
         },
         chartData,
         upcomingGuests
@@ -147,7 +183,7 @@ export const getUpcomingBookings = (
         });
 
     return filteredByProp
-        .filter(g => g.status === 'upcoming' || g.status === 'active')
+        .filter(g => isGuestStayValid(g, properties))
         .sort((a, b) => new Date(a.checkInDate).getTime() - new Date(b.checkInDate).getTime())
         .slice(0, limit);
 };
