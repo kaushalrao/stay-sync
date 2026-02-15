@@ -265,3 +265,10 @@ export interface InventoryLog {
     createdAt: number;
     propertyId: string;
 }
+
+export interface InventoryMasterItem {
+    id: string;
+    category: string;
+    item: string;
+    createdAt: number;
+}
