@@ -8,7 +8,9 @@ import {
     Settings,
     Wrench,
     LayoutDashboard,
-    Sparkles
+    Sparkles,
+    UserPlus,
+    ShoppingCart
 } from 'lucide-react';
 import React from 'react';
 
@@ -153,9 +155,10 @@ export const QUICK_ACTIONS: QuickAction[] = [
 
 export const SIDEBAR_NAV_ITEMS: NavItem[] = [
     { label: 'Dashboard', href: '/', icon: LayoutDashboard },
-    { label: 'New Guest', href: '/greeter', icon: PlusCircle },
+    { label: 'New Guest', href: '/greeter', icon: UserPlus }, // Changed from PlusCircle
     { label: 'Guests', href: '/guests', icon: Users },
     { label: 'Cleaning Checklist', href: '/cleaning-checklist', icon: Sparkles },
+    { label: 'Inventory', href: '/inventory', icon: ShoppingCart }, // Added Inventory
     { label: 'Maintenance', href: '/maintenance', icon: Wrench },
     { label: 'Analytics', href: '/analytics', icon: BarChart3 },
     { label: 'Settings', href: '/settings', icon: Settings },

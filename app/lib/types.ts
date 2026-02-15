@@ -244,3 +244,24 @@ export interface CleaningTask {
 export interface RoomSettings {
     roomOrder?: string[];
 }
+
+// Inventory Interfaces
+export interface InventoryNeed {
+    id: string;
+    item: string;
+    quantity: number;
+    room: string;
+    status: 'pending';
+    createdAt: number;
+    propertyId: string;
+}
+
+export interface InventoryLog {
+    id: string;
+    item: string;
+    quantity: number;
+    room: string;
+    type: 'consumed' | 'restock';
+    createdAt: number;
+    propertyId: string;
+}
