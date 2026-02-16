@@ -14,6 +14,7 @@ import { signOut } from "firebase/auth";
 import { auth } from '@lib/firebase';
 import { SIDEBAR_NAV_ITEMS } from '@/app/lib/constants';
 import { useTheme } from '@/app/components/providers/ThemeProvider';
+import { SidebarLanguageSelector } from '@/app/components/ui/SidebarLanguageSelector';
 
 interface SidebarProps {
     onNavigate?: () => void;
@@ -135,6 +136,9 @@ export function Sidebar({ onNavigate }: SidebarProps) {
                         <span className="font-medium text-sm">Sign Out</span>
                     </button>
                 </div>
+
+                {/* Language Selector */}
+                <SidebarLanguageSelector />
 
                 {/* Copyright */}
                 <div className="text-xs text-slate-500 dark:text-slate-600 text-center py-4">
