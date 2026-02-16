@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { AppProvider } from "./components/providers/AppProvider";
 import { ThemeProvider } from "./components/providers/ThemeProvider";
+import { I18nProvider } from "./components/providers/I18nProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -38,19 +39,21 @@ export default function RootLayout({
         />
       </head>
       <body className={inter.className}>
-        <ThemeProvider>
-          <AppProvider>
-            <div className="min-h-screen bg-slate-50 dark:bg-[#0f172a] font-sans relative flex flex-col shadow-2xl overflow-x-hidden">
-              <div className="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none transform-gpu z-0">
-                <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-orange-400/5 dark:bg-orange-600/10 rounded-full blur-[100px] will-change-transform" />
-                <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-pink-400/5 dark:bg-pink-600/10 rounded-full blur-[100px] will-change-transform" />
+        <I18nProvider>
+          <ThemeProvider>
+            <AppProvider>
+              <div className="min-h-screen bg-slate-50 dark:bg-[#0f172a] font-sans relative flex flex-col shadow-2xl overflow-x-hidden">
+                <div className="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none transform-gpu z-0">
+                  <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-orange-400/5 dark:bg-orange-600/10 rounded-full blur-[100px] will-change-transform" />
+                  <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-pink-400/5 dark:bg-pink-600/10 rounded-full blur-[100px] will-change-transform" />
+                </div>
+                <main className="flex-1 relative z-10 w-full">
+                  {children}
+                </main>
               </div>
-              <main className="flex-1 relative z-10 w-full">
-                {children}
-              </main>
-            </div>
-          </AppProvider>
-        </ThemeProvider>
+            </AppProvider>
+          </ThemeProvider>
+        </I18nProvider>
       </body>
     </html>
   );
