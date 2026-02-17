@@ -59,6 +59,17 @@ export const CONSUMABLE_ITEMS: Record<string, string[]> = {
     ]
 };
 
+export const DEFAULT_ROOM_TYPES: Record<string, string> = {
+    'Living': 'Living',
+    'Kitchen': 'Kitchen',
+    'Bedroom 1': 'Bedroom',
+    'Bedroom 2': 'Bedroom',
+    'Bathroom 1': 'Bathroom',
+    'Bathroom 2': 'Bathroom',
+    'Balcony': 'Other',
+    'Other': 'Other'
+};
+
 export const TASK_ICON_MAP = [
     { keywords: ['vacuum', 'mop', 'sweep'], icon: Wind },
     { keywords: ['dust', 'wipe', 'clean'], icon: SprayCan },

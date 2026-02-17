@@ -5,8 +5,9 @@ import { useApp } from '@components/providers/AppProvider';
 import { Plus } from 'lucide-react';
 import { useCleaningTasks } from '@hooks/cleaning/useCleaningTasks';
 import { useRoomSettings } from '@hooks/cleaning/useRoomSettings';
-import { STANDARD_ROOMS } from '@constants/cleaning';
+import { STANDARD_ROOMS, DEFAULT_ROOM_TYPES } from '@constants/cleaning';
 import { CleaningTask } from '@lib/types';
+import { useInventory } from '@hooks/useInventory';
 import { CleaningHeader } from '@components/cleaning/CleaningHeader';
 import { ReadinessOverview } from '@components/cleaning/ReadinessOverview';
 import { RoomGrid } from '@components/cleaning/RoomGrid';
@@ -48,14 +49,24 @@ export default function CleaningChecklistPage() {
         addRoomPresets
     } = useCleaningTasks(filterProp);
 
+    const { needs } = useInventory(); // Fetch inventory needs
+
     const {
         roomOrder,
+        roomTypes,
         updateRoomOrder,
+        setRoomType,
         renameRoom,
         deleteRoom,
         addRoom,
+        resetToDefaults,
         isSaving: settingsSaving
     } = useRoomSettings(filterProp);
+
+    const effectiveRoomTypes = useMemo(() => ({
+        ...DEFAULT_ROOM_TYPES,
+        ...roomTypes
+    }), [roomTypes]);
 
     // Derived Logic
     const totalTasks = tasks.length;
@@ -70,6 +81,18 @@ export default function CleaningChecklistPage() {
         }, {} as Record<string, CleaningTask[]>);
     }, [tasks]);
 
+    // Map needs to rooms for quick lookup
+    // Key: room name lowercased, Value: true if has pending needs
+    const roomNeedsMap = useMemo(() => {
+        const map: Record<string, boolean> = {};
+        needs.forEach(need => {
+            if (need.status === 'pending' && need.propertyId === filterProp) {
+                map[need.room.toLowerCase()] = true;
+            }
+        });
+        return map;
+    }, [needs, filterProp]);
+
     const allRooms = useMemo(() => {
         let rooms: string[] = [];
         const roomsFromTasks = Object.keys(tasksByRoom);
@@ -82,9 +105,13 @@ export default function CleaningChecklistPage() {
                 if (!exists) rooms.push(r);
             });
         } else {
-            // Default
-            const customRooms = roomsFromTasks.filter(r => !STANDARD_ROOMS.includes(r));
-            rooms = [...STANDARD_ROOMS, ...customRooms];
+            // Even if empty, we rely on roomOrder. 
+            // If roomOrder is empty (deleted or new), we default to just tasks' rooms.
+            // If completely empty, it will return empty, triggering the "Restore" UI in modal.
+
+            // However, we still want to show rooms that have tasks even if roomOrder is empty
+            const customRooms = roomsFromTasks; // Just use tasks if no order
+            rooms = [...customRooms];
             rooms = Array.from(new Set(rooms));
         }
         return rooms;
@@ -117,6 +144,7 @@ export default function CleaningChecklistPage() {
                 <RoomGrid onManageRooms={() => setIsManagingRooms(true)}>
                     {allRooms.map((room, idx) => {
                         const roomTasks = tasksByRoom[room.toLowerCase()] || [];
+                        const hasNeeds = !!roomNeedsMap[room.toLowerCase()];
                         return (
                             <RoomCard
                                 key={room}
@@ -125,6 +153,7 @@ export default function CleaningChecklistPage() {
                                 completedTasks={roomTasks.filter(t => t.isCompleted).length}
                                 idx={idx}
                                 onClick={setSelectedRoom}
+                                hasNeeds={hasNeeds}
                             />
                         );
                     })}
@@ -150,6 +179,9 @@ export default function CleaningChecklistPage() {
                 onAddPresets={() => selectedRoom && addRoomPresets(selectedRoom)}
                 propertyName={selectedPropertyName}
                 propertyId={filterProp}
+                hasNeeds={selectedRoom ? roomNeedsMap[selectedRoom.toLowerCase()] : false}
+                forcedCategory={selectedRoom ? effectiveRoomTypes[selectedRoom] : undefined}
+                onSetCategory={(category) => selectedRoom && setRoomType(selectedRoom, category)}
             />
 
             <AddTaskModal
@@ -164,10 +196,12 @@ export default function CleaningChecklistPage() {
                 isOpen={isManagingRooms}
                 onClose={() => setIsManagingRooms(false)}
                 allRooms={allRooms}
+                roomTypes={effectiveRoomTypes}
                 onReorderRooms={updateRoomOrder}
-                onRenameRoom={(old, newName) => renameRoom(old, newName, allRooms)}
+                onRenameRoom={(old, newName, type) => renameRoom(old, newName, allRooms, type)}
                 onDeleteRoom={handleRoomDelete}
-                onAddRoom={(room) => addRoom(room, allRooms)}
+                onAddRoom={(room, type) => addRoom(room, allRooms, type)}
+                onRestoreDefaults={resetToDefaults}
                 isLoading={settingsSaving}
             />
 

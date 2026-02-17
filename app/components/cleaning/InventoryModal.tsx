@@ -4,30 +4,48 @@ import { Button } from '@components/ui/Button';
 import { addDoc, collection, writeBatch, doc } from 'firebase/firestore';
 import { db, appId } from '@lib/firebase';
 import { useApp } from '@components/providers/AppProvider';
-import { CONSUMABLE_ITEMS } from '@constants/cleaning';
+import { useInventory } from '@hooks/useInventory';
 
 interface InventoryModalProps {
     isOpen: boolean;
     onClose: () => void;
     propertyId: string;
     roomName: string;
+    forcedCategory?: string;
 }
 
-export function InventoryModal({ isOpen, onClose, propertyId, roomName }: InventoryModalProps) {
+export function InventoryModal({ isOpen, onClose, propertyId, roomName, forcedCategory }: InventoryModalProps) {
     const { user, showToast } = useApp();
+    const { masterItems, needs, isLoading } = useInventory();
     const [counts, setCounts] = useState<Record<string, number>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // Calculate existing needs for this room
+    const currentRoomNeeds = React.useMemo(() => {
+        const map: Record<string, number> = {};
+        needs.forEach(need => {
+            if (need.propertyId === propertyId && need.room === roomName && need.status === 'pending') {
+                map[need.item] = (map[need.item] || 0) + need.quantity;
+            }
+        });
+        return map;
+    }, [needs, propertyId, roomName]);
 
     if (!isOpen || !user) return null;
 
     // Determine category based on room name
-    let category = 'Other';
-    if (roomName.toLowerCase().includes('kitchen')) category = 'Kitchen';
-    else if (roomName.toLowerCase().includes('bathroom') || roomName.toLowerCase().includes('bath')) category = 'Bathroom';
-    else if (roomName.toLowerCase().includes('bedroom') || roomName.toLowerCase().includes('bed')) category = 'Bedroom';
-    else if (roomName.toLowerCase().includes('living')) category = 'Living';
+    // Default to 'General' if no specific category is forced.
+    // We strictly use the assigned room type now.
+    const category = forcedCategory || 'General';
 
-    const items = CONSUMABLE_ITEMS[category] || [];
+    // Filter items from Master Inventory based on category
+    // We also include items with 'General' category or matching the room category
+    const items = masterItems
+        .filter(item => item.category === category || item.category === 'General')
+        .map(i => i.item);
+
+    // If no items found for this specific category, maybe fallback to showing everything or a "General" list?
+    // For now, let's stick to the category filter to keep it relevant.
 
     const handleIncrement = (item: string) => {
         setCounts(prev => ({ ...prev, [item]: (prev[item] || 0) + 1 }));
@@ -95,35 +113,54 @@ export function InventoryModal({ isOpen, onClose, propertyId, roomName }: Invent
                 </div>
 
                 <div className="flex-1 overflow-y-auto mb-6 pr-2 custom-scrollbar">
-                    {items.length === 0 ? (
-                        <div className="text-center text-slate-500 py-8">
-                            No standard consumables defined for this room type.
+                    {isLoading ? (
+                        <div className="flex justify-center py-8">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500" />
+                        </div>
+                    ) : items.length === 0 ? (
+                        <div className="text-center text-slate-500 py-8 flex flex-col items-center">
+                            <Package size={32} className="mb-3 opacity-20" />
+                            <p>No standard consumables found for <strong>{category}</strong>.</p>
+                            <p className="text-xs mt-2 text-slate-400">Add items to Master Inventory with category &quot;{category}&quot;</p>
                         </div>
                     ) : (
                         <div className="space-y-3">
-                            {items.map(item => (
-                                <div key={item} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-white/5">
-                                    <span className="font-medium text-slate-700 dark:text-slate-300">{item}</span>
-                                    <div className="flex items-center gap-3 bg-white dark:bg-slate-900 rounded-lg p-1 border border-slate-200 dark:border-white/10 shadow-sm">
-                                        <button
-                                            onClick={() => handleDecrement(item)}
-                                            className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                                            disabled={!counts[item]}
-                                        >
-                                            <Minus size={14} />
-                                        </button>
-                                        <span className="w-6 text-center font-bold text-slate-900 dark:text-white">
-                                            {counts[item] || 0}
-                                        </span>
-                                        <button
-                                            onClick={() => handleIncrement(item)}
-                                            className="w-8 h-8 flex items-center justify-center rounded-md transition-colors bg-amber-50 hover:bg-amber-100 text-amber-600 dark:bg-amber-500/20 dark:hover:bg-amber-500/30 dark:text-amber-400"
-                                        >
-                                            <Plus size={14} />
-                                        </button>
+                            {items.map(item => {
+                                const pendingCount = currentRoomNeeds[item] || 0;
+                                const currentCount = counts[item] || 0;
+                                const totalCount = pendingCount + currentCount;
+
+                                return (
+                                    <div key={item} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-white/5">
+                                        <div className="flex flex-col">
+                                            <span className="font-medium text-slate-700 dark:text-slate-300">{item}</span>
+                                            {pendingCount > 0 && (
+                                                <span className="text-xs text-orange-500 font-medium mt-0.5">
+                                                    {pendingCount} already pending
+                                                </span>
+                                            )}
+                                        </div>
+                                        <div className="flex items-center gap-3 bg-white dark:bg-slate-900 rounded-lg p-1 border border-slate-200 dark:border-white/10 shadow-sm">
+                                            <button
+                                                onClick={() => handleDecrement(item)}
+                                                className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                                                disabled={!counts[item]}
+                                            >
+                                                <Minus size={14} />
+                                            </button>
+                                            <span className="w-6 text-center font-bold text-slate-900 dark:text-white">
+                                                {totalCount}
+                                            </span>
+                                            <button
+                                                onClick={() => handleIncrement(item)}
+                                                className="w-8 h-8 flex items-center justify-center rounded-md transition-colors bg-amber-50 hover:bg-amber-100 text-amber-600 dark:bg-amber-500/20 dark:hover:bg-amber-500/30 dark:text-amber-400"
+                                            >
+                                                <Plus size={14} />
+                                            </button>
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     )}
                 </div>

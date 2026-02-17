@@ -16,6 +16,9 @@ interface RoomDetailModalProps {
     onAddPresets?: () => void;
     propertyName?: string;
     propertyId?: string; // We need this now
+    hasNeeds?: boolean;
+    forcedCategory?: string;
+    onSetCategory?: (category: string) => void;
 }
 
 export function RoomDetailModal({
@@ -27,7 +30,10 @@ export function RoomDetailModal({
     onAddTask,
     onAddPresets,
     propertyName,
-    propertyId // Assume this is passed now (or we can get it from context if not)
+    propertyId,
+    hasNeeds,
+    forcedCategory,
+    onSetCategory
 }: RoomDetailModalProps) {
     const [reportingIssue, setReportingIssue] = useState<{ roomName: string, taskTitle?: string } | null>(null);
     const [showInventory, setShowInventory] = useState(false);
@@ -60,15 +66,20 @@ export function RoomDetailModal({
                             <h2 className="text-xl md:text-2xl font-bold flex items-center gap-2 md:gap-3 text-slate-900 dark:text-white">
                                 {getRoomIcon(room, 24)} {getRoomLabel(room)}
                             </h2>
-                            <p className="text-slate-500 dark:text-slate-400 text-xs md:text-sm mt-1">Checklist for {propertyName}</p>
+                            <div className="flex items-center gap-2 mt-1">
+                                <p className="text-slate-500 dark:text-slate-400 text-xs md:text-sm">Checklist for {propertyName}</p>
+                            </div>
                         </div>
                         <div className="flex gap-2">
                             <button
                                 onClick={() => setShowInventory(true)}
-                                className="p-2 bg-white/50 hover:bg-white rounded-full transition-colors dark:bg-black/20 dark:hover:bg-black/40 text-emerald-600 dark:text-emerald-400"
+                                className="relative p-2 bg-white/50 hover:bg-white rounded-full transition-colors dark:bg-black/20 dark:hover:bg-black/40 text-emerald-600 dark:text-emerald-400"
                                 title="Restock Consumables"
                             >
                                 <Package size={20} />
+                                {hasNeeds && (
+                                    <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-orange-500 rounded-full border-2 border-white dark:border-slate-900" />
+                                )}
                             </button>
                             <button
                                 onClick={() => setReportingIssue({ roomName: getRoomLabel(room) })}
@@ -179,6 +190,7 @@ export function RoomDetailModal({
                 onClose={() => setShowInventory(false)}
                 propertyId={propertyId || ''}
                 roomName={getRoomLabel(room)}
+                forcedCategory={forcedCategory}
             />
         </>
     );

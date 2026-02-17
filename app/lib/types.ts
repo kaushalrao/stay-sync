@@ -243,6 +243,7 @@ export interface CleaningTask {
 
 export interface RoomSettings {
     roomOrder?: string[];
+    roomTypes?: Record<string, string>; // Key: Room Name, Value: Category (e.g. 'Kitchen')
 }
 
 // Inventory Interfaces
