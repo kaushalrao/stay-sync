@@ -7,6 +7,8 @@ import { useApp } from './AppProvider';
 import { useStore } from '@store/useStore';
 import { InventoryNeed, InventoryLog, InventoryMasterItem, CleaningTask } from '@lib/types';
 
+import { dataService } from '@services/index';
+
 export function StateInitializer() {
     const { user } = useApp();
     const {
@@ -15,11 +17,52 @@ export function StateInitializer() {
         setMasterItems,
         setIsInventoryLoading,
         setTasks,
-        setIsCleaningLoading
+        setIsCleaningLoading,
+        setProperties,
+        setIsPropertiesLoading,
+        setTemplates,
+        setIsTemplatesLoading,
+        setIssues,
+        setIsIssuesLoading,
+        setGuests,
+        setIsGuestsLoading
     } = useStore();
 
     useEffect(() => {
         if (!user) return;
+
+        // --- CORE DATA LISTENERS ---
+        const unsubProps = dataService.properties.subscribe(user.uid, (props) => {
+            setProperties(props);
+            setIsPropertiesLoading(false);
+        }, (err) => {
+            console.error("Firestore Properties Error:", err);
+            setIsPropertiesLoading(false);
+        });
+
+        const unsubTemplates = dataService.templates.subscribe(user.uid, (temps) => {
+            setTemplates(temps);
+            setIsTemplatesLoading(false);
+        }, (err) => {
+            console.error("Firestore Templates Error:", err);
+            setIsTemplatesLoading(false);
+        });
+
+        const unsubIssues = dataService.maintenance.subscribe(user.uid, (issues) => {
+            setIssues(issues);
+            setIsIssuesLoading(false);
+        }, (err) => {
+            console.error("Firestore Issues Error:", err);
+            setIsIssuesLoading(false);
+        });
+
+        const unsubGuests = dataService.guests.subscribe(user.uid, (guests) => {
+            setGuests(guests);
+            setIsGuestsLoading(false);
+        }, (err) => {
+            console.error("Firestore Guests Error:", err);
+            setIsGuestsLoading(false);
+        });
 
         // --- INVENTORY LISTENERS ---
         const needsQuery = query(
@@ -91,8 +134,28 @@ export function StateInitializer() {
             unsubLogs();
             unsubMaster();
             unsubTasks();
+            unsubProps();
+            unsubTemplates();
+            unsubIssues();
+            unsubGuests();
         };
-    }, [user, setNeeds, setLogs, setMasterItems, setIsInventoryLoading, setTasks, setIsCleaningLoading]);
+    }, [
+        user,
+        setNeeds,
+        setLogs,
+        setMasterItems,
+        setIsInventoryLoading,
+        setTasks,
+        setIsCleaningLoading,
+        setProperties,
+        setIsPropertiesLoading,
+        setTemplates,
+        setIsTemplatesLoading,
+        setIssues,
+        setIsIssuesLoading,
+        setGuests,
+        setIsGuestsLoading
+    ]);
 
     return null;
 }

@@ -16,11 +16,16 @@ import { useApp } from '@components/providers/AppProvider';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { dataService, calendarService } from '@services/index';
 import { triggerBookingNotification } from '@lib/emailUtils';
-
 import { Suspense } from 'react';
+import { useStore } from '@store/useStore';
 
 function GreeterContent() {
-    const { properties, templates, showToast, user, loading } = useApp();
+    const properties = useStore(state => state.properties);
+    const templates = useStore(state => state.templates);
+    const showToast = useStore(state => state.showToast);
+    const guestsFromStore = useStore(state => state.guests);
+
+    const { user, loading } = useApp();
     const router = useRouter();
     const searchParams = useSearchParams();
     const guestIdParam = searchParams.get('guestId');
@@ -134,30 +139,25 @@ function GreeterContent() {
 
             let allEvents: CalendarEvent[] = [];
 
-            // 1. Fetch Internal Bookings (Host Pilot)
-            try {
-                const guests = await dataService.guests.getAll(user.uid);
-                const internalEvents: CalendarEvent[] = [];
+            // 1. Fetch Internal Bookings (from Store)
+            const internalEvents: CalendarEvent[] = [];
 
-                guests.forEach((data) => {
-                    // Filter by propName manually since getAll returns all
-                    if (data.propName !== selectedProperty.name) return;
-                    // Only block for valid statuses
-                    if (data.status !== 'cancelled' && data.checkInDate && data.checkOutDate) {
-                        internalEvents.push({
-                            start: data.checkInDate,
-                            end: data.checkOutDate,
-                            summary: `Hosted: ${data.guestName}`,
-                            source: 'manual',
-                            color: '#3b82f6' // Host Pilot Blue
-                        });
-                    }
-                });
+            guestsFromStore.forEach((data) => {
+                // Filter by propName manually since we have all guests
+                if (data.propName !== selectedProperty.name) return;
+                // Only block for valid statuses
+                if (data.status !== 'cancelled' && data.checkInDate && data.checkOutDate) {
+                    internalEvents.push({
+                        start: data.checkInDate,
+                        end: data.checkOutDate,
+                        summary: `Hosted: ${data.guestName}`,
+                        source: 'manual',
+                        color: '#3b82f6' // Host Pilot Blue
+                    });
+                }
+            });
 
-                allEvents = [...allEvents, ...internalEvents];
-            } catch (err) {
-                console.error("Error fetching internal bookings:", err);
-            }
+            allEvents = [...allEvents, ...internalEvents];
 
             // 2. Fetch External iCal Feeds
             const feeds = selectedProperty.icalFeeds || [];
@@ -186,7 +186,7 @@ function GreeterContent() {
         };
 
         fetchCalendarData();
-    }, [selectedProperty, user?.uid, showToast]);
+    }, [selectedProperty, user?.uid, showToast, guestsFromStore]);
 
     const selectedTemplate = templates.find(t => t.id === selectedTempId) || templates[0];
 

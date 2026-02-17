@@ -9,13 +9,21 @@ import { Input } from '@components/ui/Input';
 import { addDoc, collection, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { db, appId } from '@lib/firebase';
 import { MaintenanceIssue } from '@lib/types';
+import { useStore } from '@store/useStore';
 
 export default function MaintenancePage() {
-    const { user, issues, properties, showToast } = useApp();
+    const { user } = useApp();
     const router = useRouter();
+
+    // Core data from global store
+    const issues = useStore(state => state.issues);
+    const properties = useStore(state => state.properties);
+    const showToast = useStore(state => state.showToast);
+    const selectedPropertyId = useStore(state => state.selectedPropertyId);
+
     const [isAdding, setIsAdding] = useState(false);
     const [filterStatus, setFilterStatus] = useState<'all' | 'pending' | 'fixed'>('all');
-    const [filterProp, setFilterProp] = useState<string>('all');
+    const [filterProp, setFilterProp] = useState<string>(selectedPropertyId || 'all');
 
     // Redirect if not logged in
     React.useEffect(() => {
@@ -23,6 +31,13 @@ export default function MaintenancePage() {
             router.push('/');
         }
     }, [user, router]);
+
+    // Sync filter with global selected property change
+    React.useEffect(() => {
+        if (selectedPropertyId) {
+            setFilterProp(selectedPropertyId);
+        }
+    }, [selectedPropertyId]);
 
     if (!user) return null;
 

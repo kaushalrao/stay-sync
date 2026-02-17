@@ -1,9 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { ChevronDown, History, ShoppingBag, AlertCircle } from 'lucide-react';
-import { useApp } from '@components/providers/AppProvider';
-import { collection, query, where, onSnapshot } from 'firebase/firestore';
-import { db, appId } from '@lib/firebase';
+import React from 'react';
+import { ChevronDown, ShoppingBag, AlertCircle } from 'lucide-react';
 import { Property } from '@lib/types';
+import { useStore } from '@store/useStore';
 
 interface CleaningHeaderProps {
     properties: Property[];
@@ -13,25 +11,9 @@ interface CleaningHeaderProps {
 }
 
 export function CleaningHeader({ properties, selectedPropertyId, onPropertyChange, onViewLogs }: CleaningHeaderProps) {
-    const { user } = useApp();
-    const [pendingCount, setPendingCount] = useState(0);
-
-    // Listen for pending inventory needs
-    useEffect(() => {
-        if (!user || !selectedPropertyId) return;
-
-        const q = query(
-            collection(db, `artifacts/${appId}/users/${user.uid}/inventory-needs`),
-            where("propertyId", "==", selectedPropertyId),
-            where("status", "==", "pending")
-        );
-
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-            setPendingCount(snapshot.docs.length);
-        });
-
-        return () => unsubscribe();
-    }, [user, selectedPropertyId]);
+    const pendingCount = useStore(state =>
+        state.needs.filter(n => n.propertyId === selectedPropertyId && n.status === 'pending').length
+    );
 
     return (
         <div className="sticky top-0 z-10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-white/5 px-4 py-3 mb-6 transition-all duration-300">

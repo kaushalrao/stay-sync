@@ -1,35 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Users } from 'lucide-react';
-import { Guest, GuestDirectoryProps } from '../../lib/types';
+import { GuestDirectoryProps } from '../../lib/types';
 import { format, addMonths, subMonths } from 'date-fns';
-import { app } from '../../lib/firebase';
 import { triggerBookingNotification } from '../../lib/emailUtils';
 import { dataService } from '../../services';
 import { useApp } from '../providers/AppProvider';
 import { GuestCard } from './GuestCard';
 import { GuestFilters } from './GuestFilters';
 
+import { useStore } from '@store/useStore';
+
 export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode = 'page', className = '' }) => {
-    const { user, showToast, properties } = useApp();
-    const [guests, setGuests] = useState<Guest[]>([]);
+    const { user, properties } = useApp();
+    const guests = useStore(state => state.guests);
+    const isLoading = useStore(state => state.isGuestsLoading);
+    const showToast = useStore(state => state.showToast);
+
     const [search, setSearch] = useState('');
     const [statusFilter, setStatusFilter] = useState<'upcoming' | 'past' | 'all'>('all');
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        if (!user || !app) return;
-
-        const unsubscribe = dataService.guests.subscribe(user.uid, (guestList) => {
-            setGuests(guestList);
-            setLoading(false);
-        }, (error) => {
-            console.error(error);
-            showToast("Error loading guests", "error");
-            setLoading(false);
-        });
-
-        return () => unsubscribe();
-    }, [user, showToast]);
 
     const handleDelete = async (e: React.MouseEvent, id: string) => {
         e.stopPropagation();
@@ -132,7 +120,7 @@ export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode =
 
             {/* List */}
             <div className={`flex-1 overflow-y-auto custom-scrollbar ${mode === 'page' ? 'px-4 py-2 md:p-2 flex flex-col space-y-4 md:space-y-0 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-x-6 md:gap-y-10 pb-20 md:items-start' : 'p-2 space-y-3 pb-4'}`}>
-                {loading ? (
+                {isLoading ? (
                     <div className="text-center py-10 text-slate-500 col-span-full">Loading guests...</div>
                 ) : filteredGuests.length === 0 ? (
                     <div className="text-center py-10 text-slate-500 col-span-full flex flex-col items-center gap-2">

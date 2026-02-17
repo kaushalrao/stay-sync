@@ -292,7 +292,43 @@ export interface CleaningState {
     setIsCleaningLoading: (loading: boolean) => void;
 }
 
+export interface PropertyState {
+    properties: Property[];
+    isPropertiesLoading: boolean;
+    setProperties: (properties: Property[]) => void;
+    setIsPropertiesLoading: (loading: boolean) => void;
+}
+
+export interface TemplateState {
+    templates: Template[];
+    isTemplatesLoading: boolean;
+    setTemplates: (templates: Template[]) => void;
+    setIsTemplatesLoading: (loading: boolean) => void;
+}
+
+export interface MaintenanceState {
+    issues: MaintenanceIssue[];
+    isIssuesLoading: boolean;
+    setIssues: (issues: MaintenanceIssue[]) => void;
+    setIsIssuesLoading: (loading: boolean) => void;
+}
+
 export interface UIState {
     selectedPropertyId: string;
     setSelectedPropertyId: (id: string) => void;
 }
+
+export interface GuestState {
+    guests: Guest[];
+    isGuestsLoading: boolean;
+    setGuests: (guests: Guest[]) => void;
+    setIsGuestsLoading: (loading: boolean) => void;
+}
+
+export interface ToastStore {
+    toast: ToastState;
+    showToast: (message: string, type?: 'success' | 'error') => void;
+    hideToast: () => void;
+}
+
+export interface AppState extends InventoryState, CleaningState, UIState, PropertyState, TemplateState, MaintenanceState, GuestState, ToastStore { }
