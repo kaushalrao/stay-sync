@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Package, Plus, Trash2, Edit2, Check, X, Save } from 'lucide-react';
-import { useInventory } from '@hooks/useInventory';
+import { useInventory } from '@/app/hooks/inventory/useInventory';
 import { Button } from '@components/ui/Button';
 import { InventoryMasterItem } from '@lib/types';
 

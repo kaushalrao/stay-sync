@@ -1,48 +1,18 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback } from 'react';
 import {
-    collection, query, onSnapshot, addDoc, updateDoc,
-    deleteDoc, doc, writeBatch, where
+    collection, addDoc, updateDoc,
+    deleteDoc, doc, writeBatch
 } from 'firebase/firestore';
 import { db, appId } from '@lib/firebase';
-import { CleaningTask } from '@lib/types';
 import { PRESET_TASKS, STANDARD_ROOMS } from '@constants/cleaning';
 import { useApp } from '@components/providers/AppProvider';
+import { useStore } from '@store/useStore';
 
 export function useCleaningTasks(propertyId: string) {
     const { user, showToast } = useApp();
-    const [tasks, setTasks] = useState<CleaningTask[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-
-    useEffect(() => {
-        if (!user || !propertyId) {
-            setTasks([]);
-            setIsLoading(false);
-            return;
-        }
-
-        const q = query(
-            collection(db, `artifacts/${appId}/users/${user.uid}/cleaning-tasks`),
-            where("propertyId", "==", propertyId)
-        );
-
-        const qAll = query(collection(db, `artifacts/${appId}/users/${user.uid}/cleaning-tasks`));
-
-        const unsubscribe = onSnapshot(qAll, (snapshot) => {
-            const allTasks = snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            })) as CleaningTask[];
-            // Client side filter to match selected property
-            setTasks(allTasks.filter(t => t.propertyId === propertyId));
-            setIsLoading(false);
-        }, (error) => {
-            console.error(error);
-            showToast('Failed to load tasks', 'error');
-            setIsLoading(false);
-        });
-
-        return () => unsubscribe();
-    }, [user, propertyId, showToast]);
+    const allTasks = useStore(state => state.tasks);
+    const isLoading = useStore(state => state.isCleaningLoading);
+    const tasks = (allTasks || []).filter(t => t.propertyId === propertyId);
 
     const addTask = useCallback(async (title: string, room: string) => {
         if (!user || !propertyId) return false;

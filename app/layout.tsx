@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { AppProvider } from "./components/providers/AppProvider";
 import { ThemeProvider } from "./components/providers/ThemeProvider";
+import { StateInitializer } from "./components/providers/StateInitializer";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -40,6 +41,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <ThemeProvider>
           <AppProvider>
+            <StateInitializer />
             <div className="min-h-screen bg-slate-50 dark:bg-[#0f172a] font-sans relative flex flex-col shadow-2xl overflow-x-hidden">
               <div className="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none transform-gpu z-0">
                 <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-orange-400/5 dark:bg-orange-600/10 rounded-full blur-[100px] will-change-transform" />

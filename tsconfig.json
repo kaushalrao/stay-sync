@@ -40,6 +40,9 @@
       ],
       "@constants/*": [
         "./app/constants/*"
+      ],
+      "@store/*": [
+        "./app/store/*"
       ]
     }
   },

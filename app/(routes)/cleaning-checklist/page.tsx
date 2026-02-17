@@ -5,9 +5,10 @@ import { useApp } from '@components/providers/AppProvider';
 import { Plus } from 'lucide-react';
 import { useCleaningTasks } from '@hooks/cleaning/useCleaningTasks';
 import { useRoomSettings } from '@hooks/cleaning/useRoomSettings';
-import { STANDARD_ROOMS, DEFAULT_ROOM_TYPES } from '@constants/cleaning';
+import { DEFAULT_ROOM_TYPES } from '@constants/cleaning';
 import { CleaningTask } from '@lib/types';
-import { useInventory } from '@hooks/useInventory';
+import { useInventory } from '@/app/hooks/inventory/useInventory';
+import { useStore } from '@store/useStore';
 import { CleaningHeader } from '@components/cleaning/CleaningHeader';
 import { ReadinessOverview } from '@components/cleaning/ReadinessOverview';
 import { RoomGrid } from '@components/cleaning/RoomGrid';
@@ -19,7 +20,8 @@ import { InventoryManagerModal } from '@components/cleaning/InventoryManagerModa
 
 export default function CleaningChecklistPage() {
     const { user, properties } = useApp();
-    const [filterProp, setFilterProp] = useState<string>('');
+    const filterProp = useStore(state => state.selectedPropertyId);
+    const setFilterProp = useStore(state => state.setSelectedPropertyId);
     const [selectedRoom, setSelectedRoom] = useState<string | null>(null);
     const [isAdding, setIsAdding] = useState(false);
     const [isManagingRooms, setIsManagingRooms] = useState(false);
@@ -30,7 +32,7 @@ export default function CleaningChecklistPage() {
         if (properties.length > 0 && !filterProp) {
             setFilterProp(properties[0].id);
         }
-    }, [properties, filterProp]);
+    }, [properties, filterProp, setFilterProp]);
 
     // Derived Name
     const selectedPropertyName = useMemo(() =>

@@ -4,7 +4,7 @@ import { Button } from '@components/ui/Button';
 import { addDoc, collection, writeBatch, doc } from 'firebase/firestore';
 import { db, appId } from '@lib/firebase';
 import { useApp } from '@components/providers/AppProvider';
-import { useInventory } from '@hooks/useInventory';
+import { useInventory } from '@/app/hooks/inventory/useInventory';
 
 interface InventoryModalProps {
     isOpen: boolean;

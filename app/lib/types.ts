@@ -273,3 +273,26 @@ export interface InventoryMasterItem {
     item: string;
     createdAt: number;
 }
+
+export interface InventoryState {
+    needs: InventoryNeed[];
+    logs: InventoryLog[];
+    masterItems: InventoryMasterItem[];
+    isInventoryLoading: boolean;
+    setNeeds: (needs: InventoryNeed[]) => void;
+    setLogs: (logs: InventoryLog[]) => void;
+    setMasterItems: (items: InventoryMasterItem[]) => void;
+    setIsInventoryLoading: (loading: boolean) => void;
+}
+
+export interface CleaningState {
+    tasks: CleaningTask[];
+    isCleaningLoading: boolean;
+    setTasks: (tasks: CleaningTask[]) => void;
+    setIsCleaningLoading: (loading: boolean) => void;
+}
+
+export interface UIState {
+    selectedPropertyId: string;
+    setSelectedPropertyId: (id: string) => void;
+}
