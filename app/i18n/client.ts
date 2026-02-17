@@ -20,9 +20,9 @@ i18next
         ...getOptions(),
         lng: undefined, // let detect the language on client side
         detection: {
-            order: ["localStorage", "navigator"],
-            caches: ["localStorage"],
-            lookupLocalStorage: "app-lang",
+            order: ["cookie"],
+            caches: ["cookie"],
+            lookupCookie: cookieName,
         },
         preload: languages,
     });

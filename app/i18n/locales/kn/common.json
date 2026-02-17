@@ -1,1 +1,16 @@
-{}
+{
+    "sidebar": {
+        "dashboard": "ಡ್ಯಾಶ್‌ಬೋರ್ಡ್",
+        "newGuest": "ಹೊಸ ಅತಿಥಿ",
+        "guests": "ಅತಿಥಿಗಳು",
+        "cleaning": "ಶುಚಿಗೊಳಿಸುವಿಕೆ",
+        "inventory": "ದಾಸ್ತಾನು",
+        "maintenance": "ನಿರ್ವಹಣೆ",
+        "analytics": "ವಿಶ್ಲೇಷಣೆ",
+        "settings": "ಸೆಟ್ಟಿಂಗ್‌ಗಳು",
+        "theme": "ಥೀಮ್",
+        "signOut": "ಲಾಗ್ ಔಟ್",
+        "propertyManager": "ಪ್ರಾಪರ್ಟಿ ಮ್ಯಾನೇಜರ್",
+        "mobileTitle": "StaySync"
+    }
+}

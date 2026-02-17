@@ -1,7 +1,6 @@
-"use client";
-
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import Cookies from "js-cookie";
 
 export function SidebarLanguageSelector() {
     const { i18n } = useTranslation();
@@ -20,7 +19,11 @@ export function SidebarLanguageSelector() {
 
     const changeLanguage = (lang: string) => {
         i18n.changeLanguage(lang);
-        localStorage.setItem("app-lang", lang);
+        Cookies.set("i18next", lang, {
+            expires: 365,
+            path: "/",
+            sameSite: 'strict'
+        });
     };
 
     const currentLang = i18n.language || "en";

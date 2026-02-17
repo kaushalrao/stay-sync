@@ -226,6 +226,7 @@ export interface NavItem {
     label: string;
     href: string;
     icon: React.ElementType;
+    translationKey: string;
 }
 
 export interface SidebarLayoutProps {

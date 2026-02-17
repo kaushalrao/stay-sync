@@ -1,1 +1,16 @@
-{}
+{
+    "sidebar": {
+        "dashboard": "Dashboard",
+        "newGuest": "New Guest",
+        "guests": "Guests",
+        "cleaning": "Cleaning Checklist",
+        "inventory": "Inventory",
+        "maintenance": "Maintenance",
+        "analytics": "Analytics",
+        "settings": "Settings",
+        "theme": "Theme",
+        "signOut": "Sign Out",
+        "propertyManager": "Property Manager",
+        "mobileTitle": "StaySync"
+    }
+}

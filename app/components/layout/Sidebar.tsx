@@ -15,6 +15,7 @@ import { auth } from '@lib/firebase';
 import { SIDEBAR_NAV_ITEMS } from '@/app/lib/constants';
 import { useTheme } from '@/app/components/providers/ThemeProvider';
 import { SidebarLanguageSelector } from '@/app/components/ui/SidebarLanguageSelector';
+import { useTranslation } from 'react-i18next';
 
 interface SidebarProps {
     onNavigate?: () => void;
@@ -24,6 +25,7 @@ export function Sidebar({ onNavigate }: SidebarProps) {
     const pathname = usePathname();
     const [isOpen, setIsOpen] = React.useState(false);
     const { theme, toggleTheme } = useTheme();
+    const { t } = useTranslation('common');
 
     return (
         <>
@@ -36,7 +38,7 @@ export function Sidebar({ onNavigate }: SidebarProps) {
                     {isOpen ? <X size={24} /> : <Menu size={24} />}
                 </button>
 
-                <span className="font-bold text-lg text-slate-900 dark:text-white">StaySync</span>
+                <span className="font-bold text-lg text-slate-900 dark:text-white">{t('sidebar.mobileTitle')}</span>
 
                 <div className="w-8" /> {/* Spacer for centering */}
             </div>
@@ -66,7 +68,7 @@ export function Sidebar({ onNavigate }: SidebarProps) {
                         </div>
                         <div>
                             <h1 className="text-lg font-bold text-slate-900 dark:text-white">StaySync</h1>
-                            <p className="text-xs text-slate-600 dark:text-slate-400">Property Manager</p>
+                            <p className="text-xs text-slate-600 dark:text-slate-400">{t('sidebar.propertyManager')}</p>
                         </div>
                     </div>
                 </div>
@@ -101,7 +103,9 @@ export function Sidebar({ onNavigate }: SidebarProps) {
                                     size={20}
                                     className={isActive ? 'text-white' : 'text-slate-500 group-hover:text-slate-300'}
                                 />
-                                <span className="font-medium text-sm">{item.label}</span>
+                                <span className="font-medium text-sm">
+                                    {t(item.translationKey)}
+                                </span>
                             </Link>
                         );
                     })}
@@ -120,7 +124,7 @@ export function Sidebar({ onNavigate }: SidebarProps) {
                             ) : (
                                 <Sun size={20} className="text-amber-400" />
                             )}
-                            <span className="font-medium text-sm">Theme</span>
+                            <span className="font-medium text-sm">{t('sidebar.theme')}</span>
                         </div>
                         <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-500">
                             <span className="capitalize">{theme}</span>
@@ -133,7 +137,7 @@ export function Sidebar({ onNavigate }: SidebarProps) {
                         className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-red-500/10 hover:text-red-500 dark:hover:text-red-400 transition-all duration-200"
                     >
                         <LogOut size={20} />
-                        <span className="font-medium text-sm">Sign Out</span>
+                        <span className="font-medium text-sm">{t('sidebar.signOut')}</span>
                     </button>
                 </div>
 

@@ -12,5 +12,9 @@ export function getOptions(lng = fallbackLng, ns = defaultNS) {
         fallbackNS: defaultNS,
         defaultNS,
         ns,
+        detection: {
+            order: ['cookie', 'htmlTag', 'localStorage', 'path', 'subdomain'],
+            lookupCookie: cookieName,
+        },
     };
 }

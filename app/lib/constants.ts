@@ -154,12 +154,12 @@ export const QUICK_ACTIONS: QuickAction[] = [
 ];
 
 export const SIDEBAR_NAV_ITEMS: NavItem[] = [
-    { label: 'Dashboard', href: '/', icon: LayoutDashboard },
-    { label: 'New Guest', href: '/greeter', icon: UserPlus }, // Changed from PlusCircle
-    { label: 'Guests', href: '/guests', icon: Users },
-    { label: 'Cleaning Checklist', href: '/cleaning-checklist', icon: Sparkles },
-    { label: 'Inventory', href: '/inventory', icon: ShoppingCart }, // Added Inventory
-    { label: 'Maintenance', href: '/maintenance', icon: Wrench },
-    { label: 'Analytics', href: '/analytics', icon: BarChart3 },
-    { label: 'Settings', href: '/settings', icon: Settings },
+    { label: 'Dashboard', href: '/', icon: LayoutDashboard, translationKey: 'sidebar.dashboard' },
+    { label: 'New Guest', href: '/greeter', icon: UserPlus, translationKey: 'sidebar.newGuest' }, // Changed from PlusCircle
+    { label: 'Guests', href: '/guests', icon: Users, translationKey: 'sidebar.guests' },
+    { label: 'Cleaning Checklist', href: '/cleaning-checklist', icon: Sparkles, translationKey: 'sidebar.cleaning' },
+    { label: 'Inventory', href: '/inventory', icon: ShoppingCart, translationKey: 'sidebar.inventory' }, // Added Inventory
+    { label: 'Maintenance', href: '/maintenance', icon: Wrench, translationKey: 'sidebar.maintenance' },
+    { label: 'Analytics', href: '/analytics', icon: BarChart3, translationKey: 'sidebar.analytics' },
+    { label: 'Settings', href: '/settings', icon: Settings, translationKey: 'sidebar.settings' },
 ];

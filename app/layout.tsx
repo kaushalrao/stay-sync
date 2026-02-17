@@ -4,6 +4,8 @@ import "./globals.css";
 import { AppProvider } from "./components/providers/AppProvider";
 import { ThemeProvider } from "./components/providers/ThemeProvider";
 import { I18nProvider } from "./components/providers/I18nProvider";
+import { cookies } from "next/headers";
+import { fallbackLng, cookieName } from "./i18n/config";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,8 +26,11 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = cookies();
+  const lang = cookieStore.get(cookieName)?.value || fallbackLng;
+
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang={lang} suppressHydrationWarning>
       <head>
         <script
           dangerouslySetInnerHTML={{
