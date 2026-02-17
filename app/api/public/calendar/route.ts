@@ -54,23 +54,26 @@ export async function GET(req: NextRequest) {
             if (guest.checkInDate && guest.checkOutDate) {
                 const start = formatICalDate(guest.checkInDate); // YYYYMMDD
                 const end = formatICalDate(guest.checkOutDate);   // YYYYMMDD
-                // iCal DTEND is exclusive for Dates, so strictly speaking logic might need +1 day
-                // but usually reservation systems treat [in, out) or [in, out].
-                // Airbnb iCal usually expects DTEND to be the day OF checkout (which is free from noon).
-                // Standard: DTSTART:20240101, DTEND:20240103 means nights of 1st and 2nd. Checkout on 3rd.
-                // Our data is CheckIn and CheckOut date strings. This perfectly matches the [start, end) logic for full day blocking.
+                // iCal DTEND is exclusive for Dates. 
+                // DTSTART:20240101, DTEND:20240103 means nights of 1st and 2nd. Checkout on 3rd.
+                // Our data is CheckIn and CheckOut date strings (YYYY-MM-DD). 
 
                 // UUID/UID
-                const uid = doc.id + '@guest-greeter.app';
+                const eventUid = doc.id + '@stay-sync.app';
                 const created = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+
+                const guestName = guest.guestName || 'Guest';
+                const guestsCount = guest.numberOfGuests || 0;
+                const phone = guest.phoneNumber || 'N/A';
+                const total = guest.totalAmount || 'N/A';
 
                 events += `BEGIN:VEVENT
 DTSTART;VALUE=DATE:${start}
 DTEND;VALUE=DATE:${end}
 DTSTAMP:${created}
-UID:${uid}
-SUMMARY:${guest.guestName || 'Guest'} - ${propertyName}
-DESCRIPTION:Booked via Host Pilot. Guest: ${guest.guestName}
+UID:${eventUid}
+SUMMARY:🏠 ${guestName} (${guestsCount} guests) - Stay Sync
+DESCRIPTION:Guest: ${guestName}\\nPhone: ${phone}\\nTotal: ${total}\\nProperty: ${propertyName}\\nSource: Stay Sync
 END:VEVENT
 `;
             }
@@ -79,10 +82,10 @@ END:VEVENT
         // 3. Construct iCal File
         const calendarContent = `BEGIN:VCALENDAR
 VERSION:2.0
-PRODID:-//Host Pilot//NONSGML Calendar//EN
+PRODID:-//Stay Sync//NONSGML Calendar//EN
 CALSCALE:GREGORIAN
 METHOD:PUBLISH
-X-WR-CALNAME:${propertyName} - Host Pilot
+X-WR-CALNAME:Stay Sync
 ${events}END:VCALENDAR`;
 
         // 4. Return as text/calendar
