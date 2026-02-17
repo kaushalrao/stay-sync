@@ -138,7 +138,8 @@ export const GuestForm: React.FC<GuestFormProps> = ({ details, onChange, templat
                                 value={details.discount === 0 ? '' : details.discount}
                                 onChange={(e) => {
                                     const val = parseFloat(e.target.value);
-                                    update('discount', isNaN(val) ? 0 : val);
+                                    const amount = isNaN(val) ? 0 : val;
+                                    update('discount', amount);
                                 }}
                                 disabled={isReadOnly}
                                 placeholder="₹0"

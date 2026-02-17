@@ -68,23 +68,25 @@ export interface ToastState {
 
 export interface GuestDetails {
     guestName: string;
+    phoneNumber: string;
+    email?: string;
     checkInDate: string;
     checkOutDate: string;
     numberOfGuests: number;
-    advancePaid: number;
+    propertyId: string;
+    totalAmount: number;
+    balanceAmount: number;
+    advancePaid?: number;
     discount?: number;
-    phoneNumber?: string;
 }
 
 export interface Guest extends GuestDetails {
     id: string;
     createdAt: number;
-    firstName: string;
-    status: 'upcoming' | 'active' | 'completed' | 'cancelled';
+    updatedAt: number;
+    status: 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'upcoming' | 'active' | 'completed' | 'cancelled';
+    firstName?: string;
     propName?: string;
-    phoneNumber?: string;
-    email?: string;
-    totalAmount?: number;
 }
 
 export interface MaintenanceIssue {

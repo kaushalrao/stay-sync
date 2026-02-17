@@ -77,7 +77,10 @@ export const DEFAULT_GUEST_DETAILS: GuestDetails = {
     discount: 0,
     checkInDate: '',
     checkOutDate: '',
-    phoneNumber: ''
+    phoneNumber: '',
+    propertyId: '',
+    totalAmount: 0,
+    balanceAmount: 0,
 };
 
 export const DEFAULT_PROPERTY_TIMES = {

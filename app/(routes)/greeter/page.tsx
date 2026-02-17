@@ -54,14 +54,17 @@ function GreeterContent() {
             }
         }
 
-        const details = {
+        const details: GuestDetails = {
             guestName: guest.guestName,
             numberOfGuests: guest.numberOfGuests,
-            advancePaid: guest.advancePaid,
-            discount: guest.discount || 0,
+            advancePaid: guest.advancePaid ?? 0,
+            discount: guest.discount ?? 0,
             checkInDate: guest.checkInDate,
             checkOutDate: guest.checkOutDate,
-            phoneNumber: guest.phoneNumber || ''
+            phoneNumber: guest.phoneNumber || '',
+            propertyId: guest.propertyId || '',
+            totalAmount: guest.totalAmount || 0,
+            balanceAmount: guest.balanceAmount || 0,
         };
         setGuestDetails(details);
         setInitialGuestDetails(details);
@@ -229,7 +232,7 @@ function GreeterContent() {
         const discount = guestDetails.discount || 0;
         const totalAmount = Math.max(0, subTotal - discount);
 
-        const balanceDue = Math.max(0, totalAmount - guestDetails.advancePaid);
+        const balanceDue = Math.max(0, totalAmount - (guestDetails.advancePaid ?? 0));
 
         const data: Record<string, string | number> = {
             guestName: guestDetails.guestName.trim() || 'Guest',
@@ -249,7 +252,7 @@ function GreeterContent() {
             nights: nights,
             numberOfGuests: guestDetails.numberOfGuests,
             totalAmount: formatCurrency(totalAmount),
-            advancePaid: formatCurrency(guestDetails.advancePaid),
+            advancePaid: formatCurrency(guestDetails.advancePaid ?? 0),
             balanceDue: formatCurrency(balanceDue),
             basePrice: formatCurrency(selectedProperty.basePrice),
             extraGuestPrice: formatCurrency(selectedProperty.extraGuestPrice),
@@ -298,10 +301,12 @@ function GreeterContent() {
             const guestData: Partial<Guest> = {
                 ...guestDetails,
                 createdAt: Date.now(),
+                updatedAt: Date.now(),
                 status: 'upcoming',
                 firstName: guestDetails.guestName.split(' ')[0],
                 propName: selectedProperty.name,
-                totalAmount: totalAmount
+                totalAmount: totalAmount,
+                discount: guestDetails.discount || 0
             };
 
 
