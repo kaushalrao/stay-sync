@@ -103,7 +103,7 @@ export function MasterInventory() {
                                             <span className="leading-snug flex-1">{item.item}</span>
 
                                             {isEditMode && (
-                                                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <div className="flex items-center gap-1">
                                                     <button
                                                         onClick={() => {
                                                             setEditValue(item.item);
