@@ -14,6 +14,7 @@ import { signOut } from "firebase/auth";
 import { auth } from '@lib/firebase';
 import { SIDEBAR_NAV_ITEMS } from '@/app/lib/constants';
 import { useTheme } from '@/app/components/providers/ThemeProvider';
+import { useStore } from '@store/useStore';
 
 interface SidebarProps {
     onNavigate?: () => void;
@@ -23,6 +24,7 @@ export function Sidebar({ onNavigate }: SidebarProps) {
     const pathname = usePathname();
     const [isOpen, setIsOpen] = React.useState(false);
     const { theme, toggleTheme } = useTheme();
+    const setSelectedPropertyId = useStore(state => state.setSelectedPropertyId);
 
     return (
         <>
@@ -83,6 +85,7 @@ export function Sidebar({ onNavigate }: SidebarProps) {
                                 href={item.href}
                                 onClick={() => {
                                     setIsOpen(false);
+                                    setSelectedPropertyId('all');
                                     if (pathname !== item.href && onNavigate) {
                                         onNavigate();
                                     }

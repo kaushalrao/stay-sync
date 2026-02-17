@@ -3,24 +3,26 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useApp } from '@components/providers/AppProvider';
-import { dataService } from '@/app/services';
-import { Guest } from '@/app/lib/types';
 import { DashboardHeader } from '@components/analytics/DashboardHeader';
 import { StatsGrid } from '@components/analytics/StatsGrid';
 import { RevenueChart } from '@components/analytics/RevenueChart';
 import { RecentActivity } from '@components/analytics/RecentActivity';
 import { calculateDashboardMetrics } from '@/app/lib/analytics';
 import { Loader } from '@components/ui/Loader';
+import { useStore } from '@store/useStore';
 
 export default function AnalyticsPage() {
-    const { user, properties, loading: appLoading } = useApp();
+    const { user, loading: appLoading } = useApp();
     const router = useRouter();
 
-    const [guests, setGuests] = useState<Guest[]>([]);
-    const [loadingGuests, setLoadingGuests] = useState(true);
+    // Core data from global store
+    const properties = useStore(state => state.properties);
+    const guests = useStore(state => state.guests);
+    const isGuestsLoading = useStore(state => state.isGuestsLoading);
 
     // Filters
-    const [selectedProperty, setSelectedProperty] = useState<string>('all');
+    const selectedProperty = useStore(state => state.selectedPropertyId) || 'all';
+    const setSelectedProperty = useStore(state => state.setSelectedPropertyId);
     const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
 
     // Auth Redirect
@@ -30,26 +32,14 @@ export default function AnalyticsPage() {
         }
     }, [user, appLoading, router]);
 
-    // Fetch Data
-    useEffect(() => {
-        if (!user) return;
-        const unsubscribe = dataService.guests.subscribe(user.uid, (data: Guest[]) => {
-            setGuests(data);
-            setLoadingGuests(false);
-        }, (err: any) => {
-            console.error(err);
-            setLoadingGuests(false);
-        });
-        return () => unsubscribe();
-    }, [user]);
-
     // Aggregation Logic
     const dashboardData = useMemo(() => {
         return calculateDashboardMetrics(guests, properties, selectedProperty, selectedYear);
     }, [guests, selectedProperty, selectedYear, properties]);
 
+    const loading = appLoading || isGuestsLoading;
 
-    if (appLoading || !user) {
+    if (loading || !user) {
         return <Loader className="min-h-screen flex items-center justify-center text-white" iconClassName="text-orange-500" size={48} />;
     }
 
@@ -66,15 +56,15 @@ export default function AnalyticsPage() {
             />
 
             {/* Stats Grid */}
-            <StatsGrid stats={dashboardData.stats} loading={loadingGuests} />
+            <StatsGrid stats={dashboardData.stats} loading={isGuestsLoading} />
 
             {/* Main Content Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
                 <div className="lg:col-span-2">
-                    <RevenueChart data={dashboardData.chartData} year={selectedYear} loading={loadingGuests} />
+                    <RevenueChart data={dashboardData.chartData} year={selectedYear} loading={isGuestsLoading} />
                 </div>
                 <div>
-                    <RecentActivity upcomingGuests={dashboardData.upcomingGuests} loading={loadingGuests} />
+                    <RecentActivity upcomingGuests={dashboardData.upcomingGuests} loading={isGuestsLoading} />
                 </div>
             </div>
         </div>

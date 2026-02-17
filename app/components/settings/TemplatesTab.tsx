@@ -28,8 +28,12 @@ import {
     rectSortingStrategy,
 } from '@dnd-kit/sortable';
 
+import { useStore } from '@store/useStore';
+
 export function TemplatesTab() {
-    const { templates, showToast, user } = useApp();
+    const { user } = useApp();
+    const templates = useStore(state => state.templates);
+    const showToast = useStore(state => state.showToast);
     const [editingTemp, setEditingTemp] = useState<Partial<Template> | null>(null);
     const [orderedTemplates, setOrderedTemplates] = useState<Template[]>([]);
     const editorRef = useRef<VariableEditorRef>(null);

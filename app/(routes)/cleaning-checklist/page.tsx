@@ -20,20 +20,29 @@ import { InventoryManagerModal } from '@components/cleaning/InventoryManagerModa
 
 export default function CleaningChecklistPage() {
     const { user, properties } = useApp();
-    const filterProp = useStore(state => state.selectedPropertyId);
+    const globalPropertyId = useStore(state => state.selectedPropertyId);
     const setFilterProp = useStore(state => state.setSelectedPropertyId);
+
+    // In Cleaning Checklist, we MUST have a specific property. 
+    // If global is 'all' or empty, default to first property locally.
+    const filterProp = useMemo(() => {
+        if (!globalPropertyId || globalPropertyId === 'all') {
+            return properties[0]?.id || '';
+        }
+        return globalPropertyId;
+    }, [globalPropertyId, properties]);
+
     const [selectedRoom, setSelectedRoom] = useState<string | null>(null);
     const [isAdding, setIsAdding] = useState(false);
     const [isManagingRooms, setIsManagingRooms] = useState(false);
     const [showLogs, setShowLogs] = useState(false);
 
-    // Initialize default property/first property
+    // If global is empty, initialize it to first property
     useEffect(() => {
-        if (properties.length > 0 && !filterProp) {
+        if (properties.length > 0 && !globalPropertyId) {
             setFilterProp(properties[0].id);
         }
-    }, [properties, filterProp, setFilterProp]);
-
+    }, [properties, globalPropertyId, setFilterProp]);
     // Derived Name
     const selectedPropertyName = useMemo(() =>
         properties.find(p => p.id === filterProp)?.name,

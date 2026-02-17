@@ -8,8 +8,12 @@ import { Button } from '@components/ui/Button';
 import { Input } from '@components/ui/Input';
 import { useApp } from '@components/providers/AppProvider';
 
+import { useStore } from '@store/useStore';
+
 export function PropertiesTab() {
-    const { properties, showToast, user } = useApp();
+    const { user } = useApp();
+    const properties = useStore(state => state.properties);
+    const showToast = useStore(state => state.showToast);
     const [editingProp, setEditingProp] = useState<Partial<Property> | null>(null);
     const [origin, setOrigin] = useState('');
 

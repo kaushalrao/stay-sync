@@ -23,7 +23,10 @@ export default function MaintenancePage() {
 
     const [isAdding, setIsAdding] = useState(false);
     const [filterStatus, setFilterStatus] = useState<'all' | 'pending' | 'fixed'>('all');
-    const [filterProp, setFilterProp] = useState<string>(selectedPropertyId || 'all');
+
+    // Core property selection from global store
+    const filterProp = useStore(state => state.selectedPropertyId) || 'all';
+    const setFilterProp = useStore(state => state.setSelectedPropertyId);
 
     // Redirect if not logged in
     React.useEffect(() => {
@@ -31,13 +34,6 @@ export default function MaintenancePage() {
             router.push('/');
         }
     }, [user, router]);
-
-    // Sync filter with global selected property change
-    React.useEffect(() => {
-        if (selectedPropertyId) {
-            setFilterProp(selectedPropertyId);
-        }
-    }, [selectedPropertyId]);
 
     if (!user) return null;
 
