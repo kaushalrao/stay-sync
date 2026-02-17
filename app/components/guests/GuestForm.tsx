@@ -7,7 +7,7 @@ import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
 import { DatePicker } from '../calendar/DatePicker';
 
-export const GuestForm: React.FC<GuestFormProps> = ({ details, onChange, templateContent = '', blockedDates = [], onSaveGuest, onOpenDirectory, icalFeeds = [] }) => {
+export const GuestForm: React.FC<GuestFormProps> = ({ details, onChange, templateContent = '', blockedDates = [], onSaveGuest, onOpenDirectory, icalFeeds = [], isDirty, isReadOnly }) => {
 
     const isDateBlocked = (dateStr: string, type: 'checkIn' | 'checkOut') => {
         if (!dateStr || blockedDates.length === 0) return false;
@@ -24,6 +24,7 @@ export const GuestForm: React.FC<GuestFormProps> = ({ details, onChange, templat
     };
 
     const update = (field: keyof GuestDetails, value: any) => {
+        if (isReadOnly) return;
         if ((field === 'checkInDate' || field === 'checkOutDate')) {
             const type = field === 'checkInDate' ? 'checkIn' : 'checkOut';
             if (isDateBlocked(value, type)) {
@@ -44,7 +45,8 @@ export const GuestForm: React.FC<GuestFormProps> = ({ details, onChange, templat
                         value={details.guestName}
                         onChange={(e) => update('guestName', e.target.value)}
                         placeholder="Guest Name"
-                        className="w-full px-4 py-3 md:px-5 md:py-4 pl-4 md:pl-5 text-base md:text-lg font-bold text-slate-900 dark:text-white bg-white dark:bg-black/20 border border-slate-300 dark:border-white/5 rounded-2xl outline-none transition-all focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/10 focus:bg-slate-50 dark:focus:bg-black/30 placeholder:text-slate-400 dark:placeholder:text-slate-600"
+                        disabled={isReadOnly}
+                        className={`w-full px-4 py-3 md:px-5 md:py-4 pl-4 md:pl-5 text-base md:text-lg font-bold text-slate-900 dark:text-white bg-white dark:bg-black/20 border border-slate-300 dark:border-white/5 rounded-2xl outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600 ${isReadOnly ? 'opacity-70 cursor-not-allowed' : 'focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/10 focus:bg-slate-50 dark:focus:bg-black/30'}`}
                     />
                     <div className="absolute right-4 md:right-5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-600 group-focus-within:text-orange-400 transition-colors">
                         <Edit3 size={16} />
@@ -56,7 +58,8 @@ export const GuestForm: React.FC<GuestFormProps> = ({ details, onChange, templat
                         value={details.phoneNumber || ''}
                         onChange={(e) => update('phoneNumber', e.target.value.replace(/[^0-9+\-\(\)\s]/g, ''))}
                         placeholder="Phone Number"
-                        className="w-full px-4 py-3 md:px-5 md:py-3.5 pl-4 md:pl-5 text-sm md:text-base font-medium text-slate-900 dark:text-white bg-white dark:bg-black/20 border border-slate-300 dark:border-white/5 rounded-2xl outline-none transition-all focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/10 focus:bg-slate-50 dark:focus:bg-black/30 placeholder:text-slate-400 dark:placeholder:text-slate-600"
+                        disabled={isReadOnly}
+                        className={`w-full px-4 py-3 md:px-5 md:py-3.5 pl-4 md:pl-5 text-sm md:text-base font-medium text-slate-900 dark:text-white bg-white dark:bg-black/20 border border-slate-300 dark:border-white/5 rounded-2xl outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600 ${isReadOnly ? 'opacity-70 cursor-not-allowed' : 'focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/10 focus:bg-slate-50 dark:focus:bg-black/30'}`}
                     />
                 </div>
 
@@ -72,6 +75,7 @@ export const GuestForm: React.FC<GuestFormProps> = ({ details, onChange, templat
                                     onChange={(date) => update('checkInDate', date)}
                                     blockedDates={blockedDates}
                                     icalFeeds={icalFeeds}
+                                    disabled={isReadOnly}
                                 />
                             </div>
                             <div className="group bg-white dark:bg-black/20 p-3 md:p-4 rounded-2xl border border-slate-300 dark:border-white/5 focus-within:border-orange-500/50 focus-within:ring-2 focus-within:ring-orange-500/10 transition-all">
@@ -84,6 +88,7 @@ export const GuestForm: React.FC<GuestFormProps> = ({ details, onChange, templat
                                     onChange={(date) => update('checkOutDate', date)}
                                     blockedDates={blockedDates}
                                     icalFeeds={icalFeeds}
+                                    disabled={isReadOnly}
                                 />
                             </div>
                         </div>
@@ -102,6 +107,7 @@ export const GuestForm: React.FC<GuestFormProps> = ({ details, onChange, templat
                                     update('numberOfGuests', isNaN(val) ? 0 : val);
                                 }}
                                 placeholder="Guests"
+                                disabled={isReadOnly}
                                 className="text-sm md:text-base font-bold bg-white dark:bg-black/20"
                             />
                         </div>
@@ -120,6 +126,7 @@ export const GuestForm: React.FC<GuestFormProps> = ({ details, onChange, templat
                                     update('advancePaid', isNaN(val) ? 0 : val);
                                 }}
                                 placeholder="₹0"
+                                disabled={isReadOnly}
                                 className="text-sm md:text-base font-bold bg-white dark:bg-black/20"
                             />
                             <Input
@@ -133,6 +140,7 @@ export const GuestForm: React.FC<GuestFormProps> = ({ details, onChange, templat
                                     const val = parseFloat(e.target.value);
                                     update('discount', isNaN(val) ? 0 : val);
                                 }}
+                                disabled={isReadOnly}
                                 placeholder="₹0"
                                 className="text-sm md:text-base font-bold bg-white dark:bg-black/20"
                             />
@@ -153,15 +161,16 @@ export const GuestForm: React.FC<GuestFormProps> = ({ details, onChange, templat
                         {onSaveGuest && (() => {
                             const isPhoneValid = details.phoneNumber && details.phoneNumber.length >= 10 && /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/im.test(details.phoneNumber.replace(/\s/g, ''));
                             const isValid = details.guestName && isPhoneValid && details.checkInDate && details.checkOutDate && details.numberOfGuests > 0;
+                            const canSave = !isReadOnly && isValid && (isDirty === undefined || isDirty);
                             return (
                                 <Button
                                     type="button"
                                     onClick={onSaveGuest}
-                                    disabled={!isValid}
-                                    variant={isValid ? 'primary' : 'secondary'}
-                                    className={`w-full h-[54px] rounded-xl text-xs md:text-sm font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg ${!isValid ? 'opacity-60 cursor-not-allowed shadow-none' : ''}`}
+                                    disabled={!canSave}
+                                    variant={canSave ? 'primary' : 'secondary'}
+                                    className={`w-full h-[54px] rounded-xl text-xs md:text-sm font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg ${!canSave ? 'opacity-60 cursor-not-allowed shadow-none' : ''}`}
                                 >
-                                    <CalendarCheck size={16} className={isValid ? "text-orange-100" : ""} /> Save Guest
+                                    <CalendarCheck size={16} className={canSave ? "text-orange-100" : ""} /> {isReadOnly ? 'Viewing History' : 'Save Guest'}
                                 </Button>
                             );
                         })()}

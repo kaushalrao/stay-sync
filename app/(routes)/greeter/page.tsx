@@ -33,7 +33,9 @@ function GreeterContent() {
     const [selectedPropId, setSelectedPropId] = useState('');
     const [mobileTab, setMobileTab] = useState<'edit' | 'preview'>('edit');
     const [guestDetails, setGuestDetails] = useState<GuestDetails>(DEFAULT_GUEST_DETAILS);
+    const [initialGuestDetails, setInitialGuestDetails] = useState<GuestDetails | null>(null);
     const [currentGuestId, setCurrentGuestId] = useState<string | null>(null);
+    const [currentGuestStatus, setCurrentGuestStatus] = useState<Guest['status'] | null>(null);
     const [selectedTempId, setSelectedTempId] = useState('');
     const [copied, setCopied] = useState(false);
     const [blockedDates, setBlockedDates] = useState<CalendarEvent[]>([]);
@@ -52,7 +54,7 @@ function GreeterContent() {
             }
         }
 
-        setGuestDetails({
+        const details = {
             guestName: guest.guestName,
             numberOfGuests: guest.numberOfGuests,
             advancePaid: guest.advancePaid,
@@ -60,8 +62,11 @@ function GreeterContent() {
             checkInDate: guest.checkInDate,
             checkOutDate: guest.checkOutDate,
             phoneNumber: guest.phoneNumber || ''
-        });
+        };
+        setGuestDetails(details);
+        setInitialGuestDetails(details);
         setCurrentGuestId(guest.id);
+        setCurrentGuestStatus(guest.status);
         setIsGuestbookOpen(false);
         showToast("Guest details loaded", "success");
     }, [properties, selectedPropId, showToast]);
@@ -188,6 +193,29 @@ function GreeterContent() {
         fetchCalendarData();
     }, [selectedProperty, user?.uid, showToast, guestsFromStore]);
 
+    const isDirty = useMemo(() => {
+        if (!currentGuestId || !initialGuestDetails) return true;
+
+        // Deep compare (simple for GuestDetails)
+        return (
+            guestDetails.guestName !== initialGuestDetails.guestName ||
+            guestDetails.numberOfGuests !== initialGuestDetails.numberOfGuests ||
+            guestDetails.advancePaid !== initialGuestDetails.advancePaid ||
+            guestDetails.discount !== initialGuestDetails.discount ||
+            guestDetails.checkInDate !== initialGuestDetails.checkInDate ||
+            guestDetails.checkOutDate !== initialGuestDetails.checkOutDate ||
+            guestDetails.phoneNumber !== initialGuestDetails.phoneNumber
+        );
+    }, [guestDetails, initialGuestDetails, currentGuestId]);
+
+    const isReadOnly = useMemo(() => {
+        if (currentGuestStatus === 'completed' || currentGuestStatus === 'cancelled') return true;
+        if (!guestDetails.checkOutDate) return false;
+
+        const today = new Date().toISOString().split('T')[0];
+        return guestDetails.checkOutDate < today;
+    }, [currentGuestStatus, guestDetails.checkOutDate]);
+
     const selectedTemplate = templates.find(t => t.id === selectedTempId) || templates[0];
 
     const generatedMessage = useMemo(() => {
@@ -306,6 +334,9 @@ function GreeterContent() {
                     totalAmount: totalAmount,
                     dashboardLink: `${window.location.origin}/greeter?guestId=${id}`
                 });
+
+                // Reset dirty state
+                setInitialGuestDetails({ ...guestDetails });
             }
         } catch (error) {
             console.error("Error saving guest:", error);
@@ -342,6 +373,8 @@ function GreeterContent() {
                                 onSaveGuest={handleSaveGuest}
                                 onOpenDirectory={() => setIsGuestbookOpen(true)}
                                 icalFeeds={selectedProperty?.icalFeeds}
+                                isDirty={isDirty}
+                                isReadOnly={isReadOnly}
                             />
                         </div>
 

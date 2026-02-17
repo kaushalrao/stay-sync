@@ -141,6 +141,8 @@ export interface GuestFormProps {
     onSaveGuest?: () => void;
     onOpenDirectory?: () => void;
     icalFeeds?: IcalFeed[];
+    isDirty?: boolean;
+    isReadOnly?: boolean;
 }
 
 // Analytics Interfaces

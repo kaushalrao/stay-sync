@@ -9,6 +9,7 @@ export interface DatePickerProps {
     align?: 'left' | 'right';
     otherDate?: string;
     icalFeeds?: IcalFeed[];
+    disabled?: boolean;
 }
 
 export interface CalendarDayProps {

@@ -77,10 +77,13 @@ export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode =
             g.propName?.toLowerCase().includes(search.toLowerCase());
 
         let matchesStatus = true;
+        const today = new Date().toISOString().split('T')[0];
+        const isPastDate = !!(g.checkOutDate && g.checkOutDate < today);
+
         if (statusFilter === 'upcoming') {
-            matchesStatus = g.status === 'upcoming' || g.status === 'active';
+            matchesStatus = (g.status === 'upcoming' || g.status === 'active') && !isPastDate;
         } else if (statusFilter === 'past') {
-            matchesStatus = g.status === 'completed' || g.status === 'cancelled';
+            matchesStatus = g.status === 'completed' || g.status === 'cancelled' || isPastDate;
         }
 
         const matchesMonth = selectedMonth === 'all' || (g.checkInDate && g.checkInDate.startsWith(selectedMonth));
