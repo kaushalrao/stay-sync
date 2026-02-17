@@ -8,10 +8,10 @@ interface RoomCardProps {
     completedTasks: number;
     idx: number; // for animation delay
     onClick: (room: string) => void;
-    hasNeeds?: boolean;
+    needsCount?: number;
 }
 
-export function RoomCard({ room, totalTasks, completedTasks, idx, onClick, hasNeeds }: RoomCardProps) {
+export function RoomCard({ room, totalTasks, completedTasks, idx, onClick, needsCount = 0 }: RoomCardProps) {
     const roomProgress = totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100);
     const isDone = totalTasks > 0 && roomProgress === 100;
 
@@ -33,9 +33,10 @@ export function RoomCard({ room, totalTasks, completedTasks, idx, onClick, hasNe
                     {getRoomIcon(room)}
                 </div>
                 <div className="flex gap-2 items-center">
-                    {hasNeeds && (
-                        <div className="flex items-center justify-center w-8 h-8 bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 rounded-full shadow-sm border border-orange-200 dark:border-orange-500/30 animate-pulse">
-                            <Package size={16} />
+                    {needsCount > 0 && (
+                        <div className="flex items-center justify-center min-w-[32px] h-8 px-2 bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 rounded-full shadow-sm border border-orange-200 dark:border-orange-500/30 animate-pulse font-bold text-sm">
+                            <Package size={14} className="mr-1" />
+                            {needsCount}
                         </div>
                     )}
                     {isDone && <div className="bg-white text-emerald-600 px-3 h-8 flex items-center rounded-full text-xs font-bold shadow-sm">DONE</div>}

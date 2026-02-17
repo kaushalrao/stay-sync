@@ -82,12 +82,13 @@ export default function CleaningChecklistPage() {
     }, [tasks]);
 
     // Map needs to rooms for quick lookup
-    // Key: room name lowercased, Value: true if has pending needs
+    // Key: room name lowercased, Value: number of items needed
     const roomNeedsMap = useMemo(() => {
-        const map: Record<string, boolean> = {};
+        const map: Record<string, number> = {};
         needs.forEach(need => {
             if (need.status === 'pending' && need.propertyId === filterProp) {
-                map[need.room.toLowerCase()] = true;
+                const r = need.room.toLowerCase();
+                map[r] = (map[r] || 0) + 1; // Count items, or need.quantity? "number" usually implies items. Let's count distinct items for now, or just items. Need quantity might be better but usually badge is "number of alerts". Let's stick to number of need entries for now.
             }
         });
         return map;
@@ -144,7 +145,7 @@ export default function CleaningChecklistPage() {
                 <RoomGrid onManageRooms={() => setIsManagingRooms(true)}>
                     {allRooms.map((room, idx) => {
                         const roomTasks = tasksByRoom[room.toLowerCase()] || [];
-                        const hasNeeds = !!roomNeedsMap[room.toLowerCase()];
+                        const needsCount = roomNeedsMap[room.toLowerCase()] || 0;
                         return (
                             <RoomCard
                                 key={room}
@@ -153,7 +154,7 @@ export default function CleaningChecklistPage() {
                                 completedTasks={roomTasks.filter(t => t.isCompleted).length}
                                 idx={idx}
                                 onClick={setSelectedRoom}
-                                hasNeeds={hasNeeds}
+                                needsCount={needsCount}
                             />
                         );
                     })}
@@ -179,7 +180,7 @@ export default function CleaningChecklistPage() {
                 onAddPresets={() => selectedRoom && addRoomPresets(selectedRoom)}
                 propertyName={selectedPropertyName}
                 propertyId={filterProp}
-                hasNeeds={selectedRoom ? roomNeedsMap[selectedRoom.toLowerCase()] : false}
+                needsCount={selectedRoom ? (roomNeedsMap[selectedRoom.toLowerCase()] || 0) : 0}
                 forcedCategory={selectedRoom ? effectiveRoomTypes[selectedRoom] : undefined}
                 onSetCategory={(category) => selectedRoom && setRoomType(selectedRoom, category)}
             />

@@ -16,7 +16,7 @@ interface RoomDetailModalProps {
     onAddPresets?: () => void;
     propertyName?: string;
     propertyId?: string; // We need this now
-    hasNeeds?: boolean;
+    needsCount?: number;
     forcedCategory?: string;
     onSetCategory?: (category: string) => void;
 }
@@ -31,7 +31,7 @@ export function RoomDetailModal({
     onAddPresets,
     propertyName,
     propertyId,
-    hasNeeds,
+    needsCount = 0,
     forcedCategory,
     onSetCategory
 }: RoomDetailModalProps) {
@@ -77,8 +77,10 @@ export function RoomDetailModal({
                                 title="Restock Consumables"
                             >
                                 <Package size={20} />
-                                {hasNeeds && (
-                                    <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-orange-500 rounded-full border-2 border-white dark:border-slate-900" />
+                                {needsCount > 0 && (
+                                    <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center bg-orange-500 text-white text-[10px] font-bold rounded-full border-2 border-white dark:border-slate-900 px-1">
+                                        {needsCount}
+                                    </span>
                                 )}
                             </button>
                             <button
