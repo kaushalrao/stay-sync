@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Users } from 'lucide-react';
 import { Guest, GuestDirectoryProps } from '../../lib/types';
 import { format, addMonths, subMonths } from 'date-fns';
-import { app, appId } from '../../lib/firebase';
+import { app } from '../../lib/firebase';
 import { triggerBookingNotification } from '../../lib/emailUtils';
 import { dataService } from '../../services';
 import { useApp } from '../providers/AppProvider';
@@ -114,22 +114,24 @@ export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode =
     });
 
     return (
-        <div className={`flex flex-col h-full p-4 md:p-0 ${className}`}>
+        <div className={`flex flex-col h-full ${mode === 'page' ? 'p-0' : 'p-4'} md:p-0 ${className}`}>
             {/* Header / Search */}
-            <GuestFilters
-                search={search}
-                setSearch={setSearch}
-                selectedMonth={selectedMonth}
-                handlePrevMonth={handlePrevMonth}
-                handleNextMonth={handleNextMonth}
-                toggleAllMonths={toggleAllMonths}
-                statusFilter={statusFilter}
-                setStatusFilter={setStatusFilter}
-                mode={mode}
-            />
+            <div className={mode === 'page' ? 'px-4 pt-4 md:p-0' : ''}>
+                <GuestFilters
+                    search={search}
+                    setSearch={setSearch}
+                    selectedMonth={selectedMonth}
+                    handlePrevMonth={handlePrevMonth}
+                    handleNextMonth={handleNextMonth}
+                    toggleAllMonths={toggleAllMonths}
+                    statusFilter={statusFilter}
+                    setStatusFilter={setStatusFilter}
+                    mode={mode}
+                />
+            </div>
 
             {/* List */}
-            <div className={`flex-1 overflow-y-auto custom-scrollbar p-2 ${mode === 'page' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-20 items-start' : 'space-y-3 pb-4'}`}>
+            <div className={`flex-1 overflow-y-auto custom-scrollbar ${mode === 'page' ? 'px-4 py-2 md:p-2 flex flex-col space-y-4 md:space-y-0 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-x-6 md:gap-y-10 pb-20 md:items-start' : 'p-2 space-y-3 pb-4'}`}>
                 {loading ? (
                     <div className="text-center py-10 text-slate-500 col-span-full">Loading guests...</div>
                 ) : filteredGuests.length === 0 ? (

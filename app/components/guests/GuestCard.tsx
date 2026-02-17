@@ -15,7 +15,7 @@ export const GuestCard: React.FC<GuestCardProps> = ({ guest, mode, onSelect, onD
             className={`
                 group relative bg-white dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 rounded-2xl md:rounded-3xl p-5 md:p-6 transition-all shadow-lg hover:shadow-xl hover:border-slate-300 dark:hover:bg-slate-800/60 dark:hover:border-white/10
                 ${onSelect ? 'cursor-pointer hover:scale-[1.02] active:scale-95 hover:z-10' : ''}
-                ${mode === 'page' ? 'flex flex-col justify-between min-h-[180px]' : ''}
+                ${mode === 'page' ? 'w-full h-auto shrink-0 flex flex-col justify-between min-h-[180px] z-0' : ''}
             `}
         >
             {/* Header with Avatar and Actions */}
