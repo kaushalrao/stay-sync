@@ -8,7 +8,8 @@ import {
     X,
     LogOut,
     Sun,
-    Moon
+    Moon,
+    AlertCircle
 } from 'lucide-react';
 import { signOut } from "firebase/auth";
 import { auth } from '@lib/firebase';
@@ -25,6 +26,8 @@ export function Sidebar({ onNavigate }: SidebarProps) {
     const [isOpen, setIsOpen] = React.useState(false);
     const { theme, toggleTheme } = useTheme();
     const setSelectedPropertyId = useStore(state => state.setSelectedPropertyId);
+    const needs = useStore(state => state.needs);
+    const hasLowStock = needs.length > 0;
 
     return (
         <>
@@ -104,6 +107,15 @@ export function Sidebar({ onNavigate }: SidebarProps) {
                                     className={isActive ? 'text-white' : 'text-slate-500 group-hover:text-slate-300'}
                                 />
                                 <span className="font-medium text-sm">{item.label}</span>
+                                {item.label === 'Inventory' && hasLowStock && (
+                                    <AlertCircle
+                                        size={16}
+                                        className={`
+                                            ml-auto animate-pulse
+                                            ${isActive ? 'text-white' : 'text-rose-500'}
+                                        `}
+                                    />
+                                )}
                             </Link>
                         );
                     })}
