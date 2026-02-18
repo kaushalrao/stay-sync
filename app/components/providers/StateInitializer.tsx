@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useApp } from './AppProvider';
 import { useStore } from '@store/useStore';
-import { dataService, inventoryService, cleaningService, maintenanceService } from '@services/index';
+import { dataService, inventoryService, cleaningService, maintenanceService, propertyService, templateService } from '@services/index';
 
 export function StateInitializer() {
     const { user } = useApp();
@@ -28,19 +28,13 @@ export function StateInitializer() {
         if (!user) return;
 
         // --- CORE DATA LISTENERS ---
-        const unsubProps = dataService.properties.subscribe(user.uid, (props) => {
+        const unsubProps = propertyService.subscribeToProperties(user.uid, (props) => {
             setProperties(props);
-            setIsPropertiesLoading(false);
-        }, (err) => {
-            console.error("Firestore Properties Error:", err);
             setIsPropertiesLoading(false);
         });
 
-        const unsubTemplates = dataService.templates.subscribe(user.uid, (temps) => {
+        const unsubTemplates = templateService.subscribeToTemplates(user.uid, (temps) => {
             setTemplates(temps);
-            setIsTemplatesLoading(false);
-        }, (err) => {
-            console.error("Firestore Templates Error:", err);
             setIsTemplatesLoading(false);
         });
 

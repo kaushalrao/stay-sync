@@ -12,3 +12,5 @@ export * from './types';
 export { cleaningService } from './cleaning/cleaning.service';
 export { inventoryService } from './inventory/inventory.service';
 export { maintenanceService } from './maintenance/maintenance.service';
+export { propertyService } from './properties/property.service';
+export { templateService } from './templates/template.service';

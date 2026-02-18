@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
 import { Home, Edit3, Trash2, Plus, ArrowLeft, Users, CreditCard, Clock, Wifi, Calendar as CalendarIcon, Link, X, Copy } from 'lucide-react';
-import { collection, addDoc, updateDoc, deleteDoc, doc } from "firebase/firestore";
 import { Property } from '@lib/types';
 import { DEFAULT_PROPERTY_TIMES, DEFAULT_PROPERTY_VALUES } from '@lib/constants';
-import { app, db, appId } from '@lib/firebase';
 import { Button } from '@components/ui/Button';
 import { Input } from '@components/ui/Input';
 import { useApp } from '@components/providers/AppProvider';
-
 import { useStore } from '@store/useStore';
+import { propertyService } from '@services/properties/property.service';
 
 export function PropertiesTab() {
     const { user } = useApp();
@@ -21,42 +19,9 @@ export function PropertiesTab() {
         setOrigin(window.location.origin);
     }, []);
 
-    const saveToFirestore = async (collectionName: string, data: any, id?: string) => {
-        if (!app || !user) {
-            showToast("Firebase/User not initialized", "error");
-            return false;
-        }
-        try {
-            const path = `artifacts/${appId}/users/${user.uid}/${collectionName}`;
-            if (id) {
-                await updateDoc(doc(db, path, id), data);
-            } else {
-                await addDoc(collection(db, path), data);
-            }
-            return true;
-        } catch (e) {
-            console.error(e);
-            showToast("Error saving data", "error");
-            return false;
-        }
-    };
-
-    const deleteFromFirestore = async (collectionName: string, id: string) => {
-        if (!app || !user) return false;
-        try {
-            const path = `artifacts/${appId}/users/${user.uid}/${collectionName}`;
-            await deleteDoc(doc(db, path, id));
-            return true;
-        } catch (e) {
-            console.error(e);
-            showToast("Error deleting data", "error");
-            return false;
-        }
-    };
-
     const handleSaveProperty = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (!editingProp) return;
+        if (!editingProp || !user) return;
         const formData = new FormData(e.currentTarget);
         const newProp = {
             name: formData.get('name') as string,
@@ -80,17 +45,30 @@ export function PropertiesTab() {
             telegramChatId: formData.get('telegramChatId') as string,
         };
 
-        const success = await saveToFirestore('properties', newProp, editingProp.id);
-        if (success) {
+        try {
+            if (editingProp.id) {
+                await propertyService.updateProperty(user.uid, editingProp.id, newProp);
+            } else {
+                await propertyService.addProperty(user.uid, newProp as Property);
+            }
             setEditingProp(null);
             showToast('Property saved successfully!', 'success');
+        } catch (error) {
+            console.error(error);
+            showToast('Failed to save property', 'error');
         }
     };
 
     const handleDeleteProperty = async (id: string) => {
+        if (!user) return;
         if (confirm('Delete this property?')) {
-            const success = await deleteFromFirestore('properties', id);
-            if (success) showToast('Property deleted', 'success');
+            try {
+                await propertyService.deleteProperty(user.uid, id);
+                showToast('Property deleted', 'success');
+            } catch (error) {
+                console.error(error);
+                showToast('Failed to delete property', 'error');
+            }
         }
     };
 

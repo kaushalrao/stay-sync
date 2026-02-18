@@ -1,8 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Edit3, Plus, ArrowLeft, MessageCircle, Sparkles, X } from 'lucide-react';
-import { collection, addDoc, updateDoc, deleteDoc, doc } from "firebase/firestore";
 import { Template, VariableEditorRef } from '@lib/types';
-import { app, db, appId } from '@lib/firebase';
 import { getIconForTemplate } from '@lib/utils';
 import { Button } from '@components/ui/Button';
 import { Input } from '@components/ui/Input';
@@ -29,6 +27,7 @@ import {
 } from '@dnd-kit/sortable';
 
 import { useStore } from '@store/useStore';
+import { templateService } from '@services/templates/template.service';
 
 export function TemplatesTab() {
     const { user } = useApp();
@@ -52,39 +51,6 @@ export function TemplatesTab() {
         useSensor(MouseSensor)
     );
 
-    const saveToFirestore = async (collectionName: string, data: any, id?: string) => {
-        if (!app || !user) {
-            showToast("Firebase/User not initialized", "error");
-            return false;
-        }
-        try {
-            const path = `artifacts/${appId}/users/${user.uid}/${collectionName}`;
-            if (id) {
-                await updateDoc(doc(db, path, id), data);
-            } else {
-                await addDoc(collection(db, path), data);
-            }
-            return true;
-        } catch (e) {
-            console.error(e);
-            showToast("Error saving data", "error");
-            return false;
-        }
-    };
-
-    const deleteFromFirestore = async (collectionName: string, id: string) => {
-        if (!app || !user) return false;
-        try {
-            const path = `artifacts/${appId}/users/${user.uid}/${collectionName}`;
-            await deleteDoc(doc(db, path, id));
-            return true;
-        } catch (e) {
-            console.error(e);
-            showToast("Error deleting data", "error");
-            return false;
-        }
-    };
-
     const handleDragEnd = async (event: DragEndEvent) => {
         const { active, over } = event;
 
@@ -95,11 +61,13 @@ export function TemplatesTab() {
                 const newItems = arrayMove(items, oldIndex, newIndex);
 
                 // Persist order
-                newItems.forEach((item, index) => {
-                    if (item.order !== index) {
-                        saveToFirestore('templates', { ...item, order: index }, item.id);
-                    }
-                });
+                if (user) {
+                    newItems.forEach((item, index) => {
+                        if (item.order !== index) {
+                            templateService.updateTemplate(user.uid, item.id, { order: index }).catch(console.error);
+                        }
+                    });
+                }
 
                 return newItems;
             });
@@ -108,7 +76,7 @@ export function TemplatesTab() {
 
     const handleSaveTemplate = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (!editingTemp) return;
+        if (!editingTemp || !user) return;
         const formData = new FormData(e.currentTarget);
 
         const label = formData.get('label') as string;
@@ -126,17 +94,30 @@ export function TemplatesTab() {
             order: editingTemp.id ? editingTemp.order : templates.length
         };
 
-        const success = await saveToFirestore('templates', newTemp, editingTemp.id);
-        if (success) {
+        try {
+            if (editingTemp.id) {
+                await templateService.updateTemplate(user.uid, editingTemp.id, newTemp);
+            } else {
+                await templateService.addTemplate(user.uid, newTemp);
+            }
             setEditingTemp(null);
             showToast('Template saved successfully!', 'success');
+        } catch (error) {
+            console.error(error);
+            showToast('Failed to save template', 'error');
         }
     };
 
     const handleDeleteTemplate = async (id: string) => {
+        if (!user) return;
         if (confirm('Delete this template?')) {
-            const success = await deleteFromFirestore('templates', id);
-            if (success) showToast('Template deleted', 'success');
+            try {
+                await templateService.deleteTemplate(user.uid, id);
+                showToast('Template deleted', 'success');
+            } catch (error) {
+                console.error(error);
+                showToast('Failed to delete template', 'error');
+            }
         }
     };
 
