@@ -7,7 +7,7 @@ import { DashboardHeader } from '@components/analytics/DashboardHeader';
 import { StatsGrid } from '@components/analytics/StatsGrid';
 import { RevenueChart } from '@components/analytics/RevenueChart';
 import { RecentActivity } from '@components/analytics/RecentActivity';
-import { calculateDashboardMetrics } from '@/app/lib/analytics';
+import { analyticsService } from '@services/index';
 import { Loader } from '@components/ui/Loader';
 import { useStore } from '@store/useStore';
 
@@ -34,7 +34,7 @@ export default function AnalyticsPage() {
 
     // Aggregation Logic
     const dashboardData = useMemo(() => {
-        return calculateDashboardMetrics(guests, properties, selectedProperty, selectedYear);
+        return analyticsService.calculateDashboardMetrics(guests, properties, selectedProperty, selectedYear);
     }, [guests, selectedProperty, selectedYear, properties]);
 
     const loading = appLoading || isGuestsLoading;
