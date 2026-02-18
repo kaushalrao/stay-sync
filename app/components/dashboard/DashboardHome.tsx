@@ -2,13 +2,12 @@
 
 import React, { useMemo, useEffect } from 'react';
 import { useApp } from '@components/providers/AppProvider';
-import { getCurrentMonthStats, getUpcomingBookings } from '@lib/analytics';
 import { IndianRupee, Calendar, TrendingUp, Users } from 'lucide-react';
 import { UpcomingBookingsWidget } from './UpcomingBookingsWidget';
 import { HeroBanner } from './HeroBanner';
 import { QuickActionCards } from './QuickActionCards';
-import { updateWidgetData } from '@lib/widget';
 import { useStore } from '@store/useStore';
+import { analyticsService, widgetService } from '@services/index';
 
 export function DashboardHome() {
     const { user } = useApp();
@@ -21,8 +20,8 @@ export function DashboardHome() {
 
     const { monthStats, upcomingBookings } = useMemo(() => {
         return {
-            monthStats: getCurrentMonthStats(guests, properties, selectedProperty),
-            upcomingBookings: getUpcomingBookings(guests, properties, selectedProperty, 5),
+            monthStats: analyticsService.getCurrentMonthStats(guests, properties, selectedProperty),
+            upcomingBookings: analyticsService.getUpcomingBookings(guests, properties, selectedProperty, 5),
         };
     }, [guests, properties]); // Removed selectedProperty from deps as it's now constant 'all'
 
@@ -31,13 +30,10 @@ export function DashboardHome() {
         if (upcomingBookings.length > 0) {
             const guest = upcomingBookings[0];
             // Find property for time details
-            // We need to match by name as guest.propName might be the only link if propertyId isn't on guest (it usually is though? type says propName?)
-            // Guest type has propertyId? Let's check types.ts. Guest has propName.
-            // But usually we can find it.
             const statsProperty = properties.find(p => p.name === guest.propName);
-            updateWidgetData(guest, statsProperty);
+            widgetService.updateWidgetData(guest, statsProperty);
         } else {
-            updateWidgetData(null);
+            widgetService.updateWidgetData(null);
         }
     }, [upcomingBookings, properties]);
 
