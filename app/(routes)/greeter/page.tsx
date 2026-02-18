@@ -2,9 +2,9 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { Check, Copy, MessageCircle, PenTool, Eye, X } from 'lucide-react';
-import { GuestDetails, Guest, CalendarEvent, IcalFeed } from '@lib/types';
+import { GuestDetails, Guest, CalendarEvent } from '@lib/types';
 import { DEFAULT_GUEST_DETAILS } from '@lib/constants';
-import { calculateNights, formatDate, formatCurrency, processTemplate, openWhatsApp } from '@lib/utils';
+import { calculateNights, openWhatsApp } from '@lib/utils';
 import { PropertyDock } from '@components/greeter/PropertyDock';
 import { Portal } from '@components/ui/Portal';
 import { Loader } from '@components/ui/Loader';
@@ -14,8 +14,7 @@ import { PreviewPhone } from '@components/greeter/PreviewPhone';
 import { GuestDirectory } from '@components/guests/GuestDirectory';
 import { useApp } from '@components/providers/AppProvider';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { calendarService, guestService } from '@services/index';
-import { triggerBookingNotification } from '@lib/emailUtils';
+import { calendarService, guestService, templateService } from '@services/index';
 import { Suspense } from 'react';
 import { useStore } from '@store/useStore';
 
@@ -141,57 +140,12 @@ function GreeterContent() {
     useEffect(() => {
         const fetchCalendarData = async () => {
             if (!user?.uid || !selectedProperty) return;
-
-            let allEvents: CalendarEvent[] = [];
-
-            // 1. Fetch Internal Bookings (from Store)
-            const internalEvents: CalendarEvent[] = [];
-
-            guestsFromStore.forEach((data) => {
-                // Filter by propName manually since we have all guests
-                if (data.propName !== selectedProperty.name) return;
-                // Only block for valid statuses
-                if (data.status !== 'cancelled' && data.checkInDate && data.checkOutDate) {
-                    internalEvents.push({
-                        start: data.checkInDate,
-                        end: data.checkOutDate,
-                        summary: `Hosted: ${data.guestName}`,
-                        source: 'manual',
-                        color: '#3b82f6' // Host Pilot Blue
-                    });
-                }
-            });
-
-            allEvents = [...allEvents, ...internalEvents];
-
-            // 2. Fetch External iCal Feeds
-            const feeds = selectedProperty.icalFeeds || [];
-
-            // Fetch all feeds in parallel
-            const feedPromises = feeds.map(async (feed: IcalFeed) => {
-                const events = await calendarService.fetchExternal(feed.url);
-                return events.map(e => ({
-                    ...e,
-                    source: feed.name,
-                    color: feed.color
-                }));
-            });
-
-            try {
-                const externalResults = await Promise.all(feedPromises);
-                externalResults.forEach((events: CalendarEvent[]) => {
-                    allEvents = [...allEvents, ...events];
-                });
-            } catch (err) {
-                console.error("Error fetching external calendars", err);
-                showToast("Some calendars failed to sync", "error");
-            }
-
-            setBlockedDates(allEvents);
+            const events = await calendarService.aggregateEvents(guestsFromStore, selectedProperty);
+            setBlockedDates(events);
         };
 
         fetchCalendarData();
-    }, [selectedProperty, user?.uid, showToast, guestsFromStore]);
+    }, [selectedProperty, user?.uid, guestsFromStore]);
 
     const isDirty = useMemo(() => {
         if (!currentGuestId || !initialGuestDetails) return true;
@@ -220,42 +174,7 @@ function GreeterContent() {
 
     const generatedMessage = useMemo(() => {
         if (!selectedProperty || !selectedTemplate) return '';
-        const nights = calculateNights(guestDetails.checkInDate, guestDetails.checkOutDate);
-        const totalBaseCost = selectedProperty.basePrice * nights;
-        const extraGuestsCount = Math.max(0, guestDetails.numberOfGuests - selectedProperty.baseGuests);
-        const totalExtraCost = selectedProperty.extraGuestPrice * extraGuestsCount * nights;
-
-        const subTotal = totalBaseCost + totalExtraCost;
-        const discount = guestDetails.discount || 0;
-        const totalAmount = Math.max(0, subTotal - discount);
-
-        const balanceDue = Math.max(0, totalAmount - guestDetails.advancePaid);
-
-        const data: Record<string, string | number> = {
-            guestName: guestDetails.guestName.trim() || 'Guest',
-            propertyName: selectedProperty.name,
-            hostName: selectedProperty.hostName,
-            coHostName: selectedProperty.coHostName,
-            contactPrimary: selectedProperty.contactPrimary,
-            contactSecondary: selectedProperty.contactSecondary,
-            wifiName: selectedProperty.wifiName,
-            wifiPass: selectedProperty.wifiPass,
-            checkInTime: selectedProperty.checkInTime,
-            checkOutTime: selectedProperty.checkOutTime,
-            locationLink: selectedProperty.locationLink,
-            propertyLink: selectedProperty.propertyLink || '',
-            checkInDate: formatDate(guestDetails.checkInDate),
-            checkOutDate: formatDate(guestDetails.checkOutDate),
-            nights: nights,
-            numberOfGuests: guestDetails.numberOfGuests,
-            totalAmount: formatCurrency(totalAmount),
-            advancePaid: formatCurrency(guestDetails.advancePaid),
-            balanceDue: formatCurrency(balanceDue),
-            basePrice: formatCurrency(selectedProperty.basePrice),
-            extraGuestPrice: formatCurrency(selectedProperty.extraGuestPrice),
-            baseGuests: selectedProperty.baseGuests,
-        };
-        return processTemplate(selectedTemplate.content, data);
+        return templateService.generateMessage(selectedTemplate.content, selectedProperty, guestDetails);
     }, [guestDetails, selectedProperty, selectedTemplate]);
 
     const handleCopy = () => {
@@ -312,12 +231,12 @@ function GreeterContent() {
                 showToast("Guest updated!", "success");
 
                 // Trigger Email Notification (Async) - Updated Type
-                triggerBookingNotification({
+                guestService.sendNotification({
                     guest: { ...guestDetails, id: currentGuestId },
                     property: selectedProperty,
                     type: 'updated',
                     totalAmount: totalAmount,
-                    dashboardLink: `${window.location.origin}/greeter?guestId=${currentGuestId}`
+                    origin: window.location.origin
                 });
             } else {
                 // Create new
@@ -327,12 +246,12 @@ function GreeterContent() {
                 showToast("Guest saved to directory!", "success");
 
                 // Trigger Email Notification (Async) - New Type
-                triggerBookingNotification({
+                guestService.sendNotification({
                     guest: { ...guestDetails, id },
                     property: selectedProperty,
                     type: 'new',
                     totalAmount: totalAmount,
-                    dashboardLink: `${window.location.origin}/greeter?guestId=${id}`
+                    origin: window.location.origin
                 });
 
                 // Reset dirty state

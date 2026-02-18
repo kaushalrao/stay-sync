@@ -1,8 +1,10 @@
 import { Capacitor, CapacitorHttp } from '@capacitor/core';
 import { APP_URLS } from '../lib/urls';
+import { Guest, CalendarEvent, Property } from '../lib/types';
 
 export interface CalendarService {
     fetchExternal(url: string): Promise<{ start: string, end: string, summary: string }[]>;
+    aggregateEvents(internalGuests: Guest[], property: Property): Promise<CalendarEvent[]>;
 }
 
 const parseICal = (text: string): { start: string, end: string, summary: string }[] => {
@@ -51,5 +53,52 @@ export const defaultCalendarService: CalendarService = {
             console.error("Error fetching calendar:", url, error);
         }
         return [];
+    },
+
+    aggregateEvents: async (internalGuests: Guest[], property: any): Promise<CalendarEvent[]> => {
+        let allEvents: CalendarEvent[] = [];
+
+        // 1. Internal Bookings
+        const internalEvents: CalendarEvent[] = [];
+
+        internalGuests.forEach((data) => {
+            // Filter by propName
+            if (data.propName !== property.name) return;
+            // Only block for valid statuses
+            if (data.status !== 'cancelled' && data.checkInDate && data.checkOutDate) {
+                internalEvents.push({
+                    start: data.checkInDate,
+                    end: data.checkOutDate,
+                    summary: `Hosted: ${data.guestName}`,
+                    source: 'manual',
+                    color: '#3b82f6' // Host Pilot Blue
+                });
+            }
+        });
+
+        allEvents = [...allEvents, ...internalEvents];
+
+        // 2. External iCal Feeds
+        const feeds = property.icalFeeds || [];
+
+        const feedPromises = feeds.map(async (feed: any) => {
+            const events = await defaultCalendarService.fetchExternal(feed.url);
+            return events.map(e => ({
+                ...e,
+                source: feed.name,
+                color: feed.color
+            }));
+        });
+
+        try {
+            const externalResults = await Promise.all(feedPromises);
+            externalResults.forEach((events: any[]) => {
+                allEvents = [...allEvents, ...events];
+            });
+        } catch (err) {
+            console.error("Error fetching external calendars", err);
+        }
+
+        return allEvents;
     }
 };
