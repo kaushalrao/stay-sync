@@ -9,3 +9,6 @@ const calendarService = defaultCalendarService;
 
 export { dataService, calendarService };
 export * from './types';
+export { cleaningService } from './cleaning/cleaning.service';
+export { inventoryService } from './inventory/inventory.service';
+export { maintenanceService } from './maintenance/maintenance.service';

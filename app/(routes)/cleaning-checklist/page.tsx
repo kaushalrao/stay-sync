@@ -7,7 +7,7 @@ import { useCleaningTasks } from '@hooks/cleaning/useCleaningTasks';
 import { useRoomSettings } from '@hooks/cleaning/useRoomSettings';
 import { DEFAULT_ROOM_TYPES } from '@constants/cleaning';
 import { CleaningTask } from '@lib/types';
-import { useInventory } from '@/app/hooks/inventory/useInventory';
+import { useInventory } from '@hooks/inventory/useInventory';
 import { useStore } from '@store/useStore';
 import { CleaningHeader } from '@components/cleaning/CleaningHeader';
 import { ReadinessOverview } from '@components/cleaning/ReadinessOverview';

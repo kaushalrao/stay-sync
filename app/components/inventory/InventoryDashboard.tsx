@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { ShoppingCart, History, Package } from 'lucide-react';
-import { useInventory } from '@/app/hooks/inventory/useInventory';
+import { useInventory } from '@hooks/inventory/useInventory';
 import { ShoppingList, ShoppingListStickyButton } from './ShoppingList';
 import { InventoryHistory } from './InventoryHistory';
 import { MasterInventory } from './MasterInventory';

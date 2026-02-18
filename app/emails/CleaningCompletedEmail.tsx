@@ -168,7 +168,7 @@ export const CleaningCompletedEmail = ({
                                     <Text className="text-gray-400 text-[11px] uppercase tracking-wider font-bold mb-2">Staff Remarks</Text>
                                     <div className="bg-gray-50 border-l-4 border-emerald-500 p-4 rounded-r-lg">
                                         <Text className="text-gray-700 text-[14px] italic m-0">
-                                            "{remarks}"
+                                            &quot;{remarks}&quot;
                                         </Text>
                                     </div>
                                 </Section>

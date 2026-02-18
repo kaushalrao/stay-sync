@@ -6,29 +6,27 @@ import { useRouter } from 'next/navigation';
 import { Wrench, Plus, CheckCircle2, Circle, Trash2, Filter, Home, ChevronDown } from 'lucide-react';
 import { Button } from '@components/ui/Button';
 import { Input } from '@components/ui/Input';
-import { addDoc, collection, deleteDoc, doc, updateDoc } from 'firebase/firestore';
-import { db, appId } from '@lib/firebase';
 import { MaintenanceIssue } from '@lib/types';
 import { useStore } from '@store/useStore';
+import { useMaintenance } from '@hooks/maintenance/useMaintenance';
 
 export default function MaintenancePage() {
     const { user } = useApp();
     const router = useRouter();
-
-    // Core data from global store
-    const issues = useStore(state => state.issues);
     const properties = useStore(state => state.properties);
-    const showToast = useStore(state => state.showToast);
-    const selectedPropertyId = useStore(state => state.selectedPropertyId);
+    const filterProp = useStore(state => state.selectedPropertyId) || 'all';
+    const setFilterProp = useStore(state => state.setSelectedPropertyId);
 
     const [isAdding, setIsAdding] = useState(false);
     const [filterStatus, setFilterStatus] = useState<'all' | 'pending' | 'fixed'>('all');
 
-    // Core property selection from global store
-    const filterProp = useStore(state => state.selectedPropertyId) || 'all';
-    const setFilterProp = useStore(state => state.setSelectedPropertyId);
+    const {
+        issues,
+        addIssue,
+        toggleStatus,
+        deleteIssue
+    } = useMaintenance(filterProp);
 
-    // Redirect if not logged in
     React.useEffect(() => {
         if (!user) {
             router.push('/');
@@ -46,44 +44,17 @@ export default function MaintenancePage() {
 
         if (!title || !propertyId) return;
 
-        try {
-            await addDoc(collection(db, `artifacts/${appId}/users/${user.uid}/maintenance`), {
-                title,
-                propertyId,
-                priority,
-                status: 'pending',
-                createdAt: Date.now()
-            });
-            setIsAdding(false);
-            showToast('Issue reported', 'success');
-        } catch (error) {
-            console.error(error);
-            showToast('Failed to report issue', 'error');
-        }
+        const success = await addIssue(title, priority, propertyId);
+        if (success) setIsAdding(false);
     };
 
     const handleToggleStatus = async (issue: MaintenanceIssue) => {
-        const newStatus = issue.status === 'fixed' ? 'pending' : 'fixed';
-        try {
-            await updateDoc(doc(db, `artifacts/${appId}/users/${user.uid}/maintenance`, issue.id), {
-                status: newStatus
-            });
-            showToast(`Marked as ${newStatus}`, 'success');
-        } catch (error) {
-            console.error(error);
-            showToast('Failed to update status', 'error');
-        }
+        await toggleStatus(issue);
     };
 
     const handleDelete = async (id: string) => {
         if (!confirm('Delete this issue?')) return;
-        try {
-            await deleteDoc(doc(db, `artifacts/${appId}/users/${user.uid}/maintenance`, id));
-            showToast('Issue deleted', 'success');
-        } catch (error) {
-            console.error(error);
-            showToast('Failed to delete issue', 'error');
-        }
+        await deleteIssue(id);
     };
 
     const filteredIssues = issues.filter(issue => {

@@ -1,10 +1,8 @@
-import { useState } from 'react';
-import { collection, writeBatch, doc, addDoc, updateDoc, deleteDoc } from 'firebase/firestore';
-import { db, appId } from '@lib/firebase';
+import { useState, useCallback } from 'react';
 import { useApp } from '@components/providers/AppProvider';
 import { useStore } from '@store/useStore';
 import { InventoryNeed, InventoryMasterItem } from '@lib/types';
-
+import { inventoryService } from '@services/index';
 
 export function useInventory() {
     const { user, showToast } = useApp();
@@ -14,78 +12,50 @@ export function useInventory() {
     const isLoading = useStore(state => state.isInventoryLoading);
     const [processingId, setProcessingId] = useState<string | null>(null);
 
-    const markRestocked = async (need: InventoryNeed) => {
-        if (!user) return;
+    const markRestocked = useCallback(async (need: InventoryNeed) => {
         setProcessingId(need.id);
 
         try {
-            const batch = writeBatch(db);
-
-            // 1. Delete from needs
-            const needRef = doc(db, `artifacts/${appId}/users/${user.uid}/inventory-needs`, need.id);
-            batch.delete(needRef);
-
-            // 2. Add to logs
-            const logRef = doc(collection(db, `artifacts/${appId}/users/${user.uid}/inventory-logs`));
-            batch.set(logRef, {
-                item: need.item,
-                quantity: need.quantity,
-                propertyId: need.propertyId,
-                room: need.room,
-                type: 'restock',
-                createdAt: Date.now()
-            });
-
-            await batch.commit();
+            await inventoryService.markRestocked(user?.uid, need);
             showToast("Item marked as restocked", "success");
-
         } catch (error) {
             console.error(error);
             showToast("Failed to update inventory", "error");
         } finally {
             setProcessingId(null);
         }
-    };
+    }, [user, showToast]);
 
-    const addMasterItem = async (category: string, item: string) => {
-        if (!user) return;
+    const addMasterItem = useCallback(async (category: string, item: string) => {
         try {
-            const docRef = await addDoc(collection(db, `artifacts/${appId}/users/${user.uid}/inventory-master`), {
-                category,
-                item,
-                createdAt: Date.now()
-            });
+            const id = await inventoryService.addMasterItem(user?.uid, category, item);
             showToast("Item added to master list", "success");
-            return docRef.id;
+            return id;
         } catch (error) {
             console.error("Error adding master item:", error);
             showToast("Failed to add item", "error");
         }
-    };
+    }, [user, showToast]);
 
-    const updateMasterItem = async (id: string, updates: Partial<InventoryMasterItem>) => {
-        if (!user) return;
+    const updateMasterItem = useCallback(async (id: string, updates: Partial<InventoryMasterItem>) => {
         try {
-            const itemRef = doc(db, `artifacts/${appId}/users/${user.uid}/inventory-master`, id);
-            await updateDoc(itemRef, updates);
+            await inventoryService.updateMasterItem(user?.uid, id, updates);
             showToast("Item updated", "success");
         } catch (error) {
             console.error("Error updating master item:", error);
             showToast("Failed to update item", "error");
         }
-    };
+    }, [user, showToast]);
 
-    const deleteMasterItem = async (id: string) => {
-        if (!user) return;
+    const deleteMasterItem = useCallback(async (id: string) => {
         try {
-            const itemRef = doc(db, `artifacts/${appId}/users/${user.uid}/inventory-master`, id);
-            await deleteDoc(itemRef);
+            await inventoryService.deleteMasterItem(user?.uid, id);
             showToast("Item deleted", "success");
         } catch (error) {
             console.error("Error deleting master item:", error);
             showToast("Failed to delete item", "error");
         }
-    };
+    }, [user, showToast]);
 
     return {
         needs,

@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import { X, AlertTriangle, Save } from 'lucide-react';
 import { Button } from '@components/ui/Button';
 import { Input } from '@components/ui/Input';
-import { addDoc, collection } from 'firebase/firestore';
-import { db, appId } from '@lib/firebase';
 import { useApp } from '@components/providers/AppProvider';
+import { useMaintenance } from '@hooks/maintenance/useMaintenance';
 
 interface ReportIssueModalProps {
     isOpen: boolean;
@@ -15,7 +14,8 @@ interface ReportIssueModalProps {
 }
 
 export function ReportIssueModal({ isOpen, onClose, propertyId, roomName, taskTitle }: ReportIssueModalProps) {
-    const { user, showToast } = useApp();
+    const { user } = useApp();
+    const { addIssue } = useMaintenance();
     const [title, setTitle] = useState(taskTitle ? `Issue with: ${taskTitle}` : '');
     const [priority, setPriority] = useState<'low' | 'medium' | 'high'>('medium');
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -34,23 +34,11 @@ export function ReportIssueModal({ isOpen, onClose, propertyId, roomName, taskTi
         if (!title.trim()) return;
 
         setIsSubmitting(true);
-        try {
-            await addDoc(collection(db, `artifacts/${appId}/users/${user.uid}/maintenance`), {
-                title: title.trim(),
-                propertyId,
-                priority,
-                status: 'pending',
-                source: 'cleaning-checklist',
-                room: roomName,
-                createdAt: Date.now()
-            });
-            showToast('Issue reported successfully', 'success');
+        const success = await addIssue(title.trim(), priority, propertyId);
+        setIsSubmitting(false);
+
+        if (success) {
             onClose();
-        } catch (error) {
-            console.error(error);
-            showToast('Failed to report issue', 'error');
-        } finally {
-            setIsSubmitting(false);
         }
     };
 
@@ -92,10 +80,10 @@ export function ReportIssueModal({ isOpen, onClose, propertyId, roomName, taskTi
                                     type="button"
                                     onClick={() => setPriority(p)}
                                     className={`flex-1 py-2 px-4 rounded-xl text-sm font-bold capitalize transition-all border ${priority === p
-                                            ? p === 'high' ? 'bg-red-100 border-red-500 text-red-600 dark:bg-red-500/20 dark:text-red-400'
-                                                : p === 'medium' ? 'bg-orange-100 border-orange-500 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400'
-                                                    : 'bg-blue-100 border-blue-500 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400'
-                                            : 'bg-slate-50 border-slate-200 text-slate-500 dark:bg-slate-800 dark:border-slate-700'
+                                        ? p === 'high' ? 'bg-red-100 border-red-500 text-red-600 dark:bg-red-500/20 dark:text-red-400'
+                                            : p === 'medium' ? 'bg-orange-100 border-orange-500 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400'
+                                                : 'bg-blue-100 border-blue-500 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400'
+                                        : 'bg-slate-50 border-slate-200 text-slate-500 dark:bg-slate-800 dark:border-slate-700'
                                         }`}
                                 >
                                     {p}

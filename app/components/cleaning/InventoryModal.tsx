@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { X, Package, Save, Minus, Plus } from 'lucide-react';
 import { Button } from '@components/ui/Button';
-import { addDoc, collection, writeBatch, doc } from 'firebase/firestore';
+import { collection, writeBatch, doc } from 'firebase/firestore';
 import { db, appId } from '@lib/firebase';
 import { useApp } from '@components/providers/AppProvider';
-import { useInventory } from '@/app/hooks/inventory/useInventory';
+import { useInventory } from '@hooks/inventory/useInventory';
 
 interface InventoryModalProps {
     isOpen: boolean;
