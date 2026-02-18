@@ -4,7 +4,8 @@ import { useStore } from '@store/useStore';
 import { cleaningService } from '@services/cleaning/cleaning.service';
 
 export function useCleaningTasks(propertyId: string) {
-    const { user, showToast } = useApp();
+    const { user } = useApp();
+    const showToast = useStore(state => state.showToast);
     const allTasks = useStore(state => state.tasks);
     const isLoading = useStore(state => state.isCleaningLoading);
     const tasks = (allTasks || []).filter(t => t.propertyId === propertyId);

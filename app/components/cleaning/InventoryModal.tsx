@@ -5,6 +5,7 @@ import { collection, writeBatch, doc } from 'firebase/firestore';
 import { db, appId } from '@lib/firebase';
 import { useApp } from '@components/providers/AppProvider';
 import { useInventory } from '@hooks/inventory/useInventory';
+import { useStore } from '@store/useStore';
 
 interface InventoryModalProps {
     isOpen: boolean;
@@ -15,7 +16,8 @@ interface InventoryModalProps {
 }
 
 export function InventoryModal({ isOpen, onClose, propertyId, roomName, forcedCategory }: InventoryModalProps) {
-    const { user, showToast } = useApp();
+    const { user } = useApp();
+    const showToast = useStore(state => state.showToast);
     const { masterItems, needs, isLoading } = useInventory();
     const [counts, setCounts] = useState<Record<string, number>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);

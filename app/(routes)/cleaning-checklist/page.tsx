@@ -21,7 +21,9 @@ import { CompleteChecklistModal } from '@components/cleaning/CompleteChecklistMo
 import { appId } from '@lib/firebase';
 
 export default function CleaningChecklistPage() {
-    const { user, properties, showToast } = useApp();
+    const { user } = useApp();
+    const properties = useStore(state => state.properties);
+    const showToast = useStore(state => state.showToast);
     const globalPropertyId = useStore(state => state.selectedPropertyId);
     const setFilterProp = useStore(state => state.setSelectedPropertyId);
 

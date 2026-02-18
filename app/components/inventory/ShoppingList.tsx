@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useMemo } from 'react';
-import { Check, MessageCircle, ShoppingBag, MapPin, Calendar, Smartphone } from 'lucide-react';
-import { useApp } from '@components/providers/AppProvider';
+import React from 'react';
+import { Check, MessageCircle, ShoppingBag, MapPin } from 'lucide-react';
 import { InventoryNeed } from '@lib/types';
 import { openWhatsApp } from '@lib/utils';
 import { Button } from '@components/ui/Button';
+import { useStore } from '@store/useStore';
 
 interface ShoppingListProps {
     needs: InventoryNeed[];
@@ -60,7 +60,7 @@ const sendInventoryToHost = (needs: InventoryNeed[], properties: any[]) => {
 };
 
 export function ShoppingList({ needs, markRestocked, processingId }: ShoppingListProps) {
-    const { properties } = useApp();
+    const properties = useStore(state => state.properties);
 
     const handleSendToHost = () => {
         sendInventoryToHost(needs, properties);
@@ -166,7 +166,7 @@ export function ShoppingList({ needs, markRestocked, processingId }: ShoppingLis
 
 // Export StickyButton for use in parent
 export function ShoppingListStickyButton({ needs }: { needs: InventoryNeed[] }) {
-    const { properties } = useApp();
+    const properties = useStore(state => state.properties);
 
     const handleSendToHost = () => {
         sendInventoryToHost(needs, properties);

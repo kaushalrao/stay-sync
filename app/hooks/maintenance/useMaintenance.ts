@@ -5,7 +5,8 @@ import { MaintenanceIssue } from '@lib/types';
 import { maintenanceService } from '@services/maintenance/maintenance.service';
 
 export function useMaintenance(propertyId: string = 'all') {
-    const { user, showToast } = useApp();
+    const { user } = useApp();
+    const showToast = useStore(state => state.showToast);
     const allIssues = useStore(state => state.issues);
     const isLoading = useStore(state => state.isIssuesLoading);
     const [processingId, setProcessingId] = useState<string | null>(null);

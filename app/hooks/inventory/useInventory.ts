@@ -5,7 +5,8 @@ import { InventoryNeed, InventoryMasterItem } from '@lib/types';
 import { inventoryService } from '@services/index';
 
 export function useInventory() {
-    const { user, showToast } = useApp();
+    const { user } = useApp();
+    const showToast = useStore(state => state.showToast);
     const needs = useStore(state => state.needs);
     const logs = useStore(state => state.logs);
     const masterItems = useStore(state => state.masterItems);

@@ -11,7 +11,8 @@ import { GuestFilters } from './GuestFilters';
 import { useStore } from '@store/useStore';
 
 export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode = 'page', className = '' }) => {
-    const { user, properties } = useApp();
+    const { user } = useApp();
+    const properties = useStore(state => state.properties);
     const guests = useStore(state => state.guests);
     const isLoading = useStore(state => state.isGuestsLoading);
     const showToast = useStore(state => state.showToast);

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { History, Calendar, MapPin, Package } from 'lucide-react';
-import { useApp } from '@components/providers/AppProvider';
+import { useStore } from '@store/useStore';
 import { InventoryLog } from '@lib/types';
 
 interface InventoryHistoryProps {
@@ -10,7 +10,7 @@ interface InventoryHistoryProps {
 }
 
 export function InventoryHistory({ logs }: InventoryHistoryProps) {
-    const { properties } = useApp();
+    const properties = useStore(state => state.properties);
 
     if (logs.length === 0) {
         return (
