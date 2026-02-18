@@ -4,6 +4,7 @@ import * as React from 'react';
 import { GuestArrivalEmail } from '../emails/GuestArrivalEmail';
 import { GuestCheckoutEmail } from '../emails/GuestCheckoutEmail';
 import { BookingNotificationEmail } from '../emails/BookingNotificationEmail';
+import { CleaningCompletedEmail } from '../emails/CleaningCompletedEmail';
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -130,6 +131,35 @@ export const emailService = {
                     numberOfGuests={numberOfGuests}
                     nights={nights}
                     totalAmount={totalAmount}
+                    dashboardLink={dashboardLink}
+                />
+            ),
+        });
+    },
+
+    sendCleaningCompletionNotification: async (
+        to: string | string[],
+        propName: string,
+        propId: string,
+        completedAt: string,
+        cleanedBy: string,
+        summary: { total: number; completed: number },
+        roomSummary: Record<string, { total: number; completed: number }>,
+        remarks: string,
+        dashboardLink: string
+    ) => {
+        return sendEmail({
+            to: to,
+            subject: `Ready for Guest: Cleaning Completed at ${propName}`,
+            component: (
+                <CleaningCompletedEmail
+                    propName={propName}
+                    propId={propId}
+                    completedAt={completedAt}
+                    cleanedBy={cleanedBy}
+                    summary={summary}
+                    roomSummary={roomSummary}
+                    remarks={remarks}
                     dashboardLink={dashboardLink}
                 />
             ),

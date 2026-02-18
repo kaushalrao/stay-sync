@@ -17,9 +17,11 @@ import { RoomDetailModal } from '@components/cleaning/RoomDetailModal';
 import { AddTaskModal } from '@components/cleaning/AddTaskModal';
 import { ManageRoomsModal } from '@components/cleaning/ManageRoomsModal';
 import { InventoryManagerModal } from '@components/cleaning/InventoryManagerModal';
+import { CompleteChecklistModal } from '@components/cleaning/CompleteChecklistModal';
+import { appId } from '@lib/firebase';
 
 export default function CleaningChecklistPage() {
-    const { user, properties } = useApp();
+    const { user, properties, showToast } = useApp();
     const globalPropertyId = useStore(state => state.selectedPropertyId);
     const setFilterProp = useStore(state => state.setSelectedPropertyId);
 
@@ -36,6 +38,8 @@ export default function CleaningChecklistPage() {
     const [isAdding, setIsAdding] = useState(false);
     const [isManagingRooms, setIsManagingRooms] = useState(false);
     const [showLogs, setShowLogs] = useState(false);
+    const [isCompleting, setIsCompleting] = useState(false);
+    const [hasAutoTriggered, setHasAutoTriggered] = useState(false);
 
     // If global is empty, initialize it to first property
     useEffect(() => {
@@ -92,6 +96,17 @@ export default function CleaningChecklistPage() {
         }, {} as Record<string, CleaningTask[]>);
     }, [tasks]);
 
+    // Auto-trigger completion modal when 100% is reached
+    useEffect(() => {
+        if (totalTasks > 0 && completedTasks === totalTasks && !hasAutoTriggered) {
+            setIsCompleting(true);
+            setHasAutoTriggered(true);
+        } else if (completedTasks < totalTasks) {
+            // Reset trigger so it can fire again if they uncheck and re-check
+            setHasAutoTriggered(false);
+        }
+    }, [completedTasks, totalTasks, hasAutoTriggered]);
+
     // Map needs to rooms for quick lookup
     // Key: room name lowercased, Value: number of items needed
     const roomNeedsMap = useMemo(() => {
@@ -134,6 +149,63 @@ export default function CleaningChecklistPage() {
         return await deleteRoom(room, allRooms);
     };
 
+    const handleCompleteChecklist = async (data: { staffName: string; remarks: string }) => {
+        if (!user || !filterProp) return false;
+
+        // Calculate room-by-room summary
+        const roomSummary: Record<string, { total: number, completed: number }> = {};
+        allRooms.forEach(room => {
+            const roomTasks = tasksByRoom[room.toLowerCase()] || [];
+            roomSummary[room] = {
+                total: roomTasks.length,
+                completed: roomTasks.filter(t => t.isCompleted).length
+            };
+        });
+
+        try {
+            const res = await fetch('/api/cleaning/complete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    propertyId: filterProp,
+                    staffName: data.staffName,
+                    remarks: data.remarks,
+                    totalTasks,
+                    completedTasks,
+                    roomSummary,
+                    userId: user.uid,
+                    appId: appId
+                })
+            });
+
+            const result = await res.json();
+            if (result.success) {
+                // Determine toast message based on email status
+                if (result.emailStatus === 'sent') {
+                    showToast('Checklist completed. Host has been notified!', 'success');
+                } else if (result.emailStatus === 'failed') {
+                    showToast('Log saved, but email notification failed.', 'error');
+                } else {
+                    showToast('Checklist completed and logged.', 'success');
+                }
+
+                // ONLY reset if it was 100% completion
+                if (completedTasks === totalTasks && totalTasks > 0) {
+                    await resetTasks(false);
+                }
+
+                return true;
+            } else {
+                showToast(result.error || 'Failed to complete checklist', 'error');
+                return false;
+            }
+        } catch (error) {
+            console.error(error);
+            showToast('An error occurred during completion', 'error');
+            return false;
+        }
+    };
+
     if (!user) return null;
 
     return (
@@ -151,6 +223,7 @@ export default function CleaningChecklistPage() {
                     completedTasks={completedTasks}
                     onInitializePresets={initializePresets}
                     onResetTasks={resetTasks}
+                    onComplete={() => setIsCompleting(true)}
                 />
 
                 <RoomGrid onManageRooms={() => setIsManagingRooms(true)}>
@@ -221,6 +294,15 @@ export default function CleaningChecklistPage() {
                 isOpen={showLogs}
                 onClose={() => setShowLogs(false)}
                 propertyId={filterProp}
+            />
+
+            <CompleteChecklistModal
+                isOpen={isCompleting}
+                onClose={() => setIsCompleting(false)}
+                onComplete={handleCompleteChecklist}
+                totalTasks={totalTasks}
+                completedTasks={completedTasks}
+                defaultStaffName={user.displayName || ''}
             />
         </div>
     );

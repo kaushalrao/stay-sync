@@ -58,15 +58,15 @@ export function useCleaningTasks(propertyId: string) {
     }, [user, showToast]);
 
     // Batch operations
-    const resetTasks = useCallback(async () => {
+    const resetTasks = useCallback(async (showConfirmation = true) => {
         if (!user || !tasks.length) return;
         const completedTasks = tasks.filter(t => t.isCompleted);
         if (completedTasks.length === 0) {
-            showToast("No completed tasks to reset.", "success");
+            if (showConfirmation) showToast("No completed tasks to reset.", "success");
             return;
         }
 
-        if (!confirm('Are you sure you want to reset all tasks to "Not Completed"?')) return;
+        if (showConfirmation && !confirm('Are you sure you want to reset all tasks to "Not Completed"?')) return;
 
         try {
             const batch = writeBatch(db);
@@ -75,7 +75,7 @@ export function useCleaningTasks(propertyId: string) {
                 batch.update(ref, { isCompleted: false });
             });
             await batch.commit();
-            showToast("All tasks reset successfully!", "success");
+            if (showConfirmation) showToast("All tasks reset successfully!", "success");
         } catch (error) {
             console.error(error);
             showToast("Failed to reset tasks", "error");

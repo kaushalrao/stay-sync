@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react';
-import { Wand2, RotateCcw } from 'lucide-react';
+import React from 'react';
+import { Wand2, RotateCcw, MailCheck } from 'lucide-react';
 import { Button } from '@components/ui/Button';
 
 interface ReadinessOverviewProps {
@@ -7,9 +7,16 @@ interface ReadinessOverviewProps {
     completedTasks: number;
     onInitializePresets: () => void;
     onResetTasks: () => void;
+    onComplete: () => void;
 }
 
-export function ReadinessOverview({ totalTasks, completedTasks, onInitializePresets, onResetTasks }: ReadinessOverviewProps) {
+export function ReadinessOverview({
+    totalTasks,
+    completedTasks,
+    onInitializePresets,
+    onResetTasks,
+    onComplete
+}: ReadinessOverviewProps) {
     const globalProgress = totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100);
 
     return (
@@ -26,7 +33,17 @@ export function ReadinessOverview({ totalTasks, completedTasks, onInitializePres
                             : `${totalTasks - completedTasks} tasks remaining to be guest-ready.`}
                     </p>
 
-                    <div className="flex gap-3 mt-4 justify-center md:justify-start w-full">
+                    <div className="flex flex-wrap gap-3 mt-4 justify-center md:justify-start w-full">
+                        {/* Notify Host Button */}
+                        {totalTasks > 0 && (
+                            <Button
+                                onClick={onComplete}
+                                className="rounded-xl text-xs md:text-sm py-2 px-3 md:px-4 bg-emerald-500 hover:bg-emerald-600 border-none shadow-lg shadow-emerald-500/20 w-full md:w-auto"
+                            >
+                                <MailCheck size={16} className="mr-1" />Notify Host
+                            </Button>
+                        )}
+
                         {/* Preset Button (only if no tasks) */}
                         {totalTasks === 0 && (
                             <Button onClick={onInitializePresets} variant="purple" className="rounded-xl text-xs md:text-sm py-2 px-3 md:px-4 w-full md:w-auto">
