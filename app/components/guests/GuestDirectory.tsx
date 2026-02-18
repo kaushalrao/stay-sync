@@ -3,7 +3,7 @@ import { Users } from 'lucide-react';
 import { GuestDirectoryProps } from '../../lib/types';
 import { format, addMonths, subMonths } from 'date-fns';
 import { triggerBookingNotification } from '../../lib/emailUtils';
-import { dataService } from '../../services';
+import { guestService } from '../../services';
 import { useApp } from '../providers/AppProvider';
 import { GuestCard } from './GuestCard';
 import { GuestFilters } from './GuestFilters';
@@ -43,7 +43,7 @@ export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode =
         }
 
         try {
-            await dataService.guests.delete(user.uid, id);
+            await guestService.deleteGuest(user.uid, id);
             showToast('Guest deleted', 'success');
         } catch (error) {
             console.error(error);

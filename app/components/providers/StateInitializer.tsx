@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useApp } from './AppProvider';
 import { useStore } from '@store/useStore';
-import { dataService, inventoryService, cleaningService, maintenanceService, propertyService, templateService } from '@services/index';
+import { inventoryService, cleaningService, maintenanceService, propertyService, templateService, guestService } from '@services/index';
 
 export function StateInitializer() {
     const { user } = useApp();
@@ -43,11 +43,8 @@ export function StateInitializer() {
             setIsIssuesLoading(false);
         });
 
-        const unsubGuests = dataService.guests.subscribe(user.uid, (guests) => {
+        const unsubGuests = guestService.subscribeToGuests(user.uid, (guests) => {
             setGuests(guests);
-            setIsGuestsLoading(false);
-        }, (err) => {
-            console.error("Firestore Guests Error:", err);
             setIsGuestsLoading(false);
         });
 

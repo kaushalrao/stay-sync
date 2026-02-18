@@ -14,7 +14,7 @@ import { PreviewPhone } from '@components/greeter/PreviewPhone';
 import { GuestDirectory } from '@components/guests/GuestDirectory';
 import { useApp } from '@components/providers/AppProvider';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { dataService, calendarService } from '@services/index';
+import { calendarService, guestService } from '@services/index';
 import { triggerBookingNotification } from '@lib/emailUtils';
 import { Suspense } from 'react';
 import { useStore } from '@store/useStore';
@@ -84,7 +84,7 @@ function GreeterContent() {
             if (!user || !guestIdParam) return;
 
             try {
-                const guest = await dataService.guests.getOne(user.uid, guestIdParam);
+                const guest = await guestService.getGuest(user.uid, guestIdParam);
 
                 if (guest) {
                     handleSelectGuest(guest);
@@ -308,7 +308,7 @@ function GreeterContent() {
 
             if (currentGuestId) {
                 // Update existing
-                await dataService.guests.update(user.uid, currentGuestId, guestData);
+                await guestService.updateGuest(user.uid, currentGuestId, guestData);
                 showToast("Guest updated!", "success");
 
                 // Trigger Email Notification (Async) - Updated Type
@@ -322,7 +322,7 @@ function GreeterContent() {
             } else {
                 // Create new
                 // Cast to any to bypass Partial check here, assuming form validation handles required fields
-                const id = await dataService.guests.add(user.uid, guestData as any);
+                const id = await guestService.addGuest(user.uid, guestData as any);
                 setCurrentGuestId(id);
                 showToast("Guest saved to directory!", "success");
 
