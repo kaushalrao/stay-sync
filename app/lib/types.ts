@@ -318,6 +318,9 @@ export interface MaintenanceState {
 export interface UIState {
     selectedPropertyId: string;
     setSelectedPropertyId: (id: string) => void;
+    theme: 'light' | 'dark';
+    toggleTheme: () => void;
+    setTheme: (theme: 'light' | 'dark') => void;
 }
 
 export interface GuestState {

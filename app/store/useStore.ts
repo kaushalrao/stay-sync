@@ -34,8 +34,11 @@ export const useStore = create<AppState>()(
                 setIsCleaningLoading: (isCleaningLoading) => set({ isCleaningLoading }),
 
                 // UI / Global
-                selectedPropertyId: '',
+                selectedPropertyId: 'all', // Default to 'all'
                 setSelectedPropertyId: (selectedPropertyId) => set({ selectedPropertyId }),
+                theme: 'dark', // Default to dark theme
+                toggleTheme: () => set((state) => ({ theme: state.theme === 'light' ? 'dark' : 'light' })),
+                setTheme: (theme) => set({ theme }),
 
                 // Properties
                 properties: [],
@@ -72,7 +75,10 @@ export const useStore = create<AppState>()(
             {
                 name: 'staysync-storage',
                 // Only persist UI state
-                partialize: (state) => ({ selectedPropertyId: state.selectedPropertyId }),
+                partialize: (state) => ({
+                    selectedPropertyId: state.selectedPropertyId,
+                    theme: state.theme
+                }),
             }
         )
     )

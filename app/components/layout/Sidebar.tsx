@@ -14,7 +14,6 @@ import {
 import { signOut } from "firebase/auth";
 import { auth } from '@lib/firebase';
 import { SIDEBAR_NAV_ITEMS } from '@/app/lib/constants';
-import { useTheme } from '@/app/components/providers/ThemeProvider';
 import { useStore } from '@store/useStore';
 
 interface SidebarProps {
@@ -24,7 +23,8 @@ interface SidebarProps {
 export function Sidebar({ onNavigate }: SidebarProps) {
     const pathname = usePathname();
     const [isOpen, setIsOpen] = React.useState(false);
-    const { theme, toggleTheme } = useTheme();
+    const theme = useStore(state => state.theme);
+    const toggleTheme = useStore(state => state.toggleTheme);
     const setSelectedPropertyId = useStore(state => state.setSelectedPropertyId);
     const needs = useStore(state => state.needs);
     const hasLowStock = needs.length > 0;
