@@ -7,15 +7,15 @@ import { Wrench, Plus, CheckCircle2, Circle, Trash2, Filter, Home, ChevronDown }
 import { Button } from '@components/ui/Button';
 import { Input } from '@components/ui/Input';
 import { MaintenanceIssue } from '@lib/types';
-import { useStore } from '@store/useStore';
+import { usePropertyStore, useUIStore } from '@store/index';
 import { useMaintenance } from '@hooks/maintenance/useMaintenance';
 
 export default function MaintenancePage() {
     const { user } = useApp();
     const router = useRouter();
-    const properties = useStore(state => state.properties);
-    const filterProp = useStore(state => state.selectedPropertyId) || 'all';
-    const setFilterProp = useStore(state => state.setSelectedPropertyId);
+    const properties = usePropertyStore(state => state.properties);
+    const filterProp = useUIStore(state => state.selectedPropertyId) || 'all';
+    const setFilterProp = useUIStore(state => state.setSelectedPropertyId);
 
     const [isAdding, setIsAdding] = useState(false);
     const [filterStatus, setFilterStatus] = useState<'all' | 'pending' | 'fixed'>('all');

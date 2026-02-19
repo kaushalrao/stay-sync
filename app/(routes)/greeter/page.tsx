@@ -16,13 +16,13 @@ import { useApp } from '@components/providers/AppProvider';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { calendarService, guestService, templateService } from '@services/index';
 import { Suspense } from 'react';
-import { useStore } from '@store/useStore';
+import { useGuestStore, usePropertyStore, useTemplateStore, useUIStore } from '@store/index';
 
 function GreeterContent() {
-    const properties = useStore(state => state.properties);
-    const templates = useStore(state => state.templates);
-    const showToast = useStore(state => state.showToast);
-    const guestsFromStore = useStore(state => state.guests);
+    const properties = usePropertyStore(state => state.properties);
+    const templates = useTemplateStore(state => state.templates);
+    const showToast = useUIStore(state => state.showToast);
+    const guestsFromStore = useGuestStore(state => state.guests);
 
     const { user, loading } = useApp();
     const router = useRouter();

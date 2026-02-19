@@ -8,7 +8,7 @@ import { useRoomSettings } from '@hooks/cleaning/useRoomSettings';
 import { DEFAULT_ROOM_TYPES } from '@constants/cleaning';
 import { CleaningTask } from '@lib/types';
 import { useInventory } from '@hooks/inventory/useInventory';
-import { useStore } from '@store/useStore';
+import { usePropertyStore, useUIStore } from '@store/index';
 import { CleaningHeader } from '@components/cleaning/CleaningHeader';
 import { ReadinessOverview } from '@components/cleaning/ReadinessOverview';
 import { RoomGrid } from '@components/cleaning/RoomGrid';
@@ -22,10 +22,10 @@ import { appId } from '@lib/firebase';
 
 export default function CleaningChecklistPage() {
     const { user } = useApp();
-    const properties = useStore(state => state.properties);
-    const showToast = useStore(state => state.showToast);
-    const globalPropertyId = useStore(state => state.selectedPropertyId);
-    const setFilterProp = useStore(state => state.setSelectedPropertyId);
+    const properties = usePropertyStore(state => state.properties);
+    const showToast = useUIStore(state => state.showToast);
+    const globalPropertyId = useUIStore(state => state.selectedPropertyId);
+    const setFilterProp = useUIStore(state => state.setSelectedPropertyId);
 
     // In Cleaning Checklist, we MUST have a specific property. 
     // If global is 'all' or empty, default to first property locally.

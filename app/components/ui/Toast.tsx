@@ -1,10 +1,10 @@
 import React from 'react';
 import { CheckCircle2, XCircle } from 'lucide-react';
-import { useStore } from '@store/useStore';
+import { useUIStore } from '@store/index';
 
 export const Toast: React.FC = () => {
-    const toast = useStore(state => state.toast);
-    const hideToast = useStore(state => state.hideToast);
+    const toast = useUIStore(state => state.toast);
+    const hideToast = useUIStore(state => state.hideToast);
 
     return (
         <div

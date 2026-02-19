@@ -3,7 +3,7 @@ import { X, History, ShoppingCart, Check, Calendar } from 'lucide-react';
 import { collection, query, where, getDocs, limit, writeBatch, doc, deleteDoc } from 'firebase/firestore';
 import { db, appId } from '@lib/firebase';
 import { useApp } from '@components/providers/AppProvider';
-import { useStore } from '@store/useStore';
+import { useUIStore } from '@store/index';
 
 interface InventoryManagerModalProps {
     isOpen: boolean;
@@ -31,7 +31,7 @@ interface InventoryNeed {
 
 export function InventoryManagerModal({ isOpen, onClose, propertyId }: InventoryManagerModalProps) {
     const { user } = useApp();
-    const showToast = useStore(state => state.showToast);
+    const showToast = useUIStore(state => state.showToast);
     const [activeTab, setActiveTab] = useState<'shopping' | 'history'>('shopping');
 
     const [needs, setNeeds] = useState<InventoryNeed[]>([]);

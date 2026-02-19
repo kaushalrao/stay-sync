@@ -5,13 +5,13 @@ import { DEFAULT_PROPERTY_TIMES, DEFAULT_PROPERTY_VALUES } from '@lib/constants'
 import { Button } from '@components/ui/Button';
 import { Input } from '@components/ui/Input';
 import { useApp } from '@components/providers/AppProvider';
-import { useStore } from '@store/useStore';
+import { usePropertyStore, useUIStore } from '@store/index';
 import { propertyService } from '@services/properties/property.service';
 
 export function PropertiesTab() {
     const { user } = useApp();
-    const properties = useStore(state => state.properties);
-    const showToast = useStore(state => state.showToast);
+    const properties = usePropertyStore(state => state.properties);
+    const showToast = useUIStore(state => state.showToast);
     const [editingProp, setEditingProp] = useState<Partial<Property> | null>(null);
     const [origin, setOrigin] = useState('');
 

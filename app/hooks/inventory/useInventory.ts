@@ -1,16 +1,16 @@
 import { useState, useCallback } from 'react';
 import { useApp } from '@components/providers/AppProvider';
-import { useStore } from '@store/useStore';
+import { useInventoryStore, useUIStore } from '@store/index';
 import { InventoryNeed, InventoryMasterItem } from '@lib/types';
 import { inventoryService } from '@services/index';
 
 export function useInventory() {
     const { user } = useApp();
-    const showToast = useStore(state => state.showToast);
-    const needs = useStore(state => state.needs);
-    const logs = useStore(state => state.logs);
-    const masterItems = useStore(state => state.masterItems);
-    const isLoading = useStore(state => state.isInventoryLoading);
+    const showToast = useUIStore(state => state.showToast);
+    const needs = useInventoryStore(state => state.needs);
+    const logs = useInventoryStore(state => state.logs);
+    const masterItems = useInventoryStore(state => state.masterItems);
+    const isLoading = useInventoryStore(state => state.isInventoryLoading);
     const [processingId, setProcessingId] = useState<string | null>(null);
 
     const markRestocked = useCallback(async (need: InventoryNeed) => {

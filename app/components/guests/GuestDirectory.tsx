@@ -8,21 +8,27 @@ import { useApp } from '../providers/AppProvider';
 import { GuestCard } from './GuestCard';
 import { GuestFilters } from './GuestFilters';
 import { VirtuosoGrid } from 'react-virtuoso';
+import { useGuestStore, usePropertyStore, useUIStore } from '@store/index';
 
-import { useStore } from '@store/useStore';
+const GuestItemContainer = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ children, ...props }, ref) => (
+    <div {...props} ref={ref} className="w-full">
+        {children}
+    </div>
+));
+GuestItemContainer.displayName = 'GuestItemContainer';
 
 export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode = 'page', className = '' }) => {
     const { user } = useApp();
-    const properties = useStore(state => state.properties);
-    const guests = useStore(state => state.guests);
-    const guestLastDoc = useStore(state => state.guestLastDoc);
-    const appendGuests = useStore(state => state.appendGuests);
+    const properties = usePropertyStore(state => state.properties);
+    const guests = useGuestStore(state => state.guests);
+    const guestLastDoc = useGuestStore(state => state.guestLastDoc);
+    const appendGuests = useGuestStore(state => state.appendGuests);
 
     // Convert old single loading state to granular if needed, or just use it for initial load
-    const isLoading = useStore(state => state.isGuestsLoading);
+    const isLoading = useGuestStore(state => state.isGuestsLoading);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
 
-    const showToast = useStore(state => state.showToast);
+    const showToast = useUIStore(state => state.showToast);
 
     const [search, setSearch] = useState('');
     const [statusFilter, setStatusFilter] = useState<'upcoming' | 'past' | 'all'>('all');
@@ -128,6 +134,22 @@ export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode =
         }
     });
 
+    // Memoize List component to handle 'mode' dependency and set display name
+    const GuestListContainer = React.useMemo(() => {
+        const Comp = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ style, children, ...props }, ref) => (
+            <div
+                ref={ref}
+                style={style}
+                {...props}
+                className={`${mode === 'page' ? 'px-4 py-2 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-x-6 md:gap-y-4' : 'p-2 space-y-3'}`}
+            >
+                {children}
+            </div>
+        ));
+        Comp.displayName = 'GuestListContainer';
+        return Comp;
+    }, [mode]);
+
     return (
         <div className={`flex flex-col h-full ${mode === 'page' ? 'p-0' : 'p-4'} md:p-0 ${className}`}>
             {/* Header / Search */}
@@ -171,21 +193,8 @@ export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode =
                             </div>
                         )}
                         components={{
-                            List: React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ style, children, ...props }, ref) => (
-                                <div
-                                    ref={ref}
-                                    style={style}
-                                    {...props}
-                                    className={`${mode === 'page' ? 'px-4 py-2 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-x-6 md:gap-y-4' : 'p-2 space-y-3'}`}
-                                >
-                                    {children}
-                                </div>
-                            )),
-                            Item: React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ children, ...props }, ref) => (
-                                <div {...props} ref={ref} className="w-full">
-                                    {children}
-                                </div>
-                            ))
+                            List: GuestListContainer,
+                            Item: GuestItemContainer
                         }}
                     />
                 )}

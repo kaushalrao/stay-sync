@@ -1,13 +1,13 @@
 import { useCallback } from 'react';
 import { useApp } from '@components/providers/AppProvider';
-import { useStore } from '@store/useStore';
+import { useCleaningStore, useUIStore } from '@store/index';
 import { cleaningService } from '@services/cleaning/cleaning.service';
 
 export function useCleaningTasks(propertyId: string) {
     const { user } = useApp();
-    const showToast = useStore(state => state.showToast);
-    const allTasks = useStore(state => state.tasks);
-    const isLoading = useStore(state => state.isCleaningLoading);
+    const showToast = useUIStore(state => state.showToast);
+    const allTasks = useCleaningStore(state => state.tasks);
+    const isLoading = useCleaningStore(state => state.isCleaningLoading);
     const tasks = (allTasks || []).filter(t => t.propertyId === propertyId);
 
     const addTask = useCallback(async (title: string, room: string) => {

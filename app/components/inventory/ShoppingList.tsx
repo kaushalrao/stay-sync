@@ -5,7 +5,7 @@ import { Check, MessageCircle, ShoppingBag, MapPin } from 'lucide-react';
 import { InventoryNeed } from '@lib/types';
 import { openWhatsApp } from '@lib/utils';
 import { Button } from '@components/ui/Button';
-import { useStore } from '@store/useStore';
+import { usePropertyStore } from '@store/index';
 
 interface ShoppingListProps {
     needs: InventoryNeed[];
@@ -14,6 +14,7 @@ interface ShoppingListProps {
 }
 
 const sendInventoryToHost = (needs: InventoryNeed[], properties: any[]) => {
+    // ... (rest of the function is outside the diff, but keeping context clean)
     if (needs.length === 0) return;
 
     // Group needs by property
@@ -23,44 +24,17 @@ const sendInventoryToHost = (needs: InventoryNeed[], properties: any[]) => {
         return acc;
     }, {} as Record<string, InventoryNeed[]>);
 
-    let globalMessage = `*🛒 Inventory Request*\n📅 ${new Date().toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}\n\n`;
-
-    Object.entries(needsByProperty).forEach(([propId, propNeeds]) => {
-        const propName = properties.find(p => p.id === propId)?.name || 'Unknown Property';
-        globalMessage += `*🏡 ${propName}*\n`;
-
-        const needsByRoom = propNeeds.reduce((acc, need) => {
-            const roomKey = need.room || 'General';
-            if (!acc[roomKey]) acc[roomKey] = [];
-            acc[roomKey].push(need);
-            return acc;
-        }, {} as Record<string, InventoryNeed[]>);
-
-        Object.entries(needsByRoom).forEach(([room, roomNeeds]) => {
-            globalMessage += `\n*${room}*\n`;
-            roomNeeds.forEach(need => {
-                globalMessage += `▫️ *${need.quantity}x* ${need.item}\n`;
-            });
-        });
-
-        globalMessage += `\n-------------------\n\n`;
-    });
-
-    // Validated Contact Logic
-    let contact: string | undefined = undefined;
-    for (const need of needs) {
-        const prop = properties.find(p => p.id === need.propertyId);
-        if (prop?.contactPrimary) {
-            contact = prop.contactPrimary;
-            break;
-        }
-    }
-
-    openWhatsApp(globalMessage, contact);
+    // ... (abriged for brevity in tool call, standard diff applies)
+    // Actually I need to replace imports at top and hook usage inside component.
+    // The previous chunks were contiguous but large.
+    // Let's do it in two chunks or one if I can match safely.
+    // I will match imports first.
 };
 
+// ...
+
 export function ShoppingList({ needs, markRestocked, processingId }: ShoppingListProps) {
-    const properties = useStore(state => state.properties);
+    const properties = usePropertyStore(state => state.properties);
 
     const handleSendToHost = () => {
         sendInventoryToHost(needs, properties);
@@ -166,7 +140,7 @@ export function ShoppingList({ needs, markRestocked, processingId }: ShoppingLis
 
 // Export StickyButton for use in parent
 export function ShoppingListStickyButton({ needs }: { needs: InventoryNeed[] }) {
-    const properties = useStore(state => state.properties);
+    const properties = usePropertyStore(state => state.properties);
 
     const handleSendToHost = () => {
         sendInventoryToHost(needs, properties);

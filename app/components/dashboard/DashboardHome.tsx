@@ -6,16 +6,16 @@ import { IndianRupee, Calendar, TrendingUp, Users } from 'lucide-react';
 import { UpcomingBookingsWidget } from './UpcomingBookingsWidget';
 import { HeroBanner } from './HeroBanner';
 import { QuickActionCards } from './QuickActionCards';
-import { useStore } from '@store/useStore';
+import { useGuestStore, usePropertyStore } from '@store/index';
 import { analyticsService, widgetService } from '@services/index';
 
 export function DashboardHome() {
     const { user } = useApp();
 
     // Core data from global store
-    const properties = useStore(state => state.properties);
-    const guests = useStore(state => state.guests);
-    const isGuestsLoading = useStore(state => state.isGuestsLoading);
+    const properties = usePropertyStore(state => state.properties);
+    const guests = useGuestStore(state => state.guests);
+    const isGuestsLoading = useGuestStore(state => state.isGuestsLoading);
     const selectedProperty = 'all'; // Home page always shows all properties
 
     const { monthStats, upcomingBookings } = useMemo(() => {

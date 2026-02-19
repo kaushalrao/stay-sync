@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { cleaningService } from '@services/cleaning/cleaning.service';
 import { useApp } from '@components/providers/AppProvider';
-import { useStore } from '@store/useStore';
+import { useUIStore } from '@store/index';
 
 export function useRoomSettings(propertyId: string) {
     const { user } = useApp();
-    const showToast = useStore(state => state.showToast);
+    const showToast = useUIStore(state => state.showToast);
     const [roomOrder, setRoomOrder] = useState<string[]>([]);
     const [roomTypes, setRoomTypes] = useState<Record<string, string>>({});
     const [isSaving, setIsSaving] = useState(false);

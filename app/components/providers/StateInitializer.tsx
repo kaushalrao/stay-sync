@@ -2,27 +2,44 @@
 
 import { useEffect } from 'react';
 import { useApp } from './AppProvider';
-import { useStore } from '@store/useStore';
+import {
+    useInventoryStore,
+    useCleaningStore,
+    usePropertyStore,
+    useTemplateStore,
+    useMaintenanceStore,
+    useGuestStore
+} from '@store/index';
 import { inventoryService, cleaningService, maintenanceService, propertyService, templateService, guestService } from '@services/index';
 
 export function StateInitializer() {
     const { user } = useApp();
-    const {
-        setNeeds,
-        setLogs,
-        setMasterItems,
-        setIsInventoryLoading,
-        setTasks,
-        setIsCleaningLoading,
-        setProperties,
-        setIsPropertiesLoading,
-        setTemplates,
-        setIsTemplatesLoading,
-        setIssues,
-        setIsIssuesLoading,
-        setGuests,
-        setIsGuestsLoading
-    } = useStore();
+
+    // Inventory Store
+    const setNeeds = useInventoryStore((state) => state.setNeeds);
+    const setLogs = useInventoryStore((state) => state.setLogs);
+    const setMasterItems = useInventoryStore((state) => state.setMasterItems);
+    const setIsInventoryLoading = useInventoryStore((state) => state.setIsInventoryLoading);
+
+    // Cleaning Store
+    const setTasks = useCleaningStore((state) => state.setTasks);
+    const setIsCleaningLoading = useCleaningStore((state) => state.setIsCleaningLoading);
+
+    // Property Store
+    const setProperties = usePropertyStore((state) => state.setProperties);
+    const setIsPropertiesLoading = usePropertyStore((state) => state.setIsPropertiesLoading);
+
+    // Template Store
+    const setTemplates = useTemplateStore((state) => state.setTemplates);
+    const setIsTemplatesLoading = useTemplateStore((state) => state.setIsTemplatesLoading);
+
+    // Maintenance Store
+    const setIssues = useMaintenanceStore((state) => state.setIssues);
+    const setIsIssuesLoading = useMaintenanceStore((state) => state.setIsIssuesLoading);
+
+    // Guest Store
+    const setGuests = useGuestStore((state) => state.setGuests);
+    const setIsGuestsLoading = useGuestStore((state) => state.setIsGuestsLoading);
 
     useEffect(() => {
         if (!user) return;
@@ -46,7 +63,6 @@ export function StateInitializer() {
         setIsGuestsLoading(true);
         guestService.getGuests(user.uid, null, 20)
             .then(({ guests, lastDoc }) => {
-                const { setGuests } = useStore.getState();
                 setGuests(guests, lastDoc);
             })
             .catch(err => console.error(err))

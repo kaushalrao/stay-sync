@@ -9,20 +9,20 @@ import { RevenueChart } from '@components/analytics/RevenueChart';
 import { RecentActivity } from '@components/analytics/RecentActivity';
 import { analyticsService } from '@services/index';
 import { Loader } from '@components/ui/Loader';
-import { useStore } from '@store/useStore';
+import { useGuestStore, usePropertyStore, useUIStore } from '@store/index';
 
 export default function AnalyticsPage() {
     const { user, loading: appLoading } = useApp();
     const router = useRouter();
 
     // Core data from global store
-    const properties = useStore(state => state.properties);
-    const guests = useStore(state => state.guests);
-    const isGuestsLoading = useStore(state => state.isGuestsLoading);
+    const properties = usePropertyStore(state => state.properties);
+    const guests = useGuestStore(state => state.guests);
+    const isGuestsLoading = useGuestStore(state => state.isGuestsLoading);
 
     // Filters
-    const selectedProperty = useStore(state => state.selectedPropertyId) || 'all';
-    const setSelectedProperty = useStore(state => state.setSelectedPropertyId);
+    const selectedProperty = useUIStore(state => state.selectedPropertyId) || 'all';
+    const setSelectedProperty = useUIStore(state => state.setSelectedPropertyId);
     const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
 
     // Auth Redirect

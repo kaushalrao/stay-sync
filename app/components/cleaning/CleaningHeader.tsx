@@ -1,7 +1,7 @@
 import React from 'react';
 import { ChevronDown, ShoppingBag, AlertCircle } from 'lucide-react';
 import { Property } from '@lib/types';
-import { useStore } from '@store/useStore';
+import { useInventoryStore } from '@store/index';
 
 interface CleaningHeaderProps {
     properties: Property[];
@@ -11,7 +11,7 @@ interface CleaningHeaderProps {
 }
 
 export function CleaningHeader({ properties, selectedPropertyId, onPropertyChange, onViewLogs }: CleaningHeaderProps) {
-    const pendingCount = useStore(state =>
+    const pendingCount = useInventoryStore(state =>
         state.needs.filter(n => n.propertyId === selectedPropertyId && n.status === 'pending').length
     );
 

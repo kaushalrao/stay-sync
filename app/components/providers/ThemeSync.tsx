@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { useStore } from '@store/useStore';
+import { useUIStore } from '@store/index';
 
 export function ThemeSync() {
-    const theme = useStore(state => state.theme);
+    const theme = useUIStore(state => state.theme);
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {

@@ -1,14 +1,14 @@
 import { useState, useCallback } from 'react';
 import { useApp } from '@components/providers/AppProvider';
-import { useStore } from '@store/useStore';
+import { useMaintenanceStore, useUIStore } from '@store/index';
 import { MaintenanceIssue } from '@lib/types';
 import { maintenanceService } from '@services/maintenance/maintenance.service';
 
 export function useMaintenance(propertyId: string = 'all') {
     const { user } = useApp();
-    const showToast = useStore(state => state.showToast);
-    const allIssues = useStore(state => state.issues);
-    const isLoading = useStore(state => state.isIssuesLoading);
+    const showToast = useUIStore(state => state.showToast);
+    const allIssues = useMaintenanceStore(state => state.issues);
+    const isLoading = useMaintenanceStore(state => state.isIssuesLoading);
     const [processingId, setProcessingId] = useState<string | null>(null);
 
     const issues = propertyId === 'all'
