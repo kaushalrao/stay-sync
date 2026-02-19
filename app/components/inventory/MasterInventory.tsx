@@ -67,7 +67,7 @@ export function MasterInventory() {
                 </Button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 animate-fade-in">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 md:gap-6 animate-fade-in">
                 {categories.map((category) => (
                     <div key={category} className="bg-white dark:bg-slate-800/50 p-5 md:p-6 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm flex flex-col h-full">
                         <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-3 md:mb-4 flex items-center gap-2">

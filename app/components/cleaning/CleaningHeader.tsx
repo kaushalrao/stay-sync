@@ -17,7 +17,7 @@ export function CleaningHeader({ properties, selectedPropertyId, onPropertyChang
 
     return (
         <div className="sticky top-0 z-10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-white/5 px-4 py-3 mb-6 transition-all duration-300">
-            <div className="max-w-5xl mx-auto flex items-center justify-between">
+            <div className="w-full px-4 md:px-8 flex items-center justify-between">
                 <div>
                     <h1 className="text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">
                         Cleaning Checklist

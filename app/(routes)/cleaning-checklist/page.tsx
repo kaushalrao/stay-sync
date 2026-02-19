@@ -219,7 +219,7 @@ export default function CleaningChecklistPage() {
                 onViewLogs={() => setShowLogs(true)}
             />
 
-            <div className="max-w-5xl mx-auto px-6 pt-8">
+            <div className="w-full px-4 md:px-8 pt-8">
                 <ReadinessOverview
                     totalTasks={totalTasks}
                     completedTasks={completedTasks}

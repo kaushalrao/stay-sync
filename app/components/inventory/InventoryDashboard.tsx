@@ -26,7 +26,7 @@ export function InventoryDashboard() {
         ];
 
     return (
-        <div className="flex flex-col h-full animate-fade-in max-w-7xl mx-auto w-full px-4 md:px-0">
+        <div className="flex flex-col h-full animate-fade-in w-full px-4 md:px-0">
             <header className="flex flex-col md:flex-row md:items-center gap-5 mb-6 md:mb-10 pt-4 md:pt-2">
                 <div className="flex items-center gap-4 md:gap-5">
                     <div className="relative group">
