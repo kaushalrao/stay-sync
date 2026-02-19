@@ -10,9 +10,9 @@ export class GuestService {
         this.repo = repo;
     }
 
-    async getGuests(userId: string | undefined | null, lastDoc?: any, limit: number = 20) {
+    async getGuests(userId: string | undefined | null, lastDoc?: any, limit: number = 20, searchQuery?: string) {
         if (!userId) throw new Error("User ID is required");
-        return this.repo.getGuests(userId, lastDoc, limit);
+        return this.repo.getGuests(userId, lastDoc, limit, searchQuery);
     }
 
     async getGuest(userId: string | undefined | null, guestId: string) {

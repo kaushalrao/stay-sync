@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import { useDebounce } from '@/app/hooks/useDebounce';
 import { Users } from 'lucide-react';
 import { GuestDirectoryProps } from '../../lib/types';
 import { format, addMonths, subMonths } from 'date-fns';
@@ -22,7 +23,9 @@ export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode =
     const properties = usePropertyStore(state => state.properties);
     const guests = useGuestStore(state => state.guests);
     const guestLastDoc = useGuestStore(state => state.guestLastDoc);
+    const setGuests = useGuestStore(state => state.setGuests);
     const appendGuests = useGuestStore(state => state.appendGuests);
+    const setIsGuestsLoading = useGuestStore(state => state.setIsGuestsLoading);
 
     // Convert old single loading state to granular if needed, or just use it for initial load
     const isLoading = useGuestStore(state => state.isGuestsLoading);
@@ -31,15 +34,34 @@ export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode =
     const showToast = useUIStore(state => state.showToast);
 
     const [search, setSearch] = useState('');
+    const debouncedSearch = useDebounce(search, 500);
     const [statusFilter, setStatusFilter] = useState<'upcoming' | 'past' | 'all'>('all');
+
+    React.useEffect(() => {
+        if (!user) return;
+
+        const fetchGuests = async () => {
+            setIsGuestsLoading(true);
+            try {
+                // If search is active, we fetch by name. If empty, default fetch (by date).
+                const { guests: newGuests, lastDoc } = await guestService.getGuests(user.uid, null, 20, debouncedSearch);
+                setGuests(newGuests, lastDoc);
+            } catch (error) {
+                console.error("Error fetching guests:", error);
+                showToast("Failed to fetch guests", "error");
+            } finally {
+                setIsGuestsLoading(false);
+            }
+        };
+
+        fetchGuests();
+    }, [debouncedSearch, user, setGuests, setIsGuestsLoading, showToast]);
 
     const loadMore = useCallback(() => {
         if (!user || isLoadingMore || !guestLastDoc) return;
 
-        if (search || statusFilter !== 'all') return;
-
         setIsLoadingMore(true);
-        guestService.getGuests(user.uid, guestLastDoc, 20)
+        guestService.getGuests(user.uid, guestLastDoc, 20, debouncedSearch)
             .then(({ guests: newGuests, lastDoc }) => {
                 if (newGuests.length > 0) {
                     appendGuests(newGuests, lastDoc);
@@ -47,7 +69,7 @@ export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode =
             })
             .catch(console.error)
             .finally(() => setIsLoadingMore(false));
-    }, [user, isLoadingMore, guestLastDoc, search, statusFilter, appendGuests]);
+    }, [user, isLoadingMore, guestLastDoc, debouncedSearch, statusFilter, appendGuests]);
 
     const handleDelete = async (e: React.MouseEvent, id: string) => {
         e.stopPropagation();
@@ -75,6 +97,11 @@ export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode =
         try {
             await guestService.deleteGuest(user.uid, id);
             showToast('Guest deleted. Refresh to see changes.', 'success');
+            // Refresh list after delete? Or just local remove?
+            // Local remove would be better but simple reload works to stay in sync.
+            // For now, simple reload of current query.
+            const { guests: newGuests, lastDoc } = await guestService.getGuests(user.uid, null, 20, debouncedSearch);
+            setGuests(newGuests, lastDoc);
         } catch (error) {
             console.error(error);
             showToast('Error deleting guest', 'error');
@@ -103,8 +130,7 @@ export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode =
 
 
     const filteredGuests = guests.filter(g => {
-        const matchesSearch = g.guestName.toLowerCase().includes(search.toLowerCase()) ||
-            g.propName?.toLowerCase().includes(search.toLowerCase());
+        const matchesSearch = true; // Handled by server (Mostly. Prop name search is lost).
 
         let matchesStatus = true;
         const today = new Date().toISOString().split('T')[0];
@@ -120,7 +146,6 @@ export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode =
 
         return matchesSearch && matchesStatus && matchesMonth;
     }).sort((a, b) => {
-        // Sorting Logic
         const dateA = new Date(a.checkInDate).getTime();
         const dateB = new Date(b.checkInDate).getTime();
 

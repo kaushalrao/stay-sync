@@ -1,6 +1,6 @@
 import {
     collection, addDoc, updateDoc, deleteDoc, doc,
-    query, getDoc, orderBy, limit, startAfter, getDocs
+    query, getDoc, orderBy, limit, startAfter, getDocs, startAt, endAt
 } from 'firebase/firestore';
 import { db, appId } from '@lib/firebase';
 import { IGuestRepository } from './repository.interface';
@@ -11,15 +11,43 @@ export class FirebaseGuestRepository implements IGuestRepository {
         return collection(db, `artifacts/${appId}/users/${userId}/guests`);
     }
 
-    async getGuests(userId: string, lastDoc?: any, limitCount: number = 20): Promise<{ guests: Guest[], lastDoc: any }> {
-        let q = query(
-            this.getCollectionRef(userId),
-            orderBy('createdAt', 'desc'),
-            limit(limitCount)
-        );
+    async getGuests(userId: string, lastDoc?: any, limitCount: number = 20, searchQuery?: string): Promise<{ guests: Guest[], lastDoc: any }> {
+        let q;
 
-        if (lastDoc) {
-            q = query(this.getCollectionRef(userId), orderBy('createdAt', 'desc'), startAfter(lastDoc), limit(limitCount));
+        if (searchQuery) {
+            // Search Mode: Order by searchName for case-insensitive prefix search
+            const normalizedQuery = searchQuery.toLowerCase();
+            let queryConstraints: any[] = [
+                orderBy('searchName'),
+                startAt(normalizedQuery),
+                endAt(normalizedQuery + '\uf8ff'),
+                limit(limitCount)
+            ];
+
+            if (lastDoc) {
+                queryConstraints = [
+                    orderBy('searchName'),
+                    startAfter(lastDoc),
+                    endAt(normalizedQuery + '\uf8ff'), // Ensure we don't go past the prefix range
+                    limit(limitCount)
+                ];
+            }
+
+            q = query(
+                this.getCollectionRef(userId),
+                ...queryConstraints
+            );
+        } else {
+            // Default Mode: Order by createdAt desc
+            q = query(
+                this.getCollectionRef(userId),
+                orderBy('createdAt', 'desc'),
+                limit(limitCount)
+            );
+
+            if (lastDoc) {
+                q = query(this.getCollectionRef(userId), orderBy('createdAt', 'desc'), startAfter(lastDoc), limit(limitCount));
+            }
         }
 
         const snapshot = await getDocs(q);
@@ -44,14 +72,24 @@ export class FirebaseGuestRepository implements IGuestRepository {
     }
 
     async addGuest(userId: string, guest: Omit<Guest, 'id'>): Promise<string> {
-        const docRef = await addDoc(this.getCollectionRef(userId), guest);
+        const guestWithSearch = {
+            ...guest,
+            searchName: guest.guestName.toLowerCase()
+        };
+        const docRef = await addDoc(this.getCollectionRef(userId), guestWithSearch);
         return docRef.id;
     }
 
     async updateGuest(userId: string, guestId: string, updates: Partial<Guest>): Promise<void> {
         console.log(`[GuestRepo] Updating guest: ${guestId}`);
         const ref = doc(this.getCollectionRef(userId), guestId);
-        await updateDoc(ref, updates);
+
+        const finalUpdates = { ...updates };
+        if (updates.guestName) {
+            finalUpdates.searchName = updates.guestName.toLowerCase();
+        }
+
+        await updateDoc(ref, finalUpdates);
     }
 
     async deleteGuest(userId: string, guestId: string): Promise<void> {

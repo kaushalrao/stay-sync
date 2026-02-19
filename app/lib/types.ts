@@ -86,6 +86,7 @@ export interface Guest extends GuestDetails {
     email?: string;
     totalAmount?: number;
     propertyId?: string; // New field for scalability
+    searchName?: string; // Lowercase name for case-insensitive search
 }
 
 export interface MaintenanceIssue {
