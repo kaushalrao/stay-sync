@@ -69,7 +69,7 @@ export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode =
             })
             .catch(console.error)
             .finally(() => setIsLoadingMore(false));
-    }, [user, isLoadingMore, guestLastDoc, debouncedSearch, statusFilter, appendGuests]);
+    }, [user, isLoadingMore, guestLastDoc, debouncedSearch, appendGuests]);
 
     const handleDelete = async (e: React.MouseEvent, id: string) => {
         e.stopPropagation();
