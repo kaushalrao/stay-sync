@@ -60,8 +60,13 @@ export const useStore = create<AppState>()(
 
                 // Guests
                 guests: [],
+                guestLastDoc: null,
                 isGuestsLoading: true,
-                setGuests: (guests) => set({ guests }),
+                setGuests: (guests, lastDoc = null) => set({ guests, guestLastDoc: lastDoc }),
+                appendGuests: (newGuests, lastDoc) => set((state) => ({
+                    guests: [...state.guests, ...newGuests],
+                    guestLastDoc: lastDoc
+                })),
                 setIsGuestsLoading: (isGuestsLoading) => set({ isGuestsLoading }),
 
                 // Toast

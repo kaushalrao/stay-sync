@@ -85,6 +85,7 @@ export interface Guest extends GuestDetails {
     phoneNumber?: string;
     email?: string;
     totalAmount?: number;
+    propertyId?: string; // New field for scalability
 }
 
 export interface MaintenanceIssue {
@@ -325,8 +326,10 @@ export interface UIState {
 
 export interface GuestState {
     guests: Guest[];
+    guestLastDoc: any;
     isGuestsLoading: boolean;
-    setGuests: (guests: Guest[]) => void;
+    setGuests: (guests: Guest[], lastDoc?: any) => void;
+    appendGuests: (guests: Guest[], lastDoc: any) => void;
     setIsGuestsLoading: (loading: boolean) => void;
 }
 

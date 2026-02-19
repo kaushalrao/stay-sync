@@ -1,6 +1,6 @@
 import {
     collection, addDoc, updateDoc, deleteDoc, doc,
-    query, onSnapshot, getDoc
+    query, getDoc, orderBy, limit, startAfter, getDocs
 } from 'firebase/firestore';
 import { db, appId } from '@lib/firebase';
 import { IGuestRepository } from './repository.interface';
@@ -11,15 +11,27 @@ export class FirebaseGuestRepository implements IGuestRepository {
         return collection(db, `artifacts/${appId}/users/${userId}/guests`);
     }
 
-    subscribeToGuests(userId: string, callback: (guests: Guest[]) => void): () => void {
-        const q = query(this.getCollectionRef(userId));
-        return onSnapshot(q, (snapshot) => {
-            const guests = snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            })) as Guest[];
-            callback(guests);
-        });
+    async getGuests(userId: string, lastDoc?: any, limitCount: number = 20): Promise<{ guests: Guest[], lastDoc: any }> {
+        let q = query(
+            this.getCollectionRef(userId),
+            orderBy('createdAt', 'desc'),
+            limit(limitCount)
+        );
+
+        if (lastDoc) {
+            q = query(this.getCollectionRef(userId), orderBy('createdAt', 'desc'), startAfter(lastDoc), limit(limitCount));
+        }
+
+        const snapshot = await getDocs(q);
+        const guests = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        })) as Guest[];
+
+        return {
+            guests,
+            lastDoc: snapshot.docs[snapshot.docs.length - 1]
+        };
     }
 
     async getGuest(userId: string, guestId: string): Promise<Guest | null> {

@@ -43,10 +43,14 @@ export function StateInitializer() {
             setIsIssuesLoading(false);
         });
 
-        const unsubGuests = guestService.subscribeToGuests(user.uid, (guests) => {
-            setGuests(guests);
-            setIsGuestsLoading(false);
-        });
+        setIsGuestsLoading(true);
+        guestService.getGuests(user.uid, null, 20)
+            .then(({ guests, lastDoc }) => {
+                const { setGuests } = useStore.getState();
+                setGuests(guests, lastDoc);
+            })
+            .catch(err => console.error(err))
+            .finally(() => setIsGuestsLoading(false));
 
         // --- INVENTORY LISTENERS ---
         const unsubNeeds = inventoryService.subscribeToNeeds(user.uid, (fetchedNeeds) => {
@@ -76,7 +80,7 @@ export function StateInitializer() {
             unsubProps();
             unsubTemplates();
             unsubIssues();
-            unsubGuests();
+            // unsubGuests();
         };
     }, [
         user,

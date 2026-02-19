@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Users } from 'lucide-react';
 import { GuestDirectoryProps } from '../../lib/types';
 import { format, addMonths, subMonths } from 'date-fns';
@@ -7,6 +7,7 @@ import { guestService } from '../../services';
 import { useApp } from '../providers/AppProvider';
 import { GuestCard } from './GuestCard';
 import { GuestFilters } from './GuestFilters';
+import { VirtuosoGrid } from 'react-virtuoso';
 
 import { useStore } from '@store/useStore';
 
@@ -14,11 +15,33 @@ export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode =
     const { user } = useApp();
     const properties = useStore(state => state.properties);
     const guests = useStore(state => state.guests);
+    const guestLastDoc = useStore(state => state.guestLastDoc);
+    const appendGuests = useStore(state => state.appendGuests);
+
+    // Convert old single loading state to granular if needed, or just use it for initial load
     const isLoading = useStore(state => state.isGuestsLoading);
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
+
     const showToast = useStore(state => state.showToast);
 
     const [search, setSearch] = useState('');
     const [statusFilter, setStatusFilter] = useState<'upcoming' | 'past' | 'all'>('all');
+
+    const loadMore = useCallback(() => {
+        if (!user || isLoadingMore || !guestLastDoc) return;
+
+        if (search || statusFilter !== 'all') return;
+
+        setIsLoadingMore(true);
+        guestService.getGuests(user.uid, guestLastDoc, 20)
+            .then(({ guests: newGuests, lastDoc }) => {
+                if (newGuests.length > 0) {
+                    appendGuests(newGuests, lastDoc);
+                }
+            })
+            .catch(console.error)
+            .finally(() => setIsLoadingMore(false));
+    }, [user, isLoadingMore, guestLastDoc, search, statusFilter, appendGuests]);
 
     const handleDelete = async (e: React.MouseEvent, id: string) => {
         e.stopPropagation();
@@ -45,7 +68,7 @@ export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode =
 
         try {
             await guestService.deleteGuest(user.uid, id);
-            showToast('Guest deleted', 'success');
+            showToast('Guest deleted. Refresh to see changes.', 'success');
         } catch (error) {
             console.error(error);
             showToast('Error deleting guest', 'error');
@@ -123,25 +146,50 @@ export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode =
             </div>
 
             {/* List */}
-            <div className={`flex-1 overflow-y-auto custom-scrollbar ${mode === 'page' ? 'px-4 py-2 md:p-2 flex flex-col space-y-4 md:space-y-0 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-x-6 md:gap-y-10 pb-20 md:items-start' : 'p-2 space-y-3 pb-4'}`}>
-                {isLoading ? (
-                    <div className="text-center py-10 text-slate-500 col-span-full">Loading guests...</div>
+            <div className={`flex-1 ${mode === 'page' ? 'pb-20' : 'pb-4'}`} style={{ minHeight: 0 }}>
+                {isLoading && guests.length === 0 ? (
+                    <div className="text-center py-10 text-slate-500">Loading guests...</div>
                 ) : filteredGuests.length === 0 ? (
-                    <div className="text-center py-10 text-slate-500 col-span-full flex flex-col items-center gap-2">
+                    <div className="text-center py-10 text-slate-500 flex flex-col items-center gap-2">
                         <Users size={32} className="opacity-20" />
                         <p>{search ? 'No guests found matching search.' : 'No guests saved yet.'}</p>
                     </div>
                 ) : (
-                    filteredGuests.map(guest => (
-                        <GuestCard
-                            key={guest.id}
-                            guest={guest}
-                            mode={mode}
-                            onSelect={onSelect}
-                            onDelete={handleDelete}
-                        />
-                    ))
+                    <VirtuosoGrid
+                        style={{ height: '100%' }}
+                        data={filteredGuests}
+                        endReached={loadMore}
+                        itemContent={(index, guest) => (
+                            <div className="mb-4 md:mb-0 md:p-2">
+                                <GuestCard
+                                    key={guest.id}
+                                    guest={guest}
+                                    mode={mode}
+                                    onSelect={onSelect}
+                                    onDelete={handleDelete}
+                                />
+                            </div>
+                        )}
+                        components={{
+                            List: React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ style, children, ...props }, ref) => (
+                                <div
+                                    ref={ref}
+                                    style={style}
+                                    {...props}
+                                    className={`${mode === 'page' ? 'px-4 py-2 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-x-6 md:gap-y-4' : 'p-2 space-y-3'}`}
+                                >
+                                    {children}
+                                </div>
+                            )),
+                            Item: React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ children, ...props }, ref) => (
+                                <div {...props} ref={ref} className="w-full">
+                                    {children}
+                                </div>
+                            ))
+                        }}
+                    />
                 )}
+                {isLoadingMore && <div className="text-center py-2 text-xs text-slate-400">Loading more...</div>}
             </div>
         </div>
     );
