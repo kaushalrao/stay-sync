@@ -1,6 +1,6 @@
 import {
     collection, addDoc, updateDoc, deleteDoc, doc,
-    query, getDoc, orderBy, limit, startAfter, getDocs, startAt, endAt
+    query, getDoc, orderBy, limit, startAfter, getDocs, startAt, endAt, where
 } from 'firebase/firestore';
 import { db, appId } from '@lib/firebase';
 import { IGuestRepository } from './repository.interface';
@@ -60,6 +60,30 @@ export class FirebaseGuestRepository implements IGuestRepository {
             guests,
             lastDoc: snapshot.docs[snapshot.docs.length - 1]
         };
+    }
+
+    async getUpcomingGuests(userId: string, limitCount: number = 5): Promise<Guest[]> {
+        const today = new Date().toISOString().split('T')[0];
+
+        // We query slightly more to handle potential filtering if needed, but primarily reliance on checkInDate
+        // Note: 'upcoming' usually means checkInDate >= today. 
+        // We also want to filter out cancelled if possible, but Firestore doesn't support != easily with range.
+        // So we fetch, then filter in memory if needed.
+
+        const q = query(
+            this.getCollectionRef(userId),
+            where('checkInDate', '>=', today),
+            orderBy('checkInDate', 'asc'),
+            limit(limitCount * 2) // Fetch double to allow for some filtering (e.g. cancelled)
+        );
+
+        const snapshot = await getDocs(q);
+        const guests = snapshot.docs
+            .map(doc => ({ id: doc.id, ...doc.data() } as Guest))
+            .filter(g => g.status !== 'cancelled')
+            .slice(0, limitCount);
+
+        return guests;
     }
 
     async getGuest(userId: string, guestId: string): Promise<Guest | null> {

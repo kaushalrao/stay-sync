@@ -6,4 +6,5 @@ export interface IGuestRepository {
     addGuest(userId: string, guest: Omit<Guest, 'id'>): Promise<string>;
     updateGuest(userId: string, guestId: string, updates: Partial<Guest>): Promise<void>;
     deleteGuest(userId: string, guestId: string): Promise<void>;
+    getUpcomingGuests(userId: string, limitCount?: number): Promise<Guest[]>;
 }

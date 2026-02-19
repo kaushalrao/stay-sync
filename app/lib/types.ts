@@ -327,11 +327,14 @@ export interface UIState {
 
 export interface GuestState {
     guests: Guest[];
+    upcomingGuests: Guest[];
     guestLastDoc: any;
     isGuestsLoading: boolean;
+    isUpcomingGuestsLoading: boolean;
     setGuests: (guests: Guest[], lastDoc?: any) => void;
     appendGuests: (guests: Guest[], lastDoc: any) => void;
     setIsGuestsLoading: (loading: boolean) => void;
+    fetchUpcomingGuests: (userId: string) => Promise<void>;
 }
 
 export interface ToastStore {

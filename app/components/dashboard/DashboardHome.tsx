@@ -11,19 +11,26 @@ import { analyticsService, widgetService } from '@services/index';
 
 export function DashboardHome() {
     const { user } = useApp();
-
-    // Core data from global store
     const properties = usePropertyStore(state => state.properties);
     const guests = useGuestStore(state => state.guests);
+    const upcomingBookings = useGuestStore(state => state.upcomingGuests);
     const isGuestsLoading = useGuestStore(state => state.isGuestsLoading);
+    const isUpcomingLoading = useGuestStore(state => state.isUpcomingGuestsLoading);
+    const fetchUpcomingGuests = useGuestStore(state => state.fetchUpcomingGuests);
     const selectedProperty = 'all'; // Home page always shows all properties
 
-    const { monthStats, upcomingBookings } = useMemo(() => {
+    const { monthStats } = useMemo(() => {
         return {
             monthStats: analyticsService.getCurrentMonthStats(guests, properties, selectedProperty),
-            upcomingBookings: analyticsService.getUpcomingBookings(guests, properties, selectedProperty, 5),
         };
     }, [guests, properties]); // Removed selectedProperty from deps as it's now constant 'all'
+
+    // Fetch upcoming guests on mount
+    useEffect(() => {
+        if (user && fetchUpcomingGuests) {
+            fetchUpcomingGuests(user.uid);
+        }
+    }, [user, fetchUpcomingGuests]);
 
     // Sync to Android Widget
     useEffect(() => {
@@ -84,7 +91,7 @@ export function DashboardHome() {
             <QuickActionCards />
 
             {/* Upcoming Bookings */}
-            <UpcomingBookingsWidget bookings={upcomingBookings} loading={isGuestsLoading} />
+            <UpcomingBookingsWidget bookings={upcomingBookings} loading={isUpcomingLoading} />
 
             {/* Stats Grid */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

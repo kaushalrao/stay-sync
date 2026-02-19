@@ -15,6 +15,11 @@ export class GuestService {
         return this.repo.getGuests(userId, lastDoc, limit, searchQuery);
     }
 
+    async getUpcomingGuests(userId: string | undefined | null, limit: number = 5) {
+        if (!userId) throw new Error("User ID is required");
+        return this.repo.getUpcomingGuests(userId, limit);
+    }
+
     async getGuest(userId: string | undefined | null, guestId: string) {
         if (!userId) throw new Error("User ID is required");
         return this.repo.getGuest(userId, guestId);
