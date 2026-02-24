@@ -163,7 +163,7 @@ function GreeterContent() {
     }, [guestDetails, initialGuestDetails, currentGuestId]);
 
     const isReadOnly = useMemo(() => {
-        if (currentGuestStatus === 'completed' || currentGuestStatus === 'cancelled') return true;
+        if (currentGuestStatus === 'cancelled') return true;
         if (!guestDetails.checkOutDate) return false;
 
         const today = new Date().toISOString().split('T')[0];
@@ -217,7 +217,7 @@ function GreeterContent() {
             const guestData: Partial<Guest> = {
                 ...guestDetails,
                 createdAt: Date.now(),
-                status: 'upcoming',
+                status: 'booked',
                 firstName: guestDetails.guestName.split(' ')[0],
                 propName: selectedProperty.name,
                 totalAmount: totalAmount

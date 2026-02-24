@@ -4,7 +4,7 @@ import { getMonth, parseISO, isSameYear, differenceInDays } from 'date-fns';
 // Helper to check if guest stay is valid (not expired)
 export const isGuestStayValid = (g: Guest, properties: Property[]) => {
     // 1. Status Check
-    if (g.status !== 'active' && g.status !== 'upcoming') return false;
+    if (g.status !== 'booked') return false;
 
     // 2. Checkout Date Check
     if (!g.checkOutDate) return true;
@@ -86,7 +86,7 @@ export const calculateDashboardMetrics = (
         .sort((a, b) => new Date(a.checkInDate).getTime() - new Date(b.checkInDate).getTime())
         .slice(0, 10);
 
-    const activeStays = filteredByProp.filter(g => g.status === 'active' && isGuestStayValid(g, properties)).length;
+    const activeStays = filteredByProp.filter(g => g.status === 'booked' && isGuestStayValid(g, properties)).length;
 
     return {
         stats: {

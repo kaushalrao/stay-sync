@@ -81,7 +81,7 @@ export interface Guest extends GuestDetails {
     id: string;
     createdAt: number;
     firstName: string;
-    status: 'upcoming' | 'active' | 'completed' | 'cancelled';
+    status: 'booked' | 'cancelled' | 'pending';
     propName?: string;
     phoneNumber?: string;
     email?: string;

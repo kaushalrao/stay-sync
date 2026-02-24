@@ -17,6 +17,7 @@ export function DashboardHome() {
     const isGuestsLoading = useGuestStore(state => state.isGuestsLoading);
     const isUpcomingLoading = useGuestStore(state => state.isUpcomingGuestsLoading);
     const fetchUpcomingGuests = useGuestStore(state => state.fetchUpcomingGuests);
+    const isPropertiesLoading = usePropertyStore(state => state.isPropertiesLoading);
     const selectedProperty = 'all'; // Home page always shows all properties
 
     const { monthStats } = useMemo(() => {
@@ -27,10 +28,10 @@ export function DashboardHome() {
 
     // Fetch upcoming guests on mount
     useEffect(() => {
-        if (user && fetchUpcomingGuests) {
+        if (user && fetchUpcomingGuests && !isPropertiesLoading) {
             fetchUpcomingGuests(user.uid);
         }
-    }, [user, fetchUpcomingGuests]);
+    }, [user, fetchUpcomingGuests, isPropertiesLoading]);
 
     // Sync to Android Widget
     useEffect(() => {

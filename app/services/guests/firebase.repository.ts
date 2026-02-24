@@ -1,5 +1,5 @@
 import {
-    collection, addDoc, updateDoc, deleteDoc, doc,
+    collection, addDoc, updateDoc, doc,
     query, getDoc, orderBy, limit, startAfter, getDocs, startAt, endAt, where
 } from 'firebase/firestore';
 import { db, appId } from '@lib/firebase';
@@ -138,8 +138,7 @@ export class FirebaseGuestRepository implements IGuestRepository {
     }
 
     async deleteGuest(guestId: string): Promise<void> {
-        console.log(`[GuestRepo] Deleting guest: ${guestId}`);
         const ref = doc(this.getCollectionRef(), guestId);
-        await deleteDoc(ref);
+        await updateDoc(ref, { status: 'cancelled' });
     }
 }

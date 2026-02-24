@@ -61,14 +61,23 @@ export const processTemplate = (templateStr: string, data: Record<string, string
 
 // ... (existing imports)
 
-export const getStatusColor = (status: Guest['status']) => {
-    switch (status) {
-        case 'upcoming': return 'bg-blue-400 shadow-[0_0_8px] shadow-blue-400/50';
-        case 'active': return 'bg-green-400 shadow-[0_0_8px] shadow-green-400/50';
-        case 'completed': return 'bg-slate-400';
-        case 'cancelled': return 'bg-rose-400';
-        default: return 'bg-slate-400';
-    }
+export const getStatusColor = (status: Guest['status'], isPast?: boolean) => {
+    if (status === 'cancelled') return 'bg-rose-400 shadow-[0_0_8px] shadow-rose-400/50';
+    if (status === 'pending') return 'bg-amber-400 shadow-[0_0_8px] shadow-amber-400/50';
+
+    // Status is 'booked'
+    if (isPast) return 'bg-slate-400';
+    return 'bg-blue-400 shadow-[0_0_8px] shadow-blue-400/50';
+};
+
+export const getDisplayStatus = (guest: Guest): string => {
+    if (guest.status === 'cancelled') return 'CANCELLED';
+    if (guest.status === 'pending') return 'PENDING';
+
+    const today = new Date().toISOString().split('T')[0];
+    const isPastDate = !!(guest.checkOutDate && guest.checkOutDate < today);
+
+    return isPastDate ? 'PAST' : 'UPCOMING';
 };
 
 export const getPropertyColorKey = (name: string) => {

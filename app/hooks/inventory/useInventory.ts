@@ -1,11 +1,9 @@
 import { useState, useCallback } from 'react';
-import { useApp } from '@components/providers/AppProvider';
 import { useInventoryStore, useUIStore } from '@store/index';
 import { InventoryNeed, InventoryMasterItem } from '@lib/types';
 import { inventoryService } from '@services/index';
 
 export function useInventory() {
-    const { user } = useApp();
     const showToast = useUIStore(state => state.showToast);
     const needs = useInventoryStore(state => state.needs);
     const logs = useInventoryStore(state => state.logs);
@@ -25,7 +23,7 @@ export function useInventory() {
         } finally {
             setProcessingId(null);
         }
-    }, [user, showToast]);
+    }, [showToast]);
 
     const addMasterItem = useCallback(async (category: string, item: string) => {
         try {
@@ -36,7 +34,7 @@ export function useInventory() {
             console.error("Error adding master item:", error);
             showToast("Failed to add item", "error");
         }
-    }, [user, showToast]);
+    }, [showToast]);
 
     const updateMasterItem = useCallback(async (id: string, updates: Partial<InventoryMasterItem>) => {
         try {
@@ -46,7 +44,7 @@ export function useInventory() {
             console.error("Error updating master item:", error);
             showToast("Failed to update item", "error");
         }
-    }, [user, showToast]);
+    }, [showToast]);
 
     const deleteMasterItem = useCallback(async (id: string) => {
         try {
@@ -56,7 +54,7 @@ export function useInventory() {
             console.error("Error deleting master item:", error);
             showToast("Failed to delete item", "error");
         }
-    }, [user, showToast]);
+    }, [showToast]);
 
     return {
         needs,

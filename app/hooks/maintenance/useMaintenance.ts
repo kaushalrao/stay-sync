@@ -1,11 +1,9 @@
 import { useState, useCallback } from 'react';
-import { useApp } from '@components/providers/AppProvider';
 import { useMaintenanceStore, useUIStore } from '@store/index';
 import { MaintenanceIssue } from '@lib/types';
 import { maintenanceService } from '@services/maintenance/maintenance.service';
 
 export function useMaintenance(propertyId: string = 'all') {
-    const { user } = useApp();
     const showToast = useUIStore(state => state.showToast);
     const allIssues = useMaintenanceStore(state => state.issues);
     const isLoading = useMaintenanceStore(state => state.isIssuesLoading);
@@ -29,7 +27,7 @@ export function useMaintenance(propertyId: string = 'all') {
             showToast('Failed to report issue', 'error');
             return false;
         }
-    }, [user, showToast]);
+    }, [showToast]);
 
     const toggleStatus = useCallback(async (issue: MaintenanceIssue) => {
         setProcessingId(issue.id);
@@ -44,7 +42,7 @@ export function useMaintenance(propertyId: string = 'all') {
         } finally {
             setProcessingId(null);
         }
-    }, [user, showToast]);
+    }, [showToast]);
 
     const deleteIssue = useCallback(async (issueId: string) => {
         try {
@@ -54,7 +52,7 @@ export function useMaintenance(propertyId: string = 'all') {
             console.error(error);
             showToast('Failed to delete issue', 'error');
         }
-    }, [user, showToast]);
+    }, [showToast]);
 
     return {
         issues,

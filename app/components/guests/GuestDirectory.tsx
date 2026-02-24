@@ -4,6 +4,7 @@ import { Users } from 'lucide-react';
 import { GuestDirectoryProps } from '../../lib/types';
 import { format, addMonths, subMonths } from 'date-fns';
 import { triggerBookingNotification } from '../../lib/emailUtils';
+import { getDisplayStatus } from '../../lib/utils';
 import { guestService } from '../../services';
 import { useApp } from '../providers/AppProvider';
 import { GuestCard } from './GuestCard';
@@ -107,7 +108,6 @@ export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode =
             showToast('Error deleting guest', 'error');
         }
     };
-
     const [selectedMonth, setSelectedMonth] = useState<string>(format(new Date(), 'yyyy-MM'));
 
     const handlePrevMonth = () => {
@@ -133,13 +133,12 @@ export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode =
         const matchesSearch = true; // Handled by server (Mostly. Prop name search is lost).
 
         let matchesStatus = true;
-        const today = new Date().toISOString().split('T')[0];
-        const isPastDate = !!(g.checkOutDate && g.checkOutDate < today);
+        const displayStatus = getDisplayStatus(g);
 
         if (statusFilter === 'upcoming') {
-            matchesStatus = (g.status === 'upcoming' || g.status === 'active') && !isPastDate;
+            matchesStatus = displayStatus === 'UPCOMING';
         } else if (statusFilter === 'past') {
-            matchesStatus = g.status === 'completed' || g.status === 'cancelled' || isPastDate;
+            matchesStatus = displayStatus === 'PAST';
         }
 
         const matchesMonth = selectedMonth === 'all' || (g.checkInDate && g.checkInDate.startsWith(selectedMonth));
@@ -193,7 +192,7 @@ export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode =
             </div>
 
             {/* List */}
-            <div className={`flex-1 ${mode === 'page' ? 'pb-20' : 'pb-4'}`} style={{ minHeight: 0 }}>
+            <div className={`flex-1 ${mode === 'page' ? 'pb-0' : 'pb-4 md:pb-0'}`} style={{ minHeight: 0 }}>
                 {isLoading && guests.length === 0 ? (
                     <div className="text-center py-10 text-slate-500">Loading guests...</div>
                 ) : filteredGuests.length === 0 ? (

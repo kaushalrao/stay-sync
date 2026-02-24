@@ -106,7 +106,7 @@ export async function GET(req: NextRequest) {
                 emailPromises.push((async () => {
                     for (const doc of checkInSnap.docs) {
                         const guest = doc.data() as Guest;
-                        if (guest.status !== 'upcoming') continue;
+                        if (guest.status !== 'booked') continue;
 
                         const property = properties.find(p => p.name === guest.propName);
                         if (!property) continue;

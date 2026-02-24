@@ -63,8 +63,8 @@ export async function GET(req: NextRequest) {
             for (const guestDoc of guestsSnap.docs) {
                 const guest = guestDoc.data();
 
-                // In-Memory Filter: Check-in Date Match AND Status Upcoming
-                if (guest.checkInDate === dateStr && guest.status === 'upcoming') {
+                // In-Memory Filter: Check-in Date Match AND Status Booked
+                if (guest.checkInDate === dateStr && guest.status === 'booked') {
                     const message = `🔔 *Upcoming Guest Arrival*\n\n` +
                         `👤 *Guest:* ${guest.guestName}\n` +
                         `📅 *Check-in:* ${guest.checkInDate}\n` +

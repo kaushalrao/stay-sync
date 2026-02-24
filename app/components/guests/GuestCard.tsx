@@ -1,13 +1,15 @@
 import React from 'react';
 import { Calendar, Users, Phone, Trash2, ArrowRight, Home } from 'lucide-react';
 import { GuestCardProps } from '../../lib/types';
-import { formatDate, formatCurrency, getPropertyColorKey, getStatusColor } from '../../lib/utils';
+import { formatDate, formatCurrency, getPropertyColorKey, getStatusColor, getDisplayStatus } from '../../lib/utils';
 import { COLOR_VARIANTS } from '../../lib/constants';
 
 export const GuestCard: React.FC<GuestCardProps> = ({ guest, mode, onSelect, onDelete }) => {
     const propertyName = guest.propName || '';
     const colorKey = getPropertyColorKey(propertyName);
     const styles = COLOR_VARIANTS[colorKey];
+    const displayStatus = getDisplayStatus(guest);
+    const isPast = displayStatus === 'PAST';
 
     return (
         <div
@@ -27,8 +29,8 @@ export const GuestCard: React.FC<GuestCardProps> = ({ guest, mode, onSelect, onD
                     <div>
                         <h4 className="text-slate-900 dark:text-white font-bold text-sm md:text-base leading-tight">{guest.guestName}</h4>
                         <div className="flex items-center gap-1.5 text-[10px] text-slate-600 dark:text-slate-400 font-bold uppercase tracking-wider mt-1">
-                            <span className={`w-2 h-2 rounded-full ${getStatusColor(guest.status)}`}></span>
-                            {guest.status}
+                            <span className={`w-2 h-2 rounded-full ${getStatusColor(guest.status, isPast)}`}></span>
+                            {displayStatus}
                         </div>
                     </div>
                 </div>
