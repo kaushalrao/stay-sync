@@ -181,12 +181,13 @@ export default function MaintenancePage() {
 
             {/* Issues List */}
             <div className="space-y-4">
-                {filteredIssues.length === 0 ? (
+                {filteredIssues.length === 0 && (
                     <div className="text-center py-20 text-slate-500">
                         <CheckCircle2 size={48} className="mx-auto mb-4 opacity-20" />
                         <p>No issues found. Everything looks good!</p>
                     </div>
-                ) : filteredIssues.map(issue => {
+                )}
+                {filteredIssues.map(issue => {
                     const property = properties.find(p => p.id === issue.propertyId);
                     return (
                         <div key={issue.id} className={`bg-white dark:bg-slate-800/30 backdrop-blur-md p-5 rounded-2xl border border-slate-200 dark:border-white/5 flex items-center gap-4 group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors shadow-sm dark:shadow-none ${issue.status === 'fixed' ? 'opacity-60' : ''}`}>

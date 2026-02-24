@@ -6,47 +6,66 @@ import { db, appId } from '@lib/firebase';
 import { ICleaningRepository } from './repository.interface';
 import { CleaningTask, RoomSettings } from '@/app/lib/types';
 import { STANDARD_ROOMS, DEFAULT_ROOM_TYPES } from '@/app/constants/cleaning';
+import { getAllowedPropertyIds } from '@/app/store/propertyStore';
 
 export class FirebaseCleaningRepository implements ICleaningRepository {
-    private getCollectionRef(userId: string) {
-        return collection(db, `artifacts/${appId}/users/${userId}/cleaning-tasks`);
+    private getCollectionRef() {
+        return collection(db, `artifacts/${appId}/cleaning-tasks`);
     }
 
-    private getSettingsRef(userId: string, propertyId: string) {
-        return doc(db, `artifacts/${appId}/users/${userId}/cleaning-settings/${propertyId}`);
+    private getSettingsRef(propertyId: string) {
+        return doc(db, `artifacts/${appId}/cleaning-settings/${propertyId}`);
     }
 
-    async addTask(userId: string, task: Omit<CleaningTask, 'id' | 'createdAt' | 'isCompleted'>): Promise<string> {
-        const docRef = await addDoc(this.getCollectionRef(userId), {
+
+
+    async addTask(task: Omit<CleaningTask, 'id' | 'createdAt' | 'isCompleted'>): Promise<string> {
+        let targetPropertyId = task.propertyId;
+        if (!targetPropertyId) {
+            const allowed = getAllowedPropertyIds();
+            targetPropertyId = allowed.length > 0 ? allowed[0] : 'unknown';
+        }
+
+        const docRef = await addDoc(this.getCollectionRef(), {
             ...task,
+            propertyId: targetPropertyId,
             isCompleted: false,
             createdAt: Date.now()
         });
         return docRef.id;
     }
 
-    async updateTaskStatus(userId: string, taskId: string, isCompleted: boolean): Promise<void> {
-        const ref = doc(db, `artifacts/${appId}/users/${userId}/cleaning-tasks/${taskId}`);
+    async updateTaskStatus(taskId: string, isCompleted: boolean): Promise<void> {
+        const ref = doc(this.getCollectionRef(), taskId);
         await updateDoc(ref, { isCompleted });
     }
 
-    async deleteTask(userId: string, taskId: string): Promise<void> {
-        const ref = doc(db, `artifacts/${appId}/users/${userId}/cleaning-tasks/${taskId}`);
+    async deleteTask(taskId: string): Promise<void> {
+        const ref = doc(this.getCollectionRef(), taskId);
         await deleteDoc(ref);
     }
 
-    async resetTasks(userId: string, taskIds: string[]): Promise<void> {
+    async resetTasks(taskIds: string[]): Promise<void> {
         if (!taskIds.length) return;
         const batch = writeBatch(db);
         taskIds.forEach(id => {
-            const ref = doc(db, `artifacts/${appId}/users/${userId}/cleaning-tasks/${id}`);
+            const ref = doc(this.getCollectionRef(), id);
             batch.update(ref, { isCompleted: false });
         });
         await batch.commit();
     }
 
-    subscribeToTasks(userId: string, callback: (tasks: CleaningTask[]) => void): () => void {
-        const q = query(this.getCollectionRef(userId));
+    subscribeToTasks(callback: (tasks: CleaningTask[]) => void): () => void {
+        const allowedPropIds = getAllowedPropertyIds();
+        if (allowedPropIds.length === 0) {
+            callback([]);
+            return () => { };
+        }
+
+        const q = query(
+            this.getCollectionRef(),
+            where('propertyId', 'in', allowedPropIds.slice(0, 10))
+        );
         return onSnapshot(q, (snapshot) => {
             const tasks = snapshot.docs.map(doc => ({
                 id: doc.id,
@@ -56,14 +75,20 @@ export class FirebaseCleaningRepository implements ICleaningRepository {
         });
     }
 
-    async addPresets(userId: string, tasks: Omit<CleaningTask, 'id' | 'createdAt' | 'isCompleted'>[]): Promise<void> {
+    async addPresets(tasks: Omit<CleaningTask, 'id' | 'createdAt' | 'isCompleted'>[]): Promise<void> {
         const batch = writeBatch(db);
-        const colRef = this.getCollectionRef(userId);
+        const colRef = this.getCollectionRef();
 
         tasks.forEach(task => {
             const docRef = doc(colRef);
+            let targetPropertyId = task.propertyId;
+            if (!targetPropertyId) {
+                const allowed = getAllowedPropertyIds();
+                targetPropertyId = allowed.length > 0 ? allowed[0] : 'unknown';
+            }
             batch.set(docRef, {
                 ...task,
+                propertyId: targetPropertyId,
                 isCompleted: false,
                 createdAt: Date.now()
             });
@@ -71,22 +96,22 @@ export class FirebaseCleaningRepository implements ICleaningRepository {
         await batch.commit();
     }
 
-    async saveRoomOrder(userId: string, propertyId: string, order: string[]): Promise<void> {
-        await setDoc(this.getSettingsRef(userId, propertyId), { roomOrder: order }, { merge: true });
+    async saveRoomOrder(propertyId: string, order: string[]): Promise<void> {
+        await setDoc(this.getSettingsRef(propertyId), { roomOrder: order }, { merge: true });
     }
 
-    async saveRoomType(userId: string, propertyId: string, roomName: string, type: string): Promise<void> {
-        await setDoc(this.getSettingsRef(userId, propertyId), {
+    async saveRoomType(propertyId: string, roomName: string, type: string): Promise<void> {
+        await setDoc(this.getSettingsRef(propertyId), {
             roomTypes: { [roomName]: type }
         }, { merge: true });
     }
 
-    async renameRoom(userId: string, propertyId: string, oldName: string, newName: string, allRooms: string[], newType?: string): Promise<void> {
+    async renameRoom(propertyId: string, oldName: string, newName: string, allRooms: string[], newType?: string): Promise<void> {
         const batch = writeBatch(db);
 
         // 1. Update Tasks
         const q = query(
-            this.getCollectionRef(userId),
+            this.getCollectionRef(),
             where("propertyId", "==", propertyId),
             where("room", "==", oldName)
         );
@@ -97,23 +122,21 @@ export class FirebaseCleaningRepository implements ICleaningRepository {
         const newOrder = allRooms.map(r => r === oldName ? newName : r);
         const updates: any = { roomOrder: newOrder };
 
-        // We'd fetch types first in a real scenario or pass them in.
-        // Simplified for this snippet:
         if (newType) updates[`roomTypes.${newName}`] = newType;
 
-        const settingsRef = this.getSettingsRef(userId, propertyId);
+        const settingsRef = this.getSettingsRef(propertyId);
         batch.update(settingsRef, updates);
 
         await batch.commit();
     }
 
-    async deleteRoom(userId: string, propertyId: string, roomName: string, currentOrder: string[]): Promise<void> {
+    async deleteRoom(propertyId: string, roomName: string, currentOrder: string[]): Promise<void> {
         const batch = writeBatch(db);
         const lowerName = roomName.toLowerCase();
 
         // Delete tasks (Exact + Lowercase)
-        const q1 = query(this.getCollectionRef(userId), where("propertyId", "==", propertyId), where("room", "==", roomName));
-        const q2 = query(this.getCollectionRef(userId), where("propertyId", "==", propertyId), where("room", "==", lowerName));
+        const q1 = query(this.getCollectionRef(), where("propertyId", "==", propertyId), where("room", "==", roomName));
+        const q2 = query(this.getCollectionRef(), where("propertyId", "==", propertyId), where("room", "==", lowerName));
 
         const [snap1, snap2] = await Promise.all([getDocs(q1), getDocs(q2)]);
         const deletedIds = new Set<string>();
@@ -127,21 +150,21 @@ export class FirebaseCleaningRepository implements ICleaningRepository {
 
         // Update Order
         const newOrder = currentOrder.filter(r => r.toLowerCase() !== lowerName);
-        batch.set(this.getSettingsRef(userId, propertyId), { roomOrder: newOrder }, { merge: true });
+        batch.set(this.getSettingsRef(propertyId), { roomOrder: newOrder }, { merge: true });
 
         await batch.commit();
     }
 
-    async addRoom(userId: string, propertyId: string, roomName: string, currentOrder: string[], type: string): Promise<void> {
+    async addRoom(propertyId: string, roomName: string, currentOrder: string[], type: string): Promise<void> {
         const newOrder = [...currentOrder, roomName];
-        await setDoc(this.getSettingsRef(userId, propertyId), {
+        await setDoc(this.getSettingsRef(propertyId), {
             roomOrder: newOrder,
             roomTypes: { [roomName]: type }
         }, { merge: true });
     }
 
-    getRoomSettings(userId: string, propertyId: string, callback: (settings: RoomSettings) => void): () => void {
-        const ref = this.getSettingsRef(userId, propertyId);
+    getRoomSettings(propertyId: string, callback: (settings: RoomSettings) => void): () => void {
+        const ref = this.getSettingsRef(propertyId);
 
         return onSnapshot(ref, (snap) => {
             if (snap.exists()) {
@@ -149,11 +172,13 @@ export class FirebaseCleaningRepository implements ICleaningRepository {
             } else {
                 callback({ roomOrder: [], roomTypes: {} });
             }
+        }, (error) => {
+            console.error("[CleaningRepo] Failed to fetch room settings:", error.message);
         });
     }
 
-    async resetRoomSettings(userId: string, propertyId: string): Promise<void> {
-        await setDoc(this.getSettingsRef(userId, propertyId), {
+    async resetRoomSettings(propertyId: string): Promise<void> {
+        await setDoc(this.getSettingsRef(propertyId), {
             roomOrder: STANDARD_ROOMS,
             roomTypes: DEFAULT_ROOM_TYPES
         }, { merge: true });

@@ -56,6 +56,7 @@ export interface Template {
     icon: string;
     content: string;
     order?: number;
+    propertyId?: string;
 }
 
 export type ViewState = 'home' | 'greeter' | 'settings';
@@ -276,6 +277,7 @@ export interface InventoryMasterItem {
     category: string;
     item: string;
     createdAt: number;
+    propertyId?: string;
 }
 
 export interface InventoryState {

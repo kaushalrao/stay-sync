@@ -17,7 +17,7 @@ export function useRoomSettings(propertyId: string) {
             return;
         }
 
-        const unsubscribe = cleaningService.getRoomSettings(user.uid, propertyId, (settings) => {
+        const unsubscribe = cleaningService.getRoomSettings(propertyId, (settings) => {
             if (settings.roomOrder) setRoomOrder(settings.roomOrder);
             if (settings.roomTypes) setRoomTypes(settings.roomTypes);
         });
@@ -29,7 +29,7 @@ export function useRoomSettings(propertyId: string) {
         if (!user || !propertyId) return;
         setRoomOrder(newOrder); // Optimistic update
         try {
-            await cleaningService.updateRoomOrder(user.uid, propertyId, newOrder);
+            await cleaningService.updateRoomOrder(propertyId, newOrder);
         } catch (error) {
             console.error("Failed to save room order", error);
             showToast("Failed to save room order", "error");
@@ -43,7 +43,7 @@ export function useRoomSettings(propertyId: string) {
         setRoomTypes(prev => ({ ...prev, [roomName]: type }));
 
         try {
-            await cleaningService.setRoomType(user.uid, propertyId, roomName, type);
+            await cleaningService.setRoomType(propertyId, roomName, type);
             showToast(`Set category for ${roomName}`, "success");
         } catch (error) {
             console.error("Failed to save room type", error);
@@ -56,7 +56,7 @@ export function useRoomSettings(propertyId: string) {
 
         setIsSaving(true);
         try {
-            await cleaningService.renameRoom(user.uid, propertyId, oldName, newName, allRooms, newType);
+            await cleaningService.renameRoom(propertyId, oldName, newName, allRooms, newType);
             showToast(`Renamed to "${newName}"`, "success");
             return true;
         } catch (error) {
@@ -73,7 +73,7 @@ export function useRoomSettings(propertyId: string) {
 
         setIsSaving(true);
         try {
-            await cleaningService.deleteRoom(user.uid, propertyId, roomToDelete, currentOrder);
+            await cleaningService.deleteRoom(propertyId, roomToDelete, currentOrder);
             showToast(`Deleted room "${roomToDelete}"`, "success");
             return true;
         } catch (error) {
@@ -99,7 +99,7 @@ export function useRoomSettings(propertyId: string) {
 
         setIsSaving(true);
         try {
-            await cleaningService.addRoom(user.uid, propertyId, roomName, currentOrder, type);
+            await cleaningService.addRoom(propertyId, roomName, currentOrder, type);
             showToast(`Added room "${roomName}"`, "success");
             return true;
         } catch (error) {
@@ -116,7 +116,7 @@ export function useRoomSettings(propertyId: string) {
 
         setIsSaving(true);
         try {
-            await cleaningService.resetRoomSettings(user.uid, propertyId);
+            await cleaningService.resetRoomSettings(propertyId);
             showToast("Restored default rooms", "success");
             return true;
         } catch (error) {

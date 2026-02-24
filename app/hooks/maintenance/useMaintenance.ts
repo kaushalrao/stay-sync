@@ -17,7 +17,7 @@ export function useMaintenance(propertyId: string = 'all') {
 
     const addIssue = useCallback(async (title: string, priority: 'low' | 'medium' | 'high', propId: string) => {
         try {
-            await maintenanceService.addIssue(user?.uid, {
+            await maintenanceService.addIssue({
                 title,
                 priority,
                 propertyId: propId
@@ -36,7 +36,7 @@ export function useMaintenance(propertyId: string = 'all') {
         const newStatus = issue.status === 'fixed' ? 'pending' : 'fixed';
 
         try {
-            await maintenanceService.updateIssueStatus(user?.uid, issue.id, newStatus);
+            await maintenanceService.updateIssueStatus(issue.id, newStatus);
             showToast(`Marked as ${newStatus}`, 'success');
         } catch (error) {
             console.error(error);
@@ -48,7 +48,7 @@ export function useMaintenance(propertyId: string = 'all') {
 
     const deleteIssue = useCallback(async (issueId: string) => {
         try {
-            await maintenanceService.deleteIssue(user?.uid, issueId);
+            await maintenanceService.deleteIssue(issueId);
             showToast('Issue deleted', 'success');
         } catch (error) {
             console.error(error);

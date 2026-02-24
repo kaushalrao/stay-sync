@@ -44,7 +44,7 @@ export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode =
             setIsGuestsLoading(true);
             try {
                 // If search is active, we fetch by name. If empty, default fetch (by date).
-                const { guests: newGuests, lastDoc } = await guestService.getGuests(user.uid, null, 20, debouncedSearch);
+                const { guests: newGuests, lastDoc } = await guestService.getGuests(null, 20, debouncedSearch);
                 setGuests(newGuests, lastDoc);
             } catch (error) {
                 console.error("Error fetching guests:", error);
@@ -61,7 +61,7 @@ export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode =
         if (!user || isLoadingMore || !guestLastDoc) return;
 
         setIsLoadingMore(true);
-        guestService.getGuests(user.uid, guestLastDoc, 20, debouncedSearch)
+        guestService.getGuests(guestLastDoc, 20, debouncedSearch)
             .then(({ guests: newGuests, lastDoc }) => {
                 if (newGuests.length > 0) {
                     appendGuests(newGuests, lastDoc);
@@ -95,12 +95,12 @@ export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode =
         }
 
         try {
-            await guestService.deleteGuest(user.uid, id);
+            await guestService.deleteGuest(id);
             showToast('Guest deleted. Refresh to see changes.', 'success');
             // Refresh list after delete? Or just local remove?
             // Local remove would be better but simple reload works to stay in sync.
             // For now, simple reload of current query.
-            const { guests: newGuests, lastDoc } = await guestService.getGuests(user.uid, null, 20, debouncedSearch);
+            const { guests: newGuests, lastDoc } = await guestService.getGuests(null, 20, debouncedSearch);
             setGuests(newGuests, lastDoc);
         } catch (error) {
             console.error(error);

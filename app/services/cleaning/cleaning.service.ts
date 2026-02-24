@@ -11,37 +11,35 @@ export class CleaningService {
     }
 
     // --- Task Management ---
-
-    async addTask(userId: string, propertyId: string, title: string, room: string) {
-        return this.repo.addTask(userId, {
+    async addTask(propertyId: string, title: string, room: string) {
+        return this.repo.addTask({
             propertyId,
             title,
             room: room.toLowerCase()
         });
     }
 
-    async toggleTask(userId: string, taskId: string, currentStatus: boolean) {
-        return this.repo.updateTaskStatus(userId, taskId, !currentStatus);
+    async toggleTask(taskId: string, currentStatus: boolean) {
+        return this.repo.updateTaskStatus(taskId, !currentStatus);
     }
 
-    async deleteTask(userId: string, taskId: string) {
-        return this.repo.deleteTask(userId, taskId);
+    async deleteTask(taskId: string) {
+        return this.repo.deleteTask(taskId);
     }
 
-    async resetTasks(userId: string, tasks: CleaningTask[]) {
+    async resetTasks(tasks: CleaningTask[]) {
         const completedIds = tasks.filter(t => t.isCompleted).map(t => t.id);
         if (completedIds.length === 0) return;
-        return this.repo.resetTasks(userId, completedIds);
+        return this.repo.resetTasks(completedIds);
     }
 
-    subscribeToTasks(userId: string | undefined | null, callback: (tasks: CleaningTask[]) => void) {
-        if (!userId) return () => { };
-        return this.repo.subscribeToTasks(userId, callback);
+    subscribeToTasks(callback: (tasks: CleaningTask[]) => void) {
+        return this.repo.subscribeToTasks(callback);
     }
 
     // --- Presets ---
 
-    async initializePresets(userId: string, propertyId: string) {
+    async initializePresets(propertyId: string) {
         const tasks: Omit<CleaningTask, 'id' | 'createdAt' | 'isCompleted'>[] = [];
 
         Object.entries(PRESET_TASKS).forEach(([room, titles]) => {
@@ -50,12 +48,12 @@ export class CleaningService {
             });
         });
 
-        await this.repo.addPresets(userId, tasks);
+        await this.repo.addPresets(tasks);
     }
 
     // ... Additional room logic wrappers ...
 
-    async addRoomPresets(userId: string, propertyId: string, roomName: string) {
+    async addRoomPresets(propertyId: string, roomName: string) {
         const lowerRoom = roomName.toLowerCase();
         let tasksToAdd: string[] = [];
 
@@ -85,37 +83,37 @@ export class CleaningService {
             title
         }));
 
-        await this.repo.addPresets(userId, tasksInfo);
+        await this.repo.addPresets(tasksInfo);
     }
 
     // --- Room Management ---
 
-    async updateRoomOrder(userId: string, propertyId: string, order: string[]) {
-        return this.repo.saveRoomOrder(userId, propertyId, order);
+    async updateRoomOrder(propertyId: string, order: string[]) {
+        return this.repo.saveRoomOrder(propertyId, order);
     }
 
-    async setRoomType(userId: string, propertyId: string, roomName: string, type: string) {
-        return this.repo.saveRoomType(userId, propertyId, roomName, type);
+    async setRoomType(propertyId: string, roomName: string, type: string) {
+        return this.repo.saveRoomType(propertyId, roomName, type);
     }
 
-    async renameRoom(userId: string, propertyId: string, oldName: string, newName: string, allRooms: string[], newType?: string) {
-        return this.repo.renameRoom(userId, propertyId, oldName, newName, allRooms, newType);
+    async renameRoom(propertyId: string, oldName: string, newName: string, allRooms: string[], newType?: string) {
+        return this.repo.renameRoom(propertyId, oldName, newName, allRooms, newType);
     }
 
-    async deleteRoom(userId: string, propertyId: string, roomName: string, currentOrder: string[]) {
-        return this.repo.deleteRoom(userId, propertyId, roomName, currentOrder);
+    async deleteRoom(propertyId: string, roomName: string, currentOrder: string[]) {
+        return this.repo.deleteRoom(propertyId, roomName, currentOrder);
     }
 
-    async addRoom(userId: string, propertyId: string, roomName: string, currentOrder: string[], type: string) {
-        return this.repo.addRoom(userId, propertyId, roomName, currentOrder, type);
+    async addRoom(propertyId: string, roomName: string, currentOrder: string[], type: string) {
+        return this.repo.addRoom(propertyId, roomName, currentOrder, type);
     }
 
-    async resetRoomSettings(userId: string, propertyId: string) {
-        return this.repo.resetRoomSettings(userId, propertyId);
+    async resetRoomSettings(propertyId: string) {
+        return this.repo.resetRoomSettings(propertyId);
     }
 
-    getRoomSettings(userId: string, propertyId: string, callback: (settings: any) => void) {
-        return this.repo.getRoomSettings(userId, propertyId, callback);
+    getRoomSettings(propertyId: string, callback: (settings: any) => void) {
+        return this.repo.getRoomSettings(propertyId, callback);
     }
 }
 

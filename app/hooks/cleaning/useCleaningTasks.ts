@@ -13,7 +13,7 @@ export function useCleaningTasks(propertyId: string) {
     const addTask = useCallback(async (title: string, room: string) => {
         if (!user || !propertyId) return false;
         try {
-            await cleaningService.addTask(user.uid, propertyId, title, room);
+            await cleaningService.addTask(propertyId, title, room);
             showToast('Task added', 'success');
             return true;
         } catch (error) {
@@ -26,7 +26,7 @@ export function useCleaningTasks(propertyId: string) {
     const toggleTask = useCallback(async (taskId: string, currentStatus: boolean) => {
         if (!user) return;
         try {
-            await cleaningService.toggleTask(user.uid, taskId, currentStatus);
+            await cleaningService.toggleTask(taskId, currentStatus);
         } catch (error) {
             console.error(error);
             showToast('Failed to update task', 'error');
@@ -37,7 +37,7 @@ export function useCleaningTasks(propertyId: string) {
         if (!user) return;
         if (!confirm('Delete this task?')) return;
         try {
-            await cleaningService.deleteTask(user.uid, taskId);
+            await cleaningService.deleteTask(taskId);
             showToast('Task deleted', 'success');
         } catch (error) {
             console.error(error);
@@ -57,7 +57,7 @@ export function useCleaningTasks(propertyId: string) {
         if (showConfirmation && !confirm('Are you sure you want to reset all tasks?')) return;
 
         try {
-            await cleaningService.resetTasks(user.uid, tasks);
+            await cleaningService.resetTasks(tasks);
             if (showConfirmation) showToast("All tasks reset successfully!", "success");
         } catch (error) {
             console.error(error);
@@ -69,7 +69,7 @@ export function useCleaningTasks(propertyId: string) {
         if (!user || !propertyId) return;
         if (!confirm('Add default tasks?')) return;
         try {
-            await cleaningService.initializePresets(user.uid, propertyId);
+            await cleaningService.initializePresets(propertyId);
             showToast('Presets added', 'success');
         } catch (e) {
             console.error(e);
@@ -82,7 +82,7 @@ export function useCleaningTasks(propertyId: string) {
         if (!confirm(`Add default tasks to ${roomName}?`)) return;
 
         try {
-            await cleaningService.addRoomPresets(user.uid, propertyId, roomName);
+            await cleaningService.addRoomPresets(propertyId, roomName);
             showToast(`Added default tasks for ${roomName}`, 'success');
         } catch (error) {
             console.error(error);

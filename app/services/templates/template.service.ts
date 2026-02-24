@@ -10,24 +10,20 @@ export class TemplateService {
         this.repo = repo;
     }
 
-    subscribeToTemplates(userId: string | undefined | null, callback: (templates: Template[]) => void) {
-        if (!userId) return () => { };
-        return this.repo.subscribeToTemplates(userId, callback);
+    subscribeToTemplates(callback: (templates: Template[]) => void) {
+        return this.repo.subscribeToTemplates(callback);
     }
 
-    async addTemplate(userId: string | undefined | null, template: Omit<Template, 'id'>) {
-        if (!userId) throw new Error("User ID is required");
-        return this.repo.addTemplate(userId, template);
+    async addTemplate(template: Omit<Template, 'id'>) {
+        return this.repo.addTemplate(template);
     }
 
-    async updateTemplate(userId: string | undefined | null, templateId: string, updates: Partial<Template>) {
-        if (!userId) throw new Error("User ID is required");
-        return this.repo.updateTemplate(userId, templateId, updates);
+    async updateTemplate(templateId: string, updates: Partial<Template>) {
+        return this.repo.updateTemplate(templateId, updates);
     }
 
-    async deleteTemplate(userId: string | undefined | null, templateId: string) {
-        if (!userId) throw new Error("User ID is required");
-        return this.repo.deleteTemplate(userId, templateId);
+    async deleteTemplate(templateId: string) {
+        return this.repo.deleteTemplate(templateId);
     }
 
     generateMessage(templateContent: string, property: any, guestDetails: any): string {

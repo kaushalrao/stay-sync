@@ -83,7 +83,7 @@ function GreeterContent() {
             if (!user || !guestIdParam) return;
 
             try {
-                const guest = await guestService.getGuest(user.uid, guestIdParam);
+                const guest = await guestService.getGuest(guestIdParam);
 
                 if (guest) {
                     handleSelectGuest(guest);
@@ -227,7 +227,7 @@ function GreeterContent() {
 
             if (currentGuestId) {
                 // Update existing
-                await guestService.updateGuest(user.uid, currentGuestId, guestData);
+                await guestService.updateGuest(currentGuestId, guestData);
                 showToast("Guest updated!", "success");
 
                 // Trigger Email Notification (Async) - Updated Type
@@ -241,7 +241,7 @@ function GreeterContent() {
             } else {
                 // Create new
                 // Cast to any to bypass Partial check here, assuming form validation handles required fields
-                const id = await guestService.addGuest(user.uid, guestData as any);
+                const id = await guestService.addGuest(guestData as any);
                 setCurrentGuestId(id);
                 showToast("Guest saved to directory!", "success");
 

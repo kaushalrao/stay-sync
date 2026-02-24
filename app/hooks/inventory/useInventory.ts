@@ -17,7 +17,7 @@ export function useInventory() {
         setProcessingId(need.id);
 
         try {
-            await inventoryService.markRestocked(user?.uid, need);
+            await inventoryService.markRestocked(need);
             showToast("Item marked as restocked", "success");
         } catch (error) {
             console.error(error);
@@ -29,7 +29,7 @@ export function useInventory() {
 
     const addMasterItem = useCallback(async (category: string, item: string) => {
         try {
-            const id = await inventoryService.addMasterItem(user?.uid, category, item);
+            const id = await inventoryService.addMasterItem(category, item);
             showToast("Item added to master list", "success");
             return id;
         } catch (error) {
@@ -40,7 +40,7 @@ export function useInventory() {
 
     const updateMasterItem = useCallback(async (id: string, updates: Partial<InventoryMasterItem>) => {
         try {
-            await inventoryService.updateMasterItem(user?.uid, id, updates);
+            await inventoryService.updateMasterItem(id, updates);
             showToast("Item updated", "success");
         } catch (error) {
             console.error("Error updating master item:", error);
@@ -50,7 +50,7 @@ export function useInventory() {
 
     const deleteMasterItem = useCallback(async (id: string) => {
         try {
-            await inventoryService.deleteMasterItem(user?.uid, id);
+            await inventoryService.deleteMasterItem(id);
             showToast("Item deleted", "success");
         } catch (error) {
             console.error("Error deleting master item:", error);

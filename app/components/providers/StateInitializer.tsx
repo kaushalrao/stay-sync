@@ -41,27 +41,59 @@ export function StateInitializer() {
     const setGuests = useGuestStore((state) => state.setGuests);
     const setIsGuestsLoading = useGuestStore((state) => state.setIsGuestsLoading);
 
+    const properties = usePropertyStore((state) => state.properties);
+    const isPropertiesLoading = usePropertyStore((state) => state.isPropertiesLoading);
+
+    // --- PHASE 1: LOAD PROPERTIES ---
     useEffect(() => {
         if (!user) return;
 
-        // --- CORE DATA LISTENERS ---
         const unsubProps = propertyService.subscribeToProperties(user.uid, (props) => {
             setProperties(props);
             setIsPropertiesLoading(false);
         });
 
-        const unsubTemplates = templateService.subscribeToTemplates(user.uid, (temps) => {
+        return () => {
+            unsubProps();
+        };
+    }, [user, setProperties, setIsPropertiesLoading]);
+
+    // --- PHASE 2: LOAD DEPENDENT DATA ---
+    useEffect(() => {
+        if (!user) return;
+        if (isPropertiesLoading) return;
+
+        if (properties.length === 0) {
+            setTemplates([]);
+            setIsTemplatesLoading(false);
+            setIssues([]);
+            setIsIssuesLoading(false);
+            setGuests([], null);
+            setIsGuestsLoading(false);
+            setNeeds([]);
+            setLogs([]);
+            setMasterItems([]);
+            setIsInventoryLoading(false);
+            setTasks([]);
+            setIsCleaningLoading(false);
+            return;
+        }
+
+        // --- At this point, `properties` are guaranteed loaded in Zustand 
+        // which means the Repositories relying on `usePropertyStore.getState().properties` will function correctly.
+
+        const unsubTemplates = templateService.subscribeToTemplates((temps) => {
             setTemplates(temps);
             setIsTemplatesLoading(false);
         });
 
-        const unsubIssues = maintenanceService.subscribeToIssues(user.uid, (issues) => {
+        const unsubIssues = maintenanceService.subscribeToIssues((issues) => {
             setIssues(issues);
             setIsIssuesLoading(false);
         });
 
         setIsGuestsLoading(true);
-        guestService.getGuests(user.uid, null, 20)
+        guestService.getGuests(null, 20)
             .then(({ guests, lastDoc }) => {
                 setGuests(guests, lastDoc);
             })
@@ -69,21 +101,21 @@ export function StateInitializer() {
             .finally(() => setIsGuestsLoading(false));
 
         // --- INVENTORY LISTENERS ---
-        const unsubNeeds = inventoryService.subscribeToNeeds(user.uid, (fetchedNeeds) => {
+        const unsubNeeds = inventoryService.subscribeToNeeds((fetchedNeeds) => {
             setNeeds(fetchedNeeds);
             setIsInventoryLoading(false);
         });
 
-        const unsubLogs = inventoryService.subscribeToLogs(user.uid, (fetchedLogs) => {
+        const unsubLogs = inventoryService.subscribeToLogs((fetchedLogs) => {
             setLogs(fetchedLogs);
         });
 
-        const unsubMaster = inventoryService.subscribeToMasterItems(user.uid, (fetchedMasterItems) => {
+        const unsubMaster = inventoryService.subscribeToMasterItems((fetchedMasterItems) => {
             setMasterItems(fetchedMasterItems);
         });
 
         // --- CLEANING LISTENERS ---
-        const unsubTasks = cleaningService.subscribeToTasks(user.uid, (fetchedTasks) => {
+        const unsubTasks = cleaningService.subscribeToTasks((fetchedTasks) => {
             setTasks(fetchedTasks);
             setIsCleaningLoading(false);
         });
@@ -93,21 +125,19 @@ export function StateInitializer() {
             unsubLogs();
             unsubMaster();
             unsubTasks();
-            unsubProps();
             unsubTemplates();
             unsubIssues();
-            // unsubGuests();
         };
     }, [
         user,
+        properties,
+        isPropertiesLoading,
         setNeeds,
         setLogs,
         setMasterItems,
         setIsInventoryLoading,
         setTasks,
         setIsCleaningLoading,
-        setProperties,
-        setIsPropertiesLoading,
         setTemplates,
         setIsTemplatesLoading,
         setIssues,

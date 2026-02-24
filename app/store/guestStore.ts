@@ -20,7 +20,7 @@ export const useGuestStore = create<GuestState>()(
             fetchUpcomingGuests: async (userId: string) => {
                 set({ isUpcomingGuestsLoading: true }, false, 'setIsUpcomingLoading');
                 try {
-                    const upcomingGuests = await guestService.getUpcomingGuests(userId);
+                    const upcomingGuests = await guestService.getUpcomingGuests();
                     set({ upcomingGuests, isUpcomingGuestsLoading: false }, false, 'setUpcomingGuests');
                 } catch (error) {
                     console.error("Failed to fetch upcoming guests", error);

@@ -9,24 +9,20 @@ export class MaintenanceService {
         this.repo = repo;
     }
 
-    subscribeToIssues(userId: string | undefined | null, callback: (issues: MaintenanceIssue[]) => void) {
-        if (!userId) return () => { };
-        return this.repo.subscribeToIssues(userId, callback);
+    subscribeToIssues(callback: (issues: MaintenanceIssue[]) => void) {
+        return this.repo.subscribeToIssues(callback);
     }
 
-    async addIssue(userId: string | undefined | null, issue: Omit<MaintenanceIssue, 'id' | 'createdAt' | 'status'>) {
-        if (!userId) throw new Error("User ID is required");
-        return this.repo.addIssue(userId, issue);
+    async addIssue(issue: Omit<MaintenanceIssue, 'id' | 'createdAt' | 'status'>) {
+        return this.repo.addIssue(issue);
     }
 
-    async updateIssueStatus(userId: string | undefined | null, issueId: string, status: 'pending' | 'in-progress' | 'fixed') {
-        if (!userId) throw new Error("User ID is required");
-        return this.repo.updateIssueStatus(userId, issueId, status);
+    async updateIssueStatus(issueId: string, status: 'pending' | 'in-progress' | 'fixed') {
+        return this.repo.updateIssueStatus(issueId, status);
     }
 
-    async deleteIssue(userId: string | undefined | null, issueId: string) {
-        if (!userId) throw new Error("User ID is required");
-        return this.repo.deleteIssue(userId, issueId);
+    async deleteIssue(issueId: string) {
+        return this.repo.deleteIssue(issueId);
     }
 }
 

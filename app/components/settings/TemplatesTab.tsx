@@ -65,7 +65,7 @@ export function TemplatesTab() {
                 if (user) {
                     newItems.forEach((item, index) => {
                         if (item.order !== index) {
-                            templateService.updateTemplate(user.uid, item.id, { order: index }).catch(console.error);
+                            templateService.updateTemplate(item.id, { order: index }).catch(console.error);
                         }
                     });
                 }
@@ -97,9 +97,9 @@ export function TemplatesTab() {
 
         try {
             if (editingTemp.id) {
-                await templateService.updateTemplate(user.uid, editingTemp.id, newTemp);
+                await templateService.updateTemplate(editingTemp.id, newTemp);
             } else {
-                await templateService.addTemplate(user.uid, newTemp);
+                await templateService.addTemplate(newTemp);
             }
             setEditingTemp(null);
             showToast('Template saved successfully!', 'success');
@@ -113,7 +113,7 @@ export function TemplatesTab() {
         if (!user) return;
         if (confirm('Delete this template?')) {
             try {
-                await templateService.deleteTemplate(user.uid, id);
+                await templateService.deleteTemplate(id);
                 showToast('Template deleted', 'success');
             } catch (error) {
                 console.error(error);

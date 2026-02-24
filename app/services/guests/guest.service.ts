@@ -10,34 +10,28 @@ export class GuestService {
         this.repo = repo;
     }
 
-    async getGuests(userId: string | undefined | null, lastDoc?: any, limit: number = 20, searchQuery?: string) {
-        if (!userId) throw new Error("User ID is required");
-        return this.repo.getGuests(userId, lastDoc, limit, searchQuery);
+    async getGuests(lastDoc?: any, limit: number = 20, searchQuery?: string) {
+        return this.repo.getGuests(lastDoc, limit, searchQuery);
     }
 
-    async getUpcomingGuests(userId: string | undefined | null, limit: number = 5) {
-        if (!userId) throw new Error("User ID is required");
-        return this.repo.getUpcomingGuests(userId, limit);
+    async getUpcomingGuests(limit: number = 5) {
+        return this.repo.getUpcomingGuests(limit);
     }
 
-    async getGuest(userId: string | undefined | null, guestId: string) {
-        if (!userId) throw new Error("User ID is required");
-        return this.repo.getGuest(userId, guestId);
+    async getGuest(guestId: string) {
+        return this.repo.getGuest(guestId);
     }
 
-    async addGuest(userId: string | undefined | null, guest: Omit<Guest, 'id'>) {
-        if (!userId) throw new Error("User ID is required");
-        return this.repo.addGuest(userId, guest);
+    async addGuest(guest: Omit<Guest, 'id'>) {
+        return this.repo.addGuest(guest);
     }
 
-    async updateGuest(userId: string | undefined | null, guestId: string, updates: Partial<Guest>) {
-        if (!userId) throw new Error("User ID is required");
-        return this.repo.updateGuest(userId, guestId, updates);
+    async updateGuest(guestId: string, updates: Partial<Guest>) {
+        return this.repo.updateGuest(guestId, updates);
     }
 
-    async deleteGuest(userId: string | undefined | null, guestId: string) {
-        if (!userId) throw new Error("User ID is required");
-        return this.repo.deleteGuest(userId, guestId);
+    async deleteGuest(guestId: string) {
+        return this.repo.deleteGuest(guestId);
     }
 
     async sendNotification(params: {

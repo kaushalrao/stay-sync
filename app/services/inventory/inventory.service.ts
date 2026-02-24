@@ -12,41 +12,34 @@ export class InventoryService {
 
     // --- Subscriptions ---
 
-    subscribeToNeeds(userId: string | undefined | null, callback: (needs: InventoryNeed[]) => void) {
-        if (!userId) return () => { };
-        return this.repo.subscribeToNeeds(userId, callback);
+    subscribeToNeeds(callback: (needs: InventoryNeed[]) => void) {
+        return this.repo.subscribeToNeeds(callback);
     }
 
-    subscribeToLogs(userId: string | undefined | null, callback: (logs: InventoryLog[]) => void) {
-        if (!userId) return () => { };
-        return this.repo.subscribeToLogs(userId, callback);
+    subscribeToLogs(callback: (logs: InventoryLog[]) => void) {
+        return this.repo.subscribeToLogs(callback);
     }
 
-    subscribeToMasterItems(userId: string | undefined | null, callback: (items: InventoryMasterItem[]) => void) {
-        if (!userId) return () => { };
-        return this.repo.subscribeToMasterItems(userId, callback);
+    subscribeToMasterItems(callback: (items: InventoryMasterItem[]) => void) {
+        return this.repo.subscribeToMasterItems(callback);
     }
 
     // --- Mutations ---
 
-    async markRestocked(userId: string | undefined | null, need: InventoryNeed) {
-        if (!userId) throw new Error("User ID required");
-        return this.repo.markRestocked(userId, need);
+    async markRestocked(need: InventoryNeed) {
+        return this.repo.markRestocked(need);
     }
 
-    async addMasterItem(userId: string | undefined | null, category: string, item: string) {
-        if (!userId) throw new Error("User ID required");
-        return this.repo.addMasterItem(userId, category, item);
+    async addMasterItem(category: string, item: string) {
+        return this.repo.addMasterItem(category, item);
     }
 
-    async updateMasterItem(userId: string | undefined | null, itemId: string, updates: Partial<InventoryMasterItem>) {
-        if (!userId) throw new Error("User ID required");
-        return this.repo.updateMasterItem(userId, itemId, updates);
+    async updateMasterItem(itemId: string, updates: Partial<InventoryMasterItem>) {
+        return this.repo.updateMasterItem(itemId, updates);
     }
 
-    async deleteMasterItem(userId: string | undefined | null, itemId: string) {
-        if (!userId) throw new Error("User ID required");
-        return this.repo.deleteMasterItem(userId, itemId);
+    async deleteMasterItem(itemId: string) {
+        return this.repo.deleteMasterItem(itemId);
     }
 }
 

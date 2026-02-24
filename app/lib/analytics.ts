@@ -21,17 +21,6 @@ export const isGuestStayValid = (g: Guest, properties: Property[]) => {
 
     const isValid = now <= checkOutDateTime;
 
-    if (g.guestName.toLowerCase().includes('akshay') || !isValid) {
-        console.log(`Checking validity for ${g.guestName}:`, {
-            status: g.status,
-            checkOutDate: g.checkOutDate,
-            checkOutTime,
-            checkOutDateTime: checkOutDateTime.toLocaleString(),
-            now: now.toLocaleString(),
-            isValid
-        });
-    }
-
     return isValid;
 };
 

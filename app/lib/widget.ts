@@ -44,8 +44,6 @@ export const updateWidgetData = async (guest: Guest | null, property?: any) => {
             key: WIDGET_DATA_KEY,
             value: JSON.stringify(data)
         });
-
-        console.log('Widget data updated:', data);
     } catch (error) {
         console.error('Failed to update widget data:', error);
     }

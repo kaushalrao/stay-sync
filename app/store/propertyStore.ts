@@ -13,3 +13,7 @@ export const usePropertyStore = create<PropertyState>()(
         { name: 'PropertyStore' }
     )
 );
+
+export const getAllowedPropertyIds = (): string[] => {
+    return usePropertyStore.getState().properties.map(p => p.id);
+};
