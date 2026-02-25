@@ -1,72 +1,11 @@
-"use client";
-
-import React, { useEffect, useState, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
-import { useApp } from '@components/providers/AppProvider';
-import { DashboardHeader } from '@components/analytics/DashboardHeader';
-import { StatsGrid } from '@components/analytics/StatsGrid';
-import { RevenueChart } from '@components/analytics/RevenueChart';
-import { RecentActivity } from '@components/analytics/RecentActivity';
-import { analyticsService } from '@services/index';
-import { Loader } from '@components/ui/Loader';
-import { useGuestStore, usePropertyStore, useUIStore } from '@store/index';
+import React from 'react';
+import { ClientAuthGuard } from '@components/providers/ClientAuthGuard';
+import { AnalyticsClient } from '@components/analytics/AnalyticsClient';
 
 export default function AnalyticsPage() {
-    const { user, loading: appLoading } = useApp();
-    const router = useRouter();
-
-    // Core data from global store
-    const properties = usePropertyStore(state => state.properties);
-    const guests = useGuestStore(state => state.guests);
-    const isGuestsLoading = useGuestStore(state => state.isGuestsLoading);
-
-    // Filters
-    const selectedProperty = useUIStore(state => state.selectedPropertyId) || 'all';
-    const setSelectedProperty = useUIStore(state => state.setSelectedPropertyId);
-    const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
-
-    // Auth Redirect
-    useEffect(() => {
-        if (!appLoading && !user) {
-            router.push('/auth');
-        }
-    }, [user, appLoading, router]);
-
-    // Aggregation Logic
-    const dashboardData = useMemo(() => {
-        return analyticsService.calculateDashboardMetrics(guests, properties, selectedProperty, selectedYear);
-    }, [guests, selectedProperty, selectedYear, properties]);
-
-    const loading = appLoading || isGuestsLoading;
-
-    if (loading || !user) {
-        return <Loader className="min-h-screen flex items-center justify-center text-white" iconClassName="text-orange-500" size={48} />;
-    }
-
     return (
-        <div className="animate-fade-in mx-auto w-full px-6 py-8 md:py-10 pb-24">
-            {/* Header */}
-            <DashboardHeader
-                userName={user.displayName || 'Host'}
-                properties={properties}
-                selectedProperty={selectedProperty}
-                onPropertyChange={setSelectedProperty}
-                selectedYear={selectedYear}
-                onYearChange={setSelectedYear}
-            />
-
-            {/* Stats Grid */}
-            <StatsGrid stats={dashboardData.stats} loading={isGuestsLoading} />
-
-            {/* Main Content Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
-                <div className="lg:col-span-2">
-                    <RevenueChart data={dashboardData.chartData} year={selectedYear} loading={isGuestsLoading} />
-                </div>
-                <div>
-                    <RecentActivity upcomingGuests={dashboardData.upcomingGuests} loading={isGuestsLoading} />
-                </div>
-            </div>
-        </div>
+        <ClientAuthGuard>
+            <AnalyticsClient />
+        </ClientAuthGuard>
     );
 }
