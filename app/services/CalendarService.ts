@@ -64,8 +64,8 @@ export const defaultCalendarService: CalendarService = {
         internalGuests.forEach((data) => {
             // Filter by propName
             if (data.propName !== property.name) return;
-            // Only block for valid statuses
-            if (data.status !== 'cancelled' && data.checkInDate && data.checkOutDate) {
+            // Only block for valid statuses (not cancelled, not deleted)
+            if (data.status !== 'cancelled' && data.status !== 'deleted' && data.checkInDate && data.checkOutDate) {
                 internalEvents.push({
                     start: data.checkInDate,
                     end: data.checkOutDate,

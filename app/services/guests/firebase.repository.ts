@@ -94,7 +94,7 @@ export class FirebaseGuestRepository implements IGuestRepository {
         const snapshot = await getDocs(q);
         const guests = snapshot.docs
             .map(doc => ({ id: doc.id, ...doc.data() } as Guest))
-            .filter(g => g.status !== 'cancelled')
+            .filter(g => g.status !== 'cancelled' && g.status !== 'deleted')
             .slice(0, limitCount);
 
         return guests;
@@ -139,6 +139,10 @@ export class FirebaseGuestRepository implements IGuestRepository {
 
     async deleteGuest(guestId: string): Promise<void> {
         const ref = doc(this.getCollectionRef(), guestId);
-        await updateDoc(ref, { status: 'deleted' });
+        await updateDoc(ref, {
+            status: 'deleted',
+            checkInDate: '',
+            checkOutDate: ''
+        });
     }
 }
