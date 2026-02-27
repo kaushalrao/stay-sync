@@ -3,7 +3,7 @@ import { Calendar, Users, Phone, Trash2, ArrowRight, Home, CheckCircle2, MoreVer
 import { GuestCardProps } from '../../lib/types';
 import { formatDate, formatCurrency, getPropertyColorKey, getStatusColor, getDisplayStatus, calculateNights } from '../../lib/utils';
 import { COLOR_VARIANTS } from '../../lib/constants';
-import { useGuestStore, useUIStore, useGuestFormStore } from '@store/index';
+import { useGuestStore, useUIStore, useGuestFormStore, usePropertyStore } from '@store/index';
 import { guestService } from '@services/index';
 import { Portal } from '../ui/Portal';
 import { useRouter } from 'next/navigation';
@@ -25,12 +25,32 @@ export const GuestCard: React.FC<GuestCardProps> = ({ guest, mode, onSelect, onD
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
     const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false);
+    const [isConfirmingBooking, setIsConfirmingBooking] = useState(false);
+    const [isMarkingBooked, setIsMarkingBooked] = useState(false);
+    const [confirmAdvancePaid, setConfirmAdvancePaid] = useState(guest.advancePaid?.toString() || '');
 
-    const balance = guest.totalAmount ? Math.max(0, guest.totalAmount - guest.advancePaid) : 0;
+    const properties = usePropertyStore(state => state.properties);
+    const selectedProperty = properties.find(p => p.name === guest.propName);
+
+    const balance = guest.totalAmount ? Math.max(0, guest.totalAmount - (guest.advancePaid || 0)) : 0;
     const isUnpaid = balance > 0;
 
     // Calculate number of nights using the utility function
     const numberOfNights = calculateNights(guest.checkInDate, guest.checkOutDate);
+
+    // Compute Receipts Financials Details
+    const baseRate = selectedProperty?.basePrice || 0;
+    const baseTotal = baseRate * numberOfNights;
+
+    const extraGuestsCount = Math.max(0, (guest.numberOfGuests || 0) - (selectedProperty?.baseGuests || 0));
+    const extraGuestRate = selectedProperty?.extraGuestPrice || 0;
+    const extraTotal = extraGuestRate * extraGuestsCount * numberOfNights;
+
+    const subTotal = baseTotal + extraTotal;
+    const discount = guest.discount || 0;
+    const advancePaid = guest.advancePaid || 0;
+
+    const totalAmount = guest.totalAmount || Math.max(0, subTotal - discount);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -67,6 +87,35 @@ export const GuestCard: React.FC<GuestCardProps> = ({ guest, mode, onSelect, onD
             showToast('Failed to update payment status', 'error');
         } finally {
             setIsMarkingPaid(false);
+        }
+    };
+
+    const handleConfirmBookingClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setConfirmAdvancePaid(guest.advancePaid?.toString() || '');
+        setIsConfirmingBooking(true);
+    };
+
+    const confirmBooking = async () => {
+        if (isMarkingBooked) return;
+
+        setIsMarkingBooked(true);
+        try {
+            const parsedAdvance = parseFloat(confirmAdvancePaid);
+            const updates: Partial<typeof guest> = { status: 'booked' as const };
+            if (!isNaN(parsedAdvance)) {
+                updates.advancePaid = parsedAdvance;
+            }
+
+            await guestService.updateGuest(guest.id, updates);
+            updateGuestInStore(guest.id, updates);
+            showToast('Booking confirmed!', 'success');
+            setIsConfirmingBooking(false);
+        } catch (error) {
+            console.error(error);
+            showToast('Failed to confirm booking', 'error');
+        } finally {
+            setIsMarkingBooked(false);
         }
     };
 
@@ -221,22 +270,35 @@ export const GuestCard: React.FC<GuestCardProps> = ({ guest, mode, onSelect, onD
                             </div>
                         </div>
 
-                        {/* Payment Action / Status */}
-                        {isUnpaid && guest.totalAmount && guest.status !== 'deleted' ? (
-                            <button
-                                onClick={handleMarkPaidClick}
-                                disabled={isMarkingPaid}
-                                className="group/btn relative bg-indigo-600 hover:bg-indigo-700 text-white border border-indigo-500/50 hover:border-indigo-600 px-4 py-2 rounded-xl transition-all duration-300 flex items-center gap-2 font-bold text-[10px] md:text-[11px] uppercase tracking-wider shadow-md shadow-indigo-600/20 hover:shadow-indigo-600/40 active:scale-95 disabled:opacity-50 shrink-0"
-                            >
-                                <Banknote size={16} className="transition-transform group-hover/btn:scale-110" />
-                                <span>Mark Paid</span>
-                            </button>
-                        ) : (!isUnpaid && guest.totalAmount! > 0) ? (
-                            <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 text-[10px] md:text-[11px] font-bold uppercase tracking-wider bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 px-3 py-1.5 rounded-xl shrink-0 animate-fade-in shadow-sm">
-                                <CheckCircle2 size={14} />
-                                <span>Settled</span>
-                            </div>
-                        ) : null}
+                        {/* Actions / Status */}
+                        <div className="flex gap-2 items-center flex-wrap sm:flex-nowrap justify-end shrink-0 max-w-[50%]">
+                            {guest.status === 'pending' && (
+                                <button
+                                    onClick={handleConfirmBookingClick}
+                                    disabled={isMarkingBooked}
+                                    className="group/btn relative bg-emerald-600 hover:bg-emerald-700 text-white border border-emerald-500/50 hover:border-emerald-600 px-3 md:px-4 py-2 rounded-xl transition-all duration-300 flex items-center gap-1.5 md:gap-2 font-bold text-[10px] md:text-[11px] uppercase tracking-wider shadow-md shadow-emerald-600/20 hover:shadow-emerald-600/40 active:scale-95 disabled:opacity-50 shrink-0"
+                                >
+                                    <CheckCircle2 size={16} className="transition-transform group-hover/btn:scale-110" />
+                                    <span className="hidden sm:inline">Confirm</span>
+                                </button>
+                            )}
+
+                            {isUnpaid && guest.totalAmount && guest.status !== 'deleted' && guest.status !== 'pending' ? (
+                                <button
+                                    onClick={handleMarkPaidClick}
+                                    disabled={isMarkingPaid}
+                                    className="group/btn relative bg-indigo-600 hover:bg-indigo-700 text-white border border-indigo-500/50 hover:border-indigo-600 px-3 md:px-4 py-2 rounded-xl transition-all duration-300 flex items-center gap-1.5 md:gap-2 font-bold text-[10px] md:text-[11px] uppercase tracking-wider shadow-md shadow-indigo-600/20 hover:shadow-indigo-600/40 active:scale-95 disabled:opacity-50 shrink-0"
+                                >
+                                    <Banknote size={16} className="transition-transform group-hover/btn:scale-110" />
+                                    <span>Mark Paid</span>
+                                </button>
+                            ) : (!isUnpaid && guest.totalAmount! > 0) ? (
+                                <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 text-[10px] md:text-[11px] font-bold uppercase tracking-wider bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 px-3 py-1.5 rounded-xl shrink-0 animate-fade-in shadow-sm">
+                                    <CheckCircle2 size={14} />
+                                    <span>Settled</span>
+                                </div>
+                            ) : null}
+                        </div>
                     </div>
 
                     <div className="flex justify-between items-center">
@@ -327,25 +389,106 @@ export const GuestCard: React.FC<GuestCardProps> = ({ guest, mode, onSelect, onD
                 </Portal>
             )}
 
+            {/* Booking Confirmation Modal */}
+            {isConfirmingBooking && (
+                <Portal>
+                    <div
+                        className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* Backdrop */}
+                        <div
+                            className="absolute inset-0 bg-slate-900/40 dark:bg-slate-900/60 backdrop-blur-sm animate-fade-in"
+                            onClick={() => !isMarkingBooked && setIsConfirmingBooking(false)}
+                        />
+
+                        {/* Modal Dialog */}
+                        <div className="relative bg-white dark:bg-slate-800 w-full max-w-sm rounded-3xl shadow-2xl border border-slate-100 dark:border-white/10 overflow-hidden animate-slide-up">
+                            {/* Close Button */}
+                            <button
+                                onClick={() => !isMarkingBooked && setIsConfirmingBooking(false)}
+                                className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors"
+                            >
+                                <X size={20} />
+                            </button>
+
+                            <div className="p-6 pt-8">
+                                <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-2xl flex items-center justify-center mb-4">
+                                    <CheckCircle2 size={24} />
+                                </div>
+                                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
+                                    Confirm Booking
+                                </h3>
+                                <p className="text-slate-600 dark:text-slate-400 text-sm mb-6 leading-relaxed">
+                                    Are you sure you want to mark <strong className="text-slate-900 dark:text-white">{guest.guestName}&apos;s</strong> stay as Confirmed? This will reserve the property and change their status from <strong className="text-orange-600 dark:text-orange-400 uppercase text-xs tracking-wider">Pending</strong> to <strong className="text-emerald-600 dark:text-emerald-400 uppercase text-xs tracking-wider">Booked</strong>.
+                                </p>
+
+                                <div className="mb-6">
+                                    <label htmlFor="advancePaid" className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Advance Paid (optional)</label>
+                                    <div className="relative">
+                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <span className="text-slate-500 sm:text-sm">₹</span>
+                                        </div>
+                                        <input
+                                            type="number"
+                                            id="advancePaid"
+                                            className="block w-full pl-7 pr-4 py-3 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all font-mono"
+                                            placeholder="0"
+                                            value={confirmAdvancePaid}
+                                            onChange={(e) => setConfirmAdvancePaid(e.target.value)}
+                                            onClick={(e) => e.stopPropagation()}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="flex gap-3">
+                                    <button
+                                        onClick={() => setIsConfirmingBooking(false)}
+                                        disabled={isMarkingBooked}
+                                        className="flex-1 px-4 py-3 rounded-xl font-bold text-sm text-slate-700 dark:text-slate-300 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 transition-colors disabled:opacity-50"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={confirmBooking}
+                                        disabled={isMarkingBooked}
+                                        className="flex-1 px-4 py-3 rounded-xl font-bold text-sm text-white bg-emerald-600 hover:bg-emerald-700 shadow-md shadow-emerald-600/20 active:scale-95 transition-all flex items-center justify-center disabled:opacity-50"
+                                    >
+                                        {isMarkingBooked ? (
+                                            <span className="flex items-center gap-2">
+                                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                                Confirming...
+                                            </span>
+                                        ) : (
+                                            'Yes, Confirm'
+                                        )}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </Portal>
+            )}
+
             <ShareReceiptModal
                 isOpen={isReceiptModalOpen}
                 onClose={() => setIsReceiptModalOpen(false)}
                 guestName={guest.guestName}
                 phoneNumber={guest.phoneNumber || ''}
-                property={{ name: guest.propName } as any}
+                property={selectedProperty}
                 checkInDate={guest.checkInDate}
                 checkOutDate={guest.checkOutDate}
                 nights={numberOfNights || 1}
                 numberOfGuests={guest.numberOfGuests || 1}
-                baseRate={balance / (numberOfNights || 1)}
-                baseTotal={balance}
-                extraGuestRate={0}
-                extraGuestsCount={0}
-                extraTotal={0}
-                discount={0}
-                totalAmount={Math.max(0, balance)}
-                advancePaid={0}
-                balanceDue={Math.max(0, balance)}
+                baseRate={baseRate}
+                baseTotal={baseTotal}
+                extraGuestRate={extraGuestRate}
+                extraGuestsCount={extraGuestsCount}
+                extraTotal={extraTotal}
+                discount={discount}
+                totalAmount={totalAmount}
+                advancePaid={advancePaid}
+                balanceDue={balance}
             />
         </div>
     );

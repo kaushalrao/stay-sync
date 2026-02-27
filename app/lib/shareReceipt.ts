@@ -19,7 +19,6 @@ export const shareReceiptImage = async (
 
         const dataUrl = await toPng(receiptElement, {
             quality: 0.95,
-            backgroundColor: '#1C1F2E',
             style: { borderRadius: '0' }
         });
 

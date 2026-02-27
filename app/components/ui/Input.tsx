@@ -16,7 +16,7 @@ export const Input: React.FC<InputProps> = ({
     ...props
 }) => {
     const paddingClass = inputSize === 'sm' ? 'px-3 py-2 text-sm' :
-        inputSize === 'lg' ? 'px-5 py-4 text-lg' :
+        inputSize === 'lg' ? 'px-3 py-2.5 text-sm md:px-5 md:py-4 md:text-lg' :
             'px-4 py-3.5';
 
     return (

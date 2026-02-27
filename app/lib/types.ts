@@ -75,6 +75,8 @@ export interface GuestDetails {
     advancePaid: number;
     discount?: number;
     phoneNumber?: string;
+    basePrice?: number;
+    totalAmount?: number;
 }
 
 export interface Guest extends GuestDetails {

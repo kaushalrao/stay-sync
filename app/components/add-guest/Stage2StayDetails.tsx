@@ -98,7 +98,7 @@ export function Stage2StayDetails() {
                                             propName: prop?.name
                                         });
                                     }}
-                                    className="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-white/10 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all text-lg font-bold text-slate-900 dark:text-white appearance-none cursor-pointer shadow-sm disabled:opacity-70 disabled:cursor-not-allowed pr-10"
+                                    className="w-full px-3 py-2.5 md:px-5 md:py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-white/10 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all text-sm md:text-lg font-bold text-slate-900 dark:text-white appearance-none cursor-pointer shadow-sm disabled:opacity-70 disabled:cursor-not-allowed pr-10"
                                 >
                                     <option value="" disabled>Select a property</option>
                                     {properties.map(p => (
@@ -113,7 +113,7 @@ export function Stage2StayDetails() {
 
                         {/* Dates Row */}
                         <div className="grid grid-cols-2 gap-6">
-                            <div className="space-y-1 group bg-slate-50 dark:bg-slate-800/40 p-4 rounded-xl border border-slate-200 dark:border-white/10 focus-within:border-indigo-500 focus-within:ring-4 focus-within:ring-indigo-500/20 transition-all shadow-sm">
+                            <div className="space-y-1 group bg-slate-50 dark:bg-slate-800/40 p-3 md:p-4 rounded-xl border border-slate-200 dark:border-white/10 focus-within:border-indigo-500 focus-within:ring-4 focus-within:ring-indigo-500/20 transition-all shadow-sm">
                                 <DatePicker
                                     label="Check-in Date"
                                     variant="check-in"
@@ -125,7 +125,7 @@ export function Stage2StayDetails() {
                                     disabled={isViewOnly}
                                 />
                             </div>
-                            <div className="space-y-1 group bg-slate-50 dark:bg-slate-800/40 p-4 rounded-xl border border-slate-200 dark:border-white/10 focus-within:border-purple-500 focus-within:ring-4 focus-within:ring-purple-500/20 transition-all shadow-sm">
+                            <div className="space-y-1 group bg-slate-50 dark:bg-slate-800/40 p-3 md:p-4 rounded-xl border border-slate-200 dark:border-white/10 focus-within:border-purple-500 focus-within:ring-4 focus-within:ring-purple-500/20 transition-all shadow-sm">
                                 <DatePicker
                                     label="Check-out Date"
                                     variant="check-out"

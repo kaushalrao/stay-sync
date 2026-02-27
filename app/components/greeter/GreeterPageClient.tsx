@@ -38,14 +38,16 @@ function GreeterContent() {
     const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false);
 
     const handleSelectGuest = React.useCallback((guest: Guest) => {
-        const details = {
+        const details: GuestDetails = {
             guestName: guest.guestName,
             numberOfGuests: guest.numberOfGuests,
             advancePaid: guest.advancePaid || 0,
             discount: guest.discount || 0,
             checkInDate: guest.checkInDate,
             checkOutDate: guest.checkOutDate,
-            phoneNumber: guest.phoneNumber || ''
+            phoneNumber: guest.phoneNumber || '',
+            totalAmount: guest.totalAmount,
+            basePrice: guest.basePrice
         };
         setGuestDetails(details);
         setCurrentGuestId(guest.id);
@@ -119,7 +121,7 @@ function GreeterContent() {
 
     // Calculate financials for receipt
     const nights = guestDetails.checkInDate && guestDetails.checkOutDate ? calculateNights(guestDetails.checkInDate, guestDetails.checkOutDate) : 0;
-    const baseRate = selectedProperty?.basePrice || 0;
+    const baseRate = guestDetails.basePrice || selectedProperty?.basePrice || 0;
     const baseTotal = baseRate * nights;
 
     const extraGuestsCount = Math.max(0, (guestDetails.numberOfGuests || 0) - (selectedProperty?.baseGuests || 0));
@@ -130,7 +132,7 @@ function GreeterContent() {
     const discount = guestDetails.discount || 0;
     const advancePaid = guestDetails.advancePaid || 0;
 
-    const totalAmount = Math.max(0, subTotal - discount);
+    const totalAmount = guestDetails.totalAmount || Math.max(0, subTotal - discount);
     const balanceDue = Math.max(0, totalAmount - advancePaid);
 
     if (loading) {
@@ -272,14 +274,14 @@ function GreeterContent() {
                 checkOutDate={guestDetails.checkOutDate}
                 nights={nights || 1}
                 numberOfGuests={guestDetails.numberOfGuests || 1}
-                baseRate={balanceDue / (nights || 1)}
-                baseTotal={balanceDue}
-                extraGuestRate={0}
-                extraGuestsCount={0}
-                extraTotal={0}
-                discount={0}
-                totalAmount={balanceDue}
-                advancePaid={0}
+                baseRate={baseRate}
+                baseTotal={baseTotal}
+                extraGuestRate={extraGuestRate}
+                extraGuestsCount={extraGuestsCount}
+                extraTotal={extraTotal}
+                discount={discount}
+                totalAmount={totalAmount}
+                advancePaid={advancePaid}
                 balanceDue={balanceDue}
             />
 

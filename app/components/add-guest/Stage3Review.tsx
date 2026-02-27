@@ -104,20 +104,15 @@ export function Stage3Review() {
                 advancePaid: advancePaid,
             };
 
-            if (isEditing) {
-                if (!guestData.id) {
-                    showToast("Error: Missing booking ID for update", "error");
-                    setIsSaving(false);
-                    return;
-                }
+            if (isEditing && guestData.id) {
                 await guestService.updateGuest(guestData.id, finalData as any);
                 updateGuestInStore(guestData.id, finalData as any);
-                showToast("Booking updated successfully!", "success");
+                showToast("Guest updated successfully!", "success");
             } else {
                 finalData.createdAt = Date.now();
                 finalData.status = 'pending';
                 await guestService.addGuest(finalData as any);
-                showToast("Booking saved successfully!", "success");
+                showToast("Guest saved successfully!", "success");
             }
 
             if (shareType === 'whatsapp') {
@@ -139,7 +134,7 @@ export function Stage3Review() {
 
     return (
         <div className="flex flex-col lg:h-full animate-fade-in lg:overflow-hidden">
-            <div className="flex-1 lg:overflow-y-auto px-1 pb-2">
+            <div className="flex-1 lg:overflow-y-auto px-1 pb-64 md:pb-48 lg:pb-2">
                 <div className="flex flex-col justify-center lg:min-h-full max-w-lg mx-auto w-full space-y-3">
                     <div className="text-center space-y-1 shrink-0 pt-2 lg:pt-4 mb-2">
                         <div className="flex items-center justify-center gap-2">
