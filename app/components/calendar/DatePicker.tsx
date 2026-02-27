@@ -7,6 +7,7 @@ import { useCalendar } from '../../hooks/useCalendar';
 import { CalendarHeader } from './CalendarHeader';
 import { CalendarLegend } from './CalendarLegend';
 import { CalendarDay } from './CalendarDay';
+import { Portal } from '../ui/Portal';
 
 export const DatePicker: React.FC<DatePickerProps> = ({
     date,
@@ -21,6 +22,35 @@ export const DatePicker: React.FC<DatePickerProps> = ({
 }) => {
     const [isOpen, setIsOpen] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
+    const popoverRef = useRef<HTMLDivElement>(null);
+    const [popoverStyle, setPopoverStyle] = useState<React.CSSProperties>({});
+
+    const updatePosition = () => {
+        if (isOpen && containerRef.current) {
+            const rect = containerRef.current.getBoundingClientRect();
+            // Try to align directly under the button. 
+            // Also adjust based on `align` prop if needed.
+            setPopoverStyle({
+                top: `${rect.bottom + window.scrollY + 8}px`,
+                left: align === 'left' ? `${rect.left}px` : undefined,
+                right: align === 'right' ? `${window.innerWidth - rect.right}px` : undefined,
+                position: 'absolute'
+            });
+        }
+    };
+
+    // Update position on open and on scroll/resize
+    useEffect(() => {
+        updatePosition();
+        if (isOpen) {
+            window.addEventListener('resize', updatePosition);
+            window.addEventListener('scroll', updatePosition, true);
+        }
+        return () => {
+            window.removeEventListener('resize', updatePosition);
+            window.removeEventListener('scroll', updatePosition, true);
+        };
+    }, [isOpen, align]);
 
     // Use Custom Hook
     const { currentMonth, nextMonth, prevMonth, goToDate, days } = useCalendar(date);
@@ -35,7 +65,10 @@ export const DatePicker: React.FC<DatePickerProps> = ({
     // Close on click outside
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
-            if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+            const isClickInsideContainer = containerRef.current && containerRef.current.contains(event.target as Node);
+            const isClickInsidePopover = popoverRef.current && popoverRef.current.contains(event.target as Node);
+
+            if (!isClickInsideContainer && !isClickInsidePopover) {
                 setIsOpen(false);
             }
         };
@@ -70,40 +103,46 @@ export const DatePicker: React.FC<DatePickerProps> = ({
             </button>
 
             {isOpen && (
-                <div className={`absolute top-full z-50 mt-2 p-4 bg-white dark:bg-[#0f172a] border border-slate-300 dark:border-white/10 rounded-2xl shadow-2xl animate-fade-in ${align === 'right' ? 'right-0' : 'left-0'} w-[300px]`}>
+                <Portal>
+                    <div
+                        ref={popoverRef}
+                        className="z-[100] p-4 bg-white dark:bg-[#0f172a] border border-slate-300 dark:border-white/10 rounded-2xl shadow-2xl animate-fade-in w-[300px]"
+                        style={popoverStyle}
+                    >
 
-                    <CalendarHeader currentMonth={currentMonth} onNext={nextMonth} onPrev={prevMonth} />
+                        <CalendarHeader currentMonth={currentMonth} onNext={nextMonth} onPrev={prevMonth} />
 
-                    <div className="grid grid-cols-7 mb-2">
-                        {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(d => (
-                            <div key={d} className="text-center text-xs font-bold text-slate-600 dark:text-slate-400 py-1">{d}</div>
-                        ))}
+                        <div className="grid grid-cols-7 mb-2">
+                            {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(d => (
+                                <div key={d} className="text-center text-xs font-bold text-slate-600 dark:text-slate-400 py-1">{d}</div>
+                            ))}
+                        </div>
+
+                        <div className="grid grid-cols-7 gap-y-1">
+                            {days.map((day) => {
+                                const blocked = isBlocked(day, blockedDates, variant);
+                                const meta = blocked ? getBlockMeta(day, blockedDates) : null;
+
+                                return (
+                                    <CalendarDay
+                                        key={day.toISOString()}
+                                        day={day}
+                                        currentMonth={currentMonth}
+                                        selectedDate={selectedDate}
+                                        comparisonDate={comparisonDate}
+                                        blockedDates={blockedDates}
+                                        variant={variant}
+                                        onSelect={handleSelect}
+                                        isBlocked={blocked}
+                                        blockMeta={meta}
+                                    />
+                                );
+                            })}
+                        </div>
+
+                        <CalendarLegend feeds={icalFeeds} />
                     </div>
-
-                    <div className="grid grid-cols-7 gap-y-1">
-                        {days.map((day) => {
-                            const blocked = isBlocked(day, blockedDates, variant);
-                            const meta = blocked ? getBlockMeta(day, blockedDates) : null;
-
-                            return (
-                                <CalendarDay
-                                    key={day.toISOString()}
-                                    day={day}
-                                    currentMonth={currentMonth}
-                                    selectedDate={selectedDate}
-                                    comparisonDate={comparisonDate}
-                                    blockedDates={blockedDates}
-                                    variant={variant}
-                                    onSelect={handleSelect}
-                                    isBlocked={blocked}
-                                    blockMeta={meta}
-                                />
-                            );
-                        })}
-                    </div>
-
-                    <CalendarLegend feeds={icalFeeds} />
-                </div>
+                </Portal>
             )}
         </div>
     );

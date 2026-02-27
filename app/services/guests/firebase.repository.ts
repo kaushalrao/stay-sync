@@ -139,6 +139,6 @@ export class FirebaseGuestRepository implements IGuestRepository {
 
     async deleteGuest(guestId: string): Promise<void> {
         const ref = doc(this.getCollectionRef(), guestId);
-        await updateDoc(ref, { status: 'cancelled' });
+        await updateDoc(ref, { status: 'deleted' });
     }
 }

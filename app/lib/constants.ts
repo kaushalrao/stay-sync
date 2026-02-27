@@ -61,7 +61,7 @@ export const FEATURE_CARD_STYLES = {
     }
 };
 
-export const GUEST_FILTER_OPTIONS = ['all', 'upcoming', 'past'] as const;
+export const GUEST_FILTER_OPTIONS = ['all', 'upcoming', 'past', 'deleted'] as const;
 
 export const VARIABLE_CATEGORIES = {
     "Property Details": ['propertyName', 'wifiName', 'wifiPass', 'locationLink', 'propertyLink', 'checkInTime', 'checkOutTime', 'baseGuests'],
@@ -109,7 +109,7 @@ export const QUICK_ACTIONS: QuickAction[] = [
         icon: PlusCircle,
         color: 'text-blue-600 dark:text-blue-400',
         bgColor: 'bg-blue-500/10',
-        href: '/greeter'
+        href: '/add-guest'
     },
     {
         label: 'Guests',
@@ -155,10 +155,10 @@ export const QUICK_ACTIONS: QuickAction[] = [
 
 export const SIDEBAR_NAV_ITEMS: NavItem[] = [
     { label: 'Dashboard', href: '/', icon: LayoutDashboard },
-    { label: 'New Guest', href: '/greeter', icon: UserPlus }, // Changed from PlusCircle
+    { label: 'Add Guest', href: '/add-guest', icon: UserPlus },
     { label: 'Guests', href: '/guests', icon: Users },
     { label: 'Cleaning Checklist', href: '/cleaning-checklist', icon: Sparkles },
-    { label: 'Inventory', href: '/inventory', icon: ShoppingCart }, // Added Inventory
+    { label: 'Inventory', href: '/inventory', icon: ShoppingCart },
     { label: 'Maintenance', href: '/maintenance', icon: Wrench },
     { label: 'Analytics', href: '/analytics', icon: BarChart3 },
     { label: 'Settings', href: '/settings', icon: Settings },

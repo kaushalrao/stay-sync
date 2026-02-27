@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Calendar, Users, Phone, Trash2, ArrowRight, Home, CheckCircle2, MoreVertical, Banknote, Moon, X, AlertTriangle } from 'lucide-react';
+import { Calendar, Users, Phone, Trash2, ArrowRight, Home, CheckCircle2, MoreVertical, Banknote, Moon, X, AlertTriangle, Edit3 } from 'lucide-react';
 import { GuestCardProps } from '../../lib/types';
 import { formatDate, formatCurrency, getPropertyColorKey, getStatusColor, getDisplayStatus, calculateNights } from '../../lib/utils';
 import { COLOR_VARIANTS } from '../../lib/constants';
-import { useGuestStore, useUIStore } from '@store/index';
+import { useGuestStore, useUIStore, useGuestFormStore } from '@store/index';
 import { guestService } from '@services/index';
 import { Portal } from '../ui/Portal';
+import { useRouter } from 'next/navigation';
 
 export const GuestCard: React.FC<GuestCardProps> = ({ guest, mode, onSelect, onDelete }) => {
     const propertyName = guest.propName || '';
@@ -14,6 +15,8 @@ export const GuestCard: React.FC<GuestCardProps> = ({ guest, mode, onSelect, onD
     const displayStatus = getDisplayStatus(guest);
     const isPast = displayStatus === 'PAST';
 
+    const router = useRouter();
+    const loadGuestForEdit = useGuestFormStore(state => state.loadGuestForEdit);
     const updateGuestInStore = useGuestStore(state => state.updateGuestInStore);
     const showToast = useUIStore(state => state.showToast);
     const [isMarkingPaid, setIsMarkingPaid] = useState(false);
@@ -89,7 +92,7 @@ export const GuestCard: React.FC<GuestCardProps> = ({ guest, mode, onSelect, onD
                             </div>
 
                             {/* Refined Subtle Urgency Indicator */}
-                            {mode === 'page' && isUnpaid && guest.totalAmount && (
+                            {mode === 'page' && isUnpaid && guest.totalAmount && guest.status !== 'deleted' && (
                                 <div className="flex items-center gap-1.5 text-[10px] text-orange-600 dark:text-orange-400 font-bold uppercase tracking-wider bg-orange-50 dark:bg-orange-500/10 inline-flex px-2 py-0.5 rounded-full border border-orange-200/50 dark:border-orange-500/20">
                                     <span className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></span>
                                     Unpaid
@@ -124,6 +127,18 @@ export const GuestCard: React.FC<GuestCardProps> = ({ guest, mode, onSelect, onD
                                     <span>Call Guest</span>
                                 </a>
                             )}
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setIsMenuOpen(false);
+                                    loadGuestForEdit(guest);
+                                    router.push('/add-guest');
+                                }}
+                                className="group flex items-center gap-2.5 w-full px-3 py-2 text-[13px] font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-xl transition-colors text-left"
+                            >
+                                <Edit3 size={14} className="text-slate-400 group-hover:text-indigo-500 transition-colors" strokeWidth={2.5} />
+                                <span>{isPast ? "View Guest Details" : "Edit Guest"}</span>
+                            </button>
                             {onDelete && (
                                 <button
                                     onClick={(e) => {
@@ -194,7 +209,7 @@ export const GuestCard: React.FC<GuestCardProps> = ({ guest, mode, onSelect, onD
                         </div>
 
                         {/* Payment Action / Status */}
-                        {isUnpaid && guest.totalAmount ? (
+                        {isUnpaid && guest.totalAmount && guest.status !== 'deleted' ? (
                             <button
                                 onClick={handleMarkPaidClick}
                                 disabled={isMarkingPaid}

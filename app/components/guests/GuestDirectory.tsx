@@ -36,7 +36,7 @@ export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode =
 
     const [search, setSearch] = useState('');
     const debouncedSearch = useDebounce(search, 500);
-    const [statusFilter, setStatusFilter] = useState<'upcoming' | 'past' | 'all'>('all');
+    const [statusFilter, setStatusFilter] = useState<'upcoming' | 'past' | 'all' | 'deleted'>('all');
 
     React.useEffect(() => {
         if (!user) return;
@@ -96,11 +96,8 @@ export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode =
         }
 
         try {
-            await guestService.deleteGuest(id);
-            showToast('Guest deleted. Refresh to see changes.', 'success');
-            // Refresh list after delete? Or just local remove?
-            // Local remove would be better but simple reload works to stay in sync.
-            // For now, simple reload of current query.
+            await guestService.updateGuest(id, { status: 'deleted' });
+            showToast('Guest marked as deleted.', 'success');
             const { guests: newGuests, lastDoc } = await guestService.getGuests(null, 20, debouncedSearch);
             setGuests(newGuests, lastDoc);
         } catch (error) {
@@ -139,6 +136,11 @@ export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode =
             matchesStatus = displayStatus === 'UPCOMING';
         } else if (statusFilter === 'past') {
             matchesStatus = displayStatus === 'PAST';
+        } else if (statusFilter === 'deleted') {
+            matchesStatus = displayStatus === 'DELETED';
+        } else {
+            // 'all' filter: exclude deleted BY DEFAULT
+            matchesStatus = displayStatus !== 'DELETED';
         }
 
         const matchesMonth = selectedMonth === 'all' || (g.checkInDate && g.checkInDate.startsWith(selectedMonth));

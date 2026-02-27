@@ -52,7 +52,7 @@ export const GuestFilters: React.FC<GuestFiltersProps> = ({
                         </button>
                     </div>
 
-                    <div className={`bg-slate-100 dark:bg-slate-900/50 border border-slate-300 dark:border-white/10 rounded-xl p-1 grid grid-cols-3 shrink-0 w-full md:w-auto min-w-[280px]`}>
+                    <div className={`bg-slate-100 dark:bg-slate-900/50 border border-slate-300 dark:border-white/10 rounded-xl p-1 grid grid-cols-2 lg:grid-cols-4 shrink-0 w-full md:w-auto min-w-[280px]`}>
                         {GUEST_FILTER_OPTIONS.map((filter) => (
                             <button
                                 key={filter}

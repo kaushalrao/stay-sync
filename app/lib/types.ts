@@ -81,11 +81,13 @@ export interface Guest extends GuestDetails {
     id: string;
     createdAt: number;
     firstName: string;
-    status: 'booked' | 'cancelled' | 'pending';
+    status: 'draft' | 'pending_payment' | 'booked' | 'cancelled' | 'pending' | 'checked_in' | 'checked_out' | 'deleted';
     propName?: string;
     phoneNumber?: string;
     email?: string;
     totalAmount?: number;
+    basePrice?: number;
+    balanceDue?: number;
     propertyId?: string; // New field for scalability
     searchName?: string; // Lowercase name for case-insensitive search
 }
@@ -131,8 +133,8 @@ export interface GuestFiltersProps {
     handlePrevMonth: () => void;
     handleNextMonth: () => void;
     toggleAllMonths: () => void;
-    statusFilter: 'upcoming' | 'past' | 'all';
-    setStatusFilter: (filter: 'upcoming' | 'past' | 'all') => void;
+    statusFilter: 'upcoming' | 'past' | 'all' | 'deleted';
+    setStatusFilter: (filter: 'upcoming' | 'past' | 'all' | 'deleted') => void;
     mode: 'page' | 'picker';
 }
 
