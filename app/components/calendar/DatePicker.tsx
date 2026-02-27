@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { format, parseISO } from 'date-fns';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import { DatePickerProps } from './types';
@@ -25,7 +25,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
     const popoverRef = useRef<HTMLDivElement>(null);
     const [popoverStyle, setPopoverStyle] = useState<React.CSSProperties>({});
 
-    const updatePosition = () => {
+    const updatePosition = useCallback(() => {
         if (isOpen && containerRef.current) {
             const rect = containerRef.current.getBoundingClientRect();
             // Try to align directly under the button. 
@@ -37,7 +37,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
                 position: 'absolute'
             });
         }
-    };
+    }, [isOpen, align]);
 
     // Update position on open and on scroll/resize
     useEffect(() => {
@@ -50,7 +50,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
             window.removeEventListener('resize', updatePosition);
             window.removeEventListener('scroll', updatePosition, true);
         };
-    }, [isOpen, align]);
+    }, [isOpen, updatePosition]);
 
     // Use Custom Hook
     const { currentMonth, nextMonth, prevMonth, goToDate, days } = useCalendar(date);

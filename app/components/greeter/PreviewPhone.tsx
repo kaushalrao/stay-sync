@@ -7,7 +7,9 @@ export const PreviewPhone: React.FC<{
     onSend: () => void;
     onCopy: () => void;
     copied: boolean;
-}> = ({ message, onSend, onCopy, copied }) => (
+    onShareImage?: () => void;
+    isCapturing?: boolean;
+}> = ({ message, onSend, onCopy, copied, onShareImage, isCapturing }) => (
     <div className="relative rounded-[2.5rem] overflow-hidden border-2 border-slate-200 dark:border-slate-700 shadow-2xl bg-white dark:bg-[#000] ring-4 ring-slate-200/50 dark:ring-slate-800/50">
         {/* Header */}
         <div className="bg-slate-50 dark:bg-slate-800 p-4 flex items-center justify-between border-b border-slate-100 dark:border-white/5">
@@ -60,7 +62,7 @@ export const PreviewPhone: React.FC<{
         </div>
 
         {/* Desktop Action Bar */}
-        <div className="p-4 bg-white dark:bg-slate-800 border-t border-slate-100 dark:border-white/5 hidden lg:block w-full z-20">
+        <div className="p-4 bg-white dark:bg-slate-800 border-t border-slate-100 dark:border-white/5 hidden lg:block w-full z-20 space-y-3">
             <Button
                 onClick={onSend}
                 disabled={!message}
@@ -69,6 +71,17 @@ export const PreviewPhone: React.FC<{
                 <MessageCircle size={20} fill="white" className="text-white group-hover:scale-110 transition-transform" />
                 Send via WhatsApp
             </Button>
+
+            {onShareImage && (
+                <Button
+                    onClick={onShareImage}
+                    disabled={!message || isCapturing}
+                    className="w-full bg-teal-600 hover:bg-teal-700 disabled:bg-slate-300 dark:disabled:bg-slate-700 shadow-lg hover:shadow-xl disabled:shadow-none text-white border-none py-4 text-base font-bold rounded-2xl transition-all active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 group flex items-center justify-center gap-2"
+                >
+                    {isCapturing ? <span className="animate-spin text-xl leading-none">⏳</span> : <MessageCircle size={20} className="hidden group-hover:scale-110 transition-transform" />}
+                    {isCapturing ? 'Generating...' : 'Share Image'}
+                </Button>
+            )}
         </div>
     </div>
 );

@@ -3,7 +3,7 @@
 import React, { useState, useMemo, useEffect, Suspense } from 'react';
 import {
     Check, Copy, MessageCircle, Eye, UserSearch,
-    Calendar, Phone, Users, MapPin, BadgeCheck, Clock, UserCheck
+    Calendar, Phone, Users, MapPin, BadgeCheck, Clock, UserCheck, Image as ImageIcon
 } from 'lucide-react';
 import { GuestDetails, Guest } from '@lib/types';
 import { DEFAULT_GUEST_DETAILS } from '@lib/constants';
@@ -15,7 +15,10 @@ import { useApp } from '@components/providers/AppProvider';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { guestService, templateService } from '@services/index';
 import { format } from 'date-fns';
+import { toPng } from 'html-to-image';
 import { useGuestStore, usePropertyStore, useTemplateStore, useUIStore } from '@store/index';
+import { ReceiptCard } from '@components/shared/ReceiptCard';
+import { calculateNights } from '@lib/utils';
 
 function GreeterContent() {
     const properties = usePropertyStore(state => state.properties);
@@ -33,6 +36,8 @@ function GreeterContent() {
     const [currentGuestId, setCurrentGuestId] = useState<string | null>(null);
     const [selectedTempId, setSelectedTempId] = useState('');
     const [copied, setCopied] = useState(false);
+    const [isCapturing, setIsCapturing] = useState(false);
+    const receiptRef = React.useRef<HTMLDivElement>(null);
 
     const handleSelectGuest = React.useCallback((guest: Guest) => {
         const details = {
@@ -112,6 +117,63 @@ function GreeterContent() {
     const handleWhatsApp = () => {
         if (!currentGuestId) return showToast("Select a guest first", "error");
         openWhatsApp(generatedMessage, guestDetails.phoneNumber);
+    };
+
+    // Calculate financials for receipt
+    const nights = guestDetails.checkInDate && guestDetails.checkOutDate ? calculateNights(guestDetails.checkInDate, guestDetails.checkOutDate) : 0;
+    const baseRate = selectedProperty?.basePrice || 0;
+    const baseTotal = baseRate * nights;
+
+    const extraGuestsCount = Math.max(0, (guestDetails.numberOfGuests || 0) - (selectedProperty?.baseGuests || 0));
+    const extraGuestRate = selectedProperty?.extraGuestPrice || 0;
+    const extraTotal = extraGuestRate * extraGuestsCount * nights;
+
+    const subTotal = baseTotal + extraTotal;
+    const discount = guestDetails.discount || 0;
+    const advancePaid = guestDetails.advancePaid || 0;
+
+    const totalAmount = Math.max(0, subTotal - discount);
+    const balanceDue = Math.max(0, totalAmount - advancePaid);
+
+    const handleShareImage = async () => {
+        if (!receiptRef.current) return;
+
+        setIsCapturing(true);
+        try {
+            const dataUrl = await toPng(receiptRef.current, {
+                quality: 0.95,
+                backgroundColor: '#1C1F2E', // Match dark mode card background
+                style: {
+                    borderRadius: '0'
+                }
+            });
+
+            const blob = await (await fetch(dataUrl)).blob();
+            const file = new File([blob], `receipt-${guestDetails.guestName || 'guest'}.png`, { type: 'image/png' });
+
+            const shareText = `Here is the quote for your stay at ${selectedProperty?.name}:\n\nDates: ${guestDetails.checkInDate && format(new Date(guestDetails.checkInDate), 'dd MMM')} to ${guestDetails.checkOutDate && format(new Date(guestDetails.checkOutDate), 'dd MMM')} (${nights} Nights)\nGuests: ${guestDetails.numberOfGuests}\nTotal Amount: ₹${totalAmount.toLocaleString()}\n\nPlease let us know to confirm your booking!`;
+
+            if (navigator.share && navigator.canShare({ files: [file] })) {
+                await navigator.share({
+                    files: [file],
+                    title: `Receipt for ${guestDetails.guestName}`,
+                    text: shareText
+                });
+                showToast(`Opening share sheet for ${guestDetails.phoneNumber}`, "success");
+            } else {
+                // Fallback: Download
+                const link = document.createElement('a');
+                link.download = `receipt-${guestDetails.guestName}.png`;
+                link.href = dataUrl;
+                link.click();
+                showToast("System sharing not supported. Image downloaded.", "success");
+            }
+        } catch (err) {
+            console.error('Sharing failed:', err);
+            showToast("Failed to generate receipt image", "error");
+        } finally {
+            setIsCapturing(false);
+        }
     };
 
     if (loading) {
@@ -227,43 +289,84 @@ function GreeterContent() {
 
                 {/* Right Section: Preview Phone */}
                 <div className={`lg:col-span-6 lg:sticky lg:top-24 ${mobileTab === 'preview' ? 'block' : 'hidden'} lg:block`}>
-                    <PreviewPhone message={generatedMessage} onSend={handleWhatsApp} onCopy={handleCopy} copied={copied} />
+                    <PreviewPhone
+                        message={generatedMessage}
+                        onSend={handleWhatsApp}
+                        onCopy={handleCopy}
+                        copied={copied}
+                        onShareImage={handleShareImage}
+                        isCapturing={isCapturing}
+                    />
                 </div>
             </div>
 
+            {/* Hidden Receipt Card for Image Generation */}
+            {currentGuestId && (
+                <div className="absolute top-0 left-[-9999px] w-[500px] pointer-events-none opacity-0">
+                    <ReceiptCard
+                        ref={receiptRef}
+                        guestName={guestDetails.guestName || ''}
+                        phoneNumber={guestDetails.phoneNumber || ''}
+                        property={selectedProperty}
+                        checkInDate={guestDetails.checkInDate}
+                        checkOutDate={guestDetails.checkOutDate}
+                        nights={nights}
+                        numberOfGuests={guestDetails.numberOfGuests || 0}
+                        baseRate={baseRate}
+                        baseTotal={baseTotal}
+                        extraGuestRate={extraGuestRate}
+                        extraGuestsCount={extraGuestsCount}
+                        extraTotal={extraTotal}
+                        discount={discount}
+                        totalAmount={totalAmount}
+                        advancePaid={advancePaid}
+                        balanceDue={balanceDue}
+                    />
+                </div>
+            )}
+
             {/* Mobile Bottom Navigation Bar */}
             <div className="lg:hidden fixed bottom-0 left-0 w-full bg-white/95 dark:bg-[#0f172a]/95 backdrop-blur-xl border-t border-slate-200 dark:border-white/10 p-2 z-30 safe-area-bottom">
-                <div className="grid grid-cols-4 gap-2 h-14">
+                <div className="grid grid-cols-5 gap-1 h-16 pb-2">
                     <button
                         onClick={() => setMobileTab('context')}
-                        className={`col-span-1 flex flex-col items-center justify-center rounded-xl transition-all ${mobileTab === 'context' ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-500/10' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
+                        className={`col-span-1 border-none bg-transparent hover:bg-transparent flex flex-col items-center justify-center rounded-xl transition-all ${mobileTab === 'context' ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-500/10' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
                     >
-                        <UserSearch size={20} />
-                        <span className="text-[10px] font-medium mt-1">Details</span>
+                        <UserSearch size={22} className="mb-1" />
+                        <span className="text-[9px] font-bold tracking-tight">Details</span>
                     </button>
 
                     <button
                         onClick={() => setMobileTab('preview')}
-                        className={`col-span-1 flex flex-col items-center justify-center rounded-xl transition-all ${mobileTab === 'preview' ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-500/10' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
+                        className={`col-span-1 border-none bg-transparent hover:bg-transparent flex flex-col items-center justify-center rounded-xl transition-all ${mobileTab === 'preview' ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-500/10' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
                     >
-                        <Eye size={20} />
-                        <span className="text-[10px] font-medium mt-1">Preview</span>
+                        <Eye size={22} className="mb-1" />
+                        <span className="text-[9px] font-bold tracking-tight">Preview</span>
                     </button>
 
                     <button
                         onClick={handleCopy}
-                        className="col-span-1 flex flex-col items-center justify-center rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white active:scale-95 transition-all"
+                        className="col-span-1 border-none bg-transparent hover:bg-transparent flex flex-col items-center justify-center rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white active:scale-95 transition-all"
                     >
-                        {copied ? <Check size={20} className="text-green-400" /> : <Copy size={20} />}
-                        <span className="text-[10px] font-medium mt-1">Copy</span>
+                        {copied ? <Check size={22} className="text-green-400 mb-1" /> : <Copy size={22} className="mb-1" />}
+                        <span className="text-[9px] font-bold tracking-tight">Copy</span>
+                    </button>
+
+                    <button
+                        onClick={handleShareImage}
+                        disabled={isCapturing}
+                        className="col-span-1 border-none bg-transparent hover:bg-transparent flex flex-col items-center justify-center rounded-xl text-slate-600 dark:text-slate-400 hover:text-teal-600 dark:hover:text-teal-400 active:scale-95 transition-all disabled:opacity-50"
+                    >
+                        {isCapturing ? <span className="animate-spin text-xl mb-1">⏳</span> : <ImageIcon size={22} className="mb-1" />}
+                        <span className="text-[9px] font-bold tracking-tight">Image</span>
                     </button>
 
                     <button
                         onClick={handleWhatsApp}
-                        className="col-span-1 flex flex-col items-center justify-center rounded-xl text-slate-600 dark:text-slate-400 hover:text-green-600 dark:hover:text-green-400 active:scale-95 transition-all"
+                        className="col-span-1 border-none bg-transparent hover:bg-transparent flex flex-col items-center justify-center rounded-xl text-slate-600 dark:text-slate-400 hover:text-green-600 dark:hover:text-green-400 active:scale-95 transition-all"
                     >
-                        <MessageCircle size={20} />
-                        <span className="text-[10px] font-medium mt-1">Send</span>
+                        <MessageCircle size={22} className="mb-1" />
+                        <span className="text-[9px] font-bold tracking-tight">Send</span>
                     </button>
                 </div>
             </div>
