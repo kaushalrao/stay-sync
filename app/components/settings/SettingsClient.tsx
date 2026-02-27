@@ -10,7 +10,7 @@ export function SettingsClient() {
 
     return (
         <>
-            <div className="sticky top-16 z-30 bg-white/95 dark:bg-[#0f172a]/95 backdrop-blur-xl w-[calc(100%+4rem)] -mx-8 px-8 py-3 border-y border-slate-200 dark:border-white/5 lg:static lg:!bg-transparent lg:backdrop-blur-none lg:border-none lg:w-auto lg:mx-0 lg:p-0 flex justify-start lg:justify-start transition-all">
+            <div className="mb-6 flex justify-start transition-all">
                 <TabControl
                     options={[
                         { id: 'properties', label: 'Properties' },
