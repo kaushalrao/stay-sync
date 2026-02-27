@@ -335,6 +335,7 @@ export interface GuestState {
     isUpcomingGuestsLoading: boolean;
     setGuests: (guests: Guest[], lastDoc?: any) => void;
     appendGuests: (guests: Guest[], lastDoc: any) => void;
+    updateGuestInStore: (id: string, updates: Partial<Guest>) => void;
     setIsGuestsLoading: (loading: boolean) => void;
     fetchUpcomingGuests: (userId: string) => Promise<void>;
 }

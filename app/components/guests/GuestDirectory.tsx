@@ -203,10 +203,11 @@ export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode =
                 ) : (
                     <VirtuosoGrid
                         style={{ height: '100%' }}
+                        className="flex-1" // Added flex-1 to ensure VirtuosoGrid takes available space within its flex parent
                         data={filteredGuests}
                         endReached={loadMore}
                         itemContent={(index, guest) => (
-                            <div className="mb-4 md:mb-0 md:p-2">
+                            <div className="mb-4 md:mb-0 md:p-2 h-full flex flex-col">
                                 <GuestCard
                                     key={guest.id}
                                     guest={guest}

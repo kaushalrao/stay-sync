@@ -1,8 +1,10 @@
-import React from 'react';
-import { Calendar, Users, Phone, Trash2, ArrowRight, Home } from 'lucide-react';
+import React, { useState } from 'react';
+import { Calendar, Users, Phone, Trash2, ArrowRight, Home, CheckCircle2 } from 'lucide-react';
 import { GuestCardProps } from '../../lib/types';
 import { formatDate, formatCurrency, getPropertyColorKey, getStatusColor, getDisplayStatus } from '../../lib/utils';
 import { COLOR_VARIANTS } from '../../lib/constants';
+import { useGuestStore, useUIStore } from '@store/index';
+import { guestService } from '@services/index';
 
 export const GuestCard: React.FC<GuestCardProps> = ({ guest, mode, onSelect, onDelete }) => {
     const propertyName = guest.propName || '';
@@ -11,13 +13,38 @@ export const GuestCard: React.FC<GuestCardProps> = ({ guest, mode, onSelect, onD
     const displayStatus = getDisplayStatus(guest);
     const isPast = displayStatus === 'PAST';
 
+    const updateGuestInStore = useGuestStore(state => state.updateGuestInStore);
+    const showToast = useUIStore(state => state.showToast);
+    const [isMarkingPaid, setIsMarkingPaid] = useState(false);
+
+    const balance = guest.totalAmount ? Math.max(0, guest.totalAmount - guest.advancePaid) : 0;
+    const isUnpaid = balance > 0;
+
+    const handleMarkPaid = async (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (isMarkingPaid) return;
+
+        setIsMarkingPaid(true);
+        try {
+            const updates = { advancePaid: guest.totalAmount };
+            await guestService.updateGuest(guest.id, updates);
+            updateGuestInStore(guest.id, updates);
+            showToast('Payment marked as received!', 'success');
+        } catch (error) {
+            console.error(error);
+            showToast('Failed to update payment status', 'error');
+        } finally {
+            setIsMarkingPaid(false);
+        }
+    };
+
     return (
         <div
             onClick={() => onSelect && onSelect(guest)}
             className={`
                 group relative bg-white dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 rounded-2xl md:rounded-3xl p-5 md:p-6 transition-all shadow-lg hover:shadow-xl hover:border-slate-300 dark:hover:bg-slate-800/60 dark:hover:border-white/10
                 ${onSelect ? 'cursor-pointer hover:scale-[1.02] active:scale-95 hover:z-10' : ''}
-                ${mode === 'page' ? 'w-full h-auto shrink-0 flex flex-col justify-between min-h-[180px] z-0' : ''}
+                ${mode === 'page' ? 'w-full h-full flex-1 shrink-0 flex flex-col justify-between min-h-[180px] z-0' : ''}
             `}
         >
             {/* Header with Avatar and Actions */}
@@ -81,32 +108,53 @@ export const GuestCard: React.FC<GuestCardProps> = ({ guest, mode, onSelect, onD
 
             {/* Financials & Property - Page Mode */}
             {mode === 'page' && (
-                <div className="mt-auto pt-4 border-t border-slate-100 dark:border-white/5 flex flex-col gap-4">
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <p className="text-slate-600 dark:text-slate-500 text-[10px] uppercase font-bold tracking-wider mb-1">Total</p>
-                            <p className="text-slate-900 dark:text-white font-mono font-bold text-base">{guest.totalAmount ? formatCurrency(guest.totalAmount) : '-'}</p>
+                <div className="mt-auto pt-5 border-t border-slate-100 dark:border-white/5 flex flex-col gap-4">
+
+                    {/* Billing Island */}
+                    <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-900/40 p-3 md:p-4 rounded-2xl border border-slate-100 dark:border-white/5">
+                        <div className="flex gap-8 md:gap-10">
+                            <div>
+                                <p className="text-slate-500 dark:text-slate-400 text-[9px] md:text-[10px] uppercase font-bold tracking-wider mb-0.5">Total</p>
+                                <p className="text-slate-900 dark:text-white font-mono font-bold text-sm md:text-base">{guest.totalAmount ? formatCurrency(guest.totalAmount) : '-'}</p>
+                            </div>
+                            <div>
+                                <p className="text-slate-500 dark:text-slate-400 text-[9px] md:text-[10px] uppercase font-bold tracking-wider mb-0.5">Balance</p>
+                                <p className={`font-mono font-bold text-sm md:text-base transition-colors duration-500 ${isUnpaid ? 'text-orange-500 dark:text-orange-400' : 'text-emerald-500 dark:text-emerald-400'}`}>
+                                    {guest.totalAmount ? formatCurrency(balance) : '-'}
+                                </p>
+                            </div>
                         </div>
-                        <div>
-                            <p className="text-slate-600 dark:text-slate-500 text-[10px] uppercase font-bold tracking-wider mb-1">Balance</p>
-                            <p className="text-orange-500 dark:text-orange-400 font-mono font-bold text-base">
-                                {guest.totalAmount ? formatCurrency(Math.max(0, guest.totalAmount - guest.advancePaid)) : '-'}
-                            </p>
-                        </div>
+
+                        {/* Payment Action / Status */}
+                        {isUnpaid && guest.totalAmount ? (
+                            <button
+                                onClick={handleMarkPaid}
+                                disabled={isMarkingPaid}
+                                className="group/btn relative bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 hover:border-emerald-500 dark:hover:border-emerald-500/30 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 px-3 py-1.5 rounded-xl transition-all duration-300 flex items-center gap-1.5 font-bold text-[10px] md:text-[11px] uppercase tracking-wider shadow-sm hover:shadow-md active:scale-95 disabled:opacity-50 shrink-0"
+                            >
+                                <CheckCircle2 size={14} className="transition-colors group-hover/btn:text-emerald-500 dark:group-hover/btn:text-emerald-400 opacity-60 group-hover/btn:opacity-100" />
+                                <span>Mark Paid</span>
+                            </button>
+                        ) : !isUnpaid && guest.totalAmount! > 0 ? (
+                            <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 text-[10px] md:text-[11px] font-bold uppercase tracking-wider bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 px-3 py-1.5 rounded-xl shrink-0 animate-fade-in shadow-sm">
+                                <CheckCircle2 size={14} />
+                                <span>Settled</span>
+                            </div>
+                        ) : null}
                     </div>
 
-                    {propertyName && (
-                        <div className="flex justify-between items-center">
-                            <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border text-[11px] font-bold tracking-wide uppercase ${styles.bg} ${styles.border} ${styles.text}`}>
+                    <div className="flex justify-between items-center">
+                        {propertyName ? (
+                            <div className={`inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full border text-[10px] md:text-[11px] font-bold tracking-wide uppercase ${styles.bg} ${styles.border} ${styles.text}`}>
                                 <Home size={12} className={styles.icon} />
-                                {propertyName}
+                                <span className="truncate max-w-[120px] md:max-w-[160px]">{propertyName}</span>
                             </div>
+                        ) : <div />}
 
-                            <div className="bg-indigo-600 text-white p-2.5 rounded-xl shadow-lg shadow-indigo-500/20 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all duration-300 transform md:translate-x-4 md:group-hover:translate-x-0">
-                                <ArrowRight size={16} />
-                            </div>
+                        <div className="bg-indigo-600 text-white p-2.5 rounded-xl md:rounded-2xl shadow-lg shadow-indigo-500/20 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all duration-300 transform md:translate-x-4 md:group-hover:translate-x-0 shrink-0">
+                            <ArrowRight size={16} />
                         </div>
-                    )}
+                    </div>
                 </div>
             )}
 

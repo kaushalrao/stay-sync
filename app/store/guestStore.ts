@@ -16,6 +16,10 @@ export const useGuestStore = create<GuestState>()(
                 guests: [...state.guests, ...newGuests],
                 guestLastDoc: lastDoc
             }), false, 'appendGuests'),
+            updateGuestInStore: (id, updates) => set((state) => ({
+                guests: state.guests.map(g => g.id === id ? { ...g, ...updates } : g),
+                upcomingGuests: state.upcomingGuests.map(g => g.id === id ? { ...g, ...updates } : g)
+            }), false, 'updateGuestInStore'),
             setIsGuestsLoading: (isGuestsLoading) => set({ isGuestsLoading }, false, 'setIsGuestsLoading'),
             fetchUpcomingGuests: async (userId: string) => {
                 set({ isUpcomingGuestsLoading: true }, false, 'setIsUpcomingLoading');

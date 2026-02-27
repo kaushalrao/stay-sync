@@ -26,25 +26,27 @@ export function SidebarLayout({ children }: SidebarLayoutProps) {
     }
 
     return (
-        <div className="flex min-h-screen bg-slate-50 dark:bg-slate-950">
-            <Sidebar 
-                onNavigate={() => setIsNavigating(true)} 
+        <div className="flex h-[100dvh] bg-slate-50 dark:bg-slate-950 overflow-hidden">
+            <Sidebar
+                onNavigate={() => setIsNavigating(true)}
                 isCollapsed={isCollapsed}
                 onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
             />
-            <main 
+            <main
                 className={`
-                    flex-1 w-full pt-16 lg:pt-0 transition-all duration-300 ease-in-out
+                    flex-1 flex flex-col w-full pt-16 lg:pt-0 transition-all duration-300 ease-in-out overflow-hidden
                     ${isCollapsed ? 'lg:pl-20' : 'lg:pl-64'}
                 `}
             >
-                <div className="relative min-h-screen">
+                <div className="relative flex-1 flex flex-col overflow-hidden">
                     {isNavigating && (
                         <div className="absolute inset-0 z-50 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-sm flex items-center justify-center animate-fade-in rounded-3xl">
                             <Loader className="flex flex-col items-center gap-4" iconClassName="text-indigo-500 w-10 h-10" />
                         </div>
                     )}
-                    {children}
+                    <div className="flex-1 overflow-y-auto w-full no-scrollbar">
+                        {children}
+                    </div>
                 </div>
             </main>
         </div>
