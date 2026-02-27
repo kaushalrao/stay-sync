@@ -268,13 +268,13 @@ function GreeterContent() {
     }
 
     return (
-        <div className="px-4 md:px-8 pb-24 md:pb-0 flex flex-col md:gap-10 h-full relative">
+        <div className="px-4 md:px-8 pb-24 md:pb-0 pt-20 lg:pt-0 flex flex-col md:gap-10 h-full relative">
             <div className="hidden lg:block mt-8 animate-fade-in">
                 <PropertyDock properties={properties} selectedId={selectedPropId} onSelect={setSelectedPropId} disabled={!!currentGuestId} />
             </div>
 
             {/* Mobile Header Controls */}
-            <div className="lg:hidden w-[calc(100%+2rem)] -mx-4 sticky top-16 z-30 bg-white/95 dark:bg-[#0f172a]/95 backdrop-blur-xl py-2 px-4 border-b border-slate-200 dark:border-white/5 animate-fade-in mb-4">
+            <div className="lg:hidden fixed top-16 inset-x-0 z-30 bg-white/95 dark:bg-[#0f172a]/95 backdrop-blur-xl py-2 px-4 shadow-sm border-b border-slate-200 dark:border-white/5 animate-fade-in">
                 <PropertyDock properties={properties} selectedId={selectedPropId} onSelect={setSelectedPropId} disabled={!!currentGuestId} />
             </div>
 

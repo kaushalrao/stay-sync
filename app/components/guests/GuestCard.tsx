@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
-import { Calendar, Users, Phone, Trash2, ArrowRight, Home, CheckCircle2 } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Calendar, Users, Phone, Trash2, ArrowRight, Home, CheckCircle2, MoreVertical, Banknote, Moon, X, AlertTriangle } from 'lucide-react';
 import { GuestCardProps } from '../../lib/types';
-import { formatDate, formatCurrency, getPropertyColorKey, getStatusColor, getDisplayStatus } from '../../lib/utils';
+import { formatDate, formatCurrency, getPropertyColorKey, getStatusColor, getDisplayStatus, calculateNights } from '../../lib/utils';
 import { COLOR_VARIANTS } from '../../lib/constants';
 import { useGuestStore, useUIStore } from '@store/index';
 import { guestService } from '@services/index';
+import { Portal } from '../ui/Portal';
 
 export const GuestCard: React.FC<GuestCardProps> = ({ guest, mode, onSelect, onDelete }) => {
     const propertyName = guest.propName || '';
@@ -16,12 +17,37 @@ export const GuestCard: React.FC<GuestCardProps> = ({ guest, mode, onSelect, onD
     const updateGuestInStore = useGuestStore(state => state.updateGuestInStore);
     const showToast = useUIStore(state => state.showToast);
     const [isMarkingPaid, setIsMarkingPaid] = useState(false);
+    const [isConfirmingPayment, setIsConfirmingPayment] = useState(false);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const menuRef = useRef<HTMLDivElement>(null);
 
     const balance = guest.totalAmount ? Math.max(0, guest.totalAmount - guest.advancePaid) : 0;
     const isUnpaid = balance > 0;
 
-    const handleMarkPaid = async (e: React.MouseEvent) => {
+    // Calculate number of nights using the utility function
+    const numberOfNights = calculateNights(guest.checkInDate, guest.checkOutDate);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+                setIsMenuOpen(false);
+            }
+        };
+
+        if (isMenuOpen) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [isMenuOpen]);
+
+    const handleMarkPaidClick = (e: React.MouseEvent) => {
         e.stopPropagation();
+        setIsConfirmingPayment(true);
+    };
+
+    const confirmPayment = async () => {
         if (isMarkingPaid) return;
 
         setIsMarkingPaid(true);
@@ -30,6 +56,7 @@ export const GuestCard: React.FC<GuestCardProps> = ({ guest, mode, onSelect, onD
             await guestService.updateGuest(guest.id, updates);
             updateGuestInStore(guest.id, updates);
             showToast('Payment marked as received!', 'success');
+            setIsConfirmingPayment(false);
         } catch (error) {
             console.error(error);
             showToast('Failed to update payment status', 'error');
@@ -43,58 +70,99 @@ export const GuestCard: React.FC<GuestCardProps> = ({ guest, mode, onSelect, onD
             onClick={() => onSelect && onSelect(guest)}
             className={`
                 group relative bg-white dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 rounded-2xl md:rounded-3xl p-5 md:p-6 transition-all shadow-lg hover:shadow-xl hover:border-slate-300 dark:hover:bg-slate-800/60 dark:hover:border-white/10
-                ${onSelect ? 'cursor-pointer hover:scale-[1.02] active:scale-95 hover:z-10' : ''}
+                ${onSelect ? 'cursor-pointer hover:scale-[1.02] hover:z-10' : ''}
                 ${mode === 'page' ? 'w-full h-full flex-1 shrink-0 flex flex-col justify-between min-h-[180px] z-0' : ''}
             `}
         >
             {/* Header with Avatar and Actions */}
-            <div className="flex justify-between items-start mb-4">
+            <div className="flex justify-between items-start mb-4 relative">
                 <div className="flex items-center gap-3">
                     <div className="w-11 h-11 rounded-full bg-indigo-50 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 flex items-center justify-center font-bold text-lg border-2 border-indigo-100 dark:border-indigo-500/10">
                         {guest.guestName.charAt(0).toUpperCase()}
                     </div>
                     <div>
-                        <h4 className="text-slate-900 dark:text-white font-bold text-sm md:text-base leading-tight">{guest.guestName}</h4>
-                        <div className="flex items-center gap-1.5 text-[10px] text-slate-600 dark:text-slate-400 font-bold uppercase tracking-wider mt-1">
-                            <span className={`w-2 h-2 rounded-full ${getStatusColor(guest.status, isPast)}`}></span>
-                            {displayStatus}
+                        <h4 className="text-slate-900 dark:text-white font-bold text-sm md:text-base leading-tight pr-8">{guest.guestName}</h4>
+                        <div className="flex items-center flex-wrap gap-2 mt-1">
+                            <div className="flex items-center gap-1.5 text-[10px] text-slate-600 dark:text-slate-400 font-bold uppercase tracking-wider bg-slate-100/50 dark:bg-slate-800/50 inline-flex px-2 py-0.5 rounded-full backdrop-blur-sm border border-slate-200/50 dark:border-white/5">
+                                <span className={`w-1.5 h-1.5 rounded-full ${getStatusColor(guest.status, isPast)}`}></span>
+                                {displayStatus}
+                            </div>
+
+                            {/* Refined Subtle Urgency Indicator */}
+                            {mode === 'page' && isUnpaid && guest.totalAmount && (
+                                <div className="flex items-center gap-1.5 text-[10px] text-orange-600 dark:text-orange-400 font-bold uppercase tracking-wider bg-orange-50 dark:bg-orange-500/10 inline-flex px-2 py-0.5 rounded-full border border-orange-200/50 dark:border-orange-500/20">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></span>
+                                    Unpaid
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
-                <div className="flex gap-2">
-                    {guest.phoneNumber && (
-                        <a
-                            href={`tel:${guest.phoneNumber}`}
-                            onClick={(e) => e.stopPropagation()}
-                            className="p-2 text-slate-500 dark:text-slate-600 hover:text-green-500 dark:hover:text-green-400 hover:bg-green-500/10 rounded-xl transition-colors opacity-100 md:opacity-0 md:group-hover:opacity-100 flex items-center justify-center"
-                            title={`Call ${guest.guestName}`}
-                        >
-                            <Phone size={16} />
-                        </a>
-                    )}
-                    {onDelete && (
-                        <button
-                            onClick={(e) => onDelete(e, guest.id)}
-                            className="p-2 text-slate-500 dark:text-slate-600 hover:text-rose-500 dark:hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-colors opacity-100 md:opacity-0 md:group-hover:opacity-100"
-                            title="Delete Guest"
-                        >
-                            <Trash2 size={16} />
-                        </button>
+
+                {/* Overflow Menu */}
+                <div className="absolute top-0 right-0" ref={menuRef}>
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setIsMenuOpen(!isMenuOpen);
+                        }}
+                        className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                        aria-label="More options"
+                    >
+                        <MoreVertical size={18} />
+                    </button>
+
+                    {isMenuOpen && (
+                        <div className="absolute right-0 top-11 w-44 bg-white dark:bg-slate-800 rounded-2xl shadow-lg shadow-slate-200/50 dark:shadow-black/50 border border-slate-100 dark:border-white/10 p-1.5 z-30 animate-fade-in origin-top-right flex flex-col gap-0.5">
+                            {guest.phoneNumber && (
+                                <a
+                                    href={`tel:${guest.phoneNumber}`}
+                                    onClick={(e) => e.stopPropagation()}
+                                    className="group flex items-center gap-2.5 w-full px-3 py-2 text-[13px] font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-xl transition-colors"
+                                >
+                                    <Phone size={14} className="text-slate-400 group-hover:text-indigo-500 transition-colors" strokeWidth={2.5} />
+                                    <span>Call Guest</span>
+                                </a>
+                            )}
+                            {onDelete && (
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setIsMenuOpen(false);
+                                        onDelete(e, guest.id);
+                                    }}
+                                    className="group flex items-center gap-2.5 w-full px-3 py-2 text-[13px] font-semibold text-slate-700 dark:text-slate-300 hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:text-rose-600 dark:hover:text-rose-400 rounded-xl transition-colors text-left"
+                                >
+                                    <Trash2 size={14} className="text-slate-400 group-hover:text-rose-500 transition-colors" strokeWidth={2.5} />
+                                    <span>Delete Guest</span>
+                                </button>
+                            )}
+                        </div>
                     )}
                 </div>
             </div>
 
-            {/* Date and Guest Info */}
-            <div className="space-y-3 mb-4">
-                <div className="flex items-center gap-2 text-xs md:text-sm text-slate-700 dark:text-slate-400 border-l-2 border-orange-500 dark:border-orange-400 pl-3 py-1">
-                    <Calendar size={13} className="text-orange-500 dark:text-orange-400 shrink-0" />
-                    <span className="font-medium">
+            {/* Compact Metadata Rows */}
+            <div className="mb-4 text-[11px] md:text-xs text-slate-600 dark:text-slate-400 flex flex-col gap-3 font-medium bg-slate-50/50 dark:bg-slate-800/30 px-3.5 py-3 rounded-2xl border border-slate-100 dark:border-white/5">
+                {/* Top Row: Dates & Duration */}
+                <div className="flex items-center justify-between gap-4">
+                    <span className="flex items-center gap-1.5" title="Dates">
+                        <Calendar size={13} className="text-indigo-500/70 dark:text-indigo-400/70 shrink-0" />
                         {formatDate(guest.checkInDate)} - {formatDate(guest.checkOutDate)}
                     </span>
+
+                    <span className="flex items-center gap-1.5" title="Duration">
+                        <Moon size={13} className="text-indigo-500/70 dark:text-indigo-400/70 shrink-0" />
+                        {numberOfNights} {numberOfNights === 1 ? 'Night' : 'Nights'}
+                    </span>
                 </div>
-                <div className="flex items-center gap-4 text-xs text-slate-600 dark:text-slate-500 pl-3">
-                    <span className="flex items-center gap-1.5"><Users size={13} /> {guest.numberOfGuests} Guests</span>
-                    {guest.phoneNumber && <span className="flex items-center gap-1.5"><Phone size={13} /> {guest.phoneNumber}</span>}
+
+                {/* Bottom Row: Guests */}
+                <div className="flex items-center gap-4">
+                    <span className="flex items-center gap-1.5" title="Guests">
+                        <Users size={13} className="text-indigo-500/70 dark:text-indigo-400/70 shrink-0" />
+                        {guest.numberOfGuests} {guest.numberOfGuests === 1 ? 'Guest' : 'Guests'}
+                    </span>
                 </div>
             </div>
 
@@ -128,14 +196,14 @@ export const GuestCard: React.FC<GuestCardProps> = ({ guest, mode, onSelect, onD
                         {/* Payment Action / Status */}
                         {isUnpaid && guest.totalAmount ? (
                             <button
-                                onClick={handleMarkPaid}
+                                onClick={handleMarkPaidClick}
                                 disabled={isMarkingPaid}
-                                className="group/btn relative bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 hover:border-emerald-500 dark:hover:border-emerald-500/30 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 px-3 py-1.5 rounded-xl transition-all duration-300 flex items-center gap-1.5 font-bold text-[10px] md:text-[11px] uppercase tracking-wider shadow-sm hover:shadow-md active:scale-95 disabled:opacity-50 shrink-0"
+                                className="group/btn relative bg-indigo-600 hover:bg-indigo-700 text-white border border-indigo-500/50 hover:border-indigo-600 px-4 py-2 rounded-xl transition-all duration-300 flex items-center gap-2 font-bold text-[10px] md:text-[11px] uppercase tracking-wider shadow-md shadow-indigo-600/20 hover:shadow-indigo-600/40 active:scale-95 disabled:opacity-50 shrink-0"
                             >
-                                <CheckCircle2 size={14} className="transition-colors group-hover/btn:text-emerald-500 dark:group-hover/btn:text-emerald-400 opacity-60 group-hover/btn:opacity-100" />
+                                <Banknote size={16} className="transition-transform group-hover/btn:scale-110" />
                                 <span>Mark Paid</span>
                             </button>
-                        ) : !isUnpaid && guest.totalAmount! > 0 ? (
+                        ) : (!isUnpaid && guest.totalAmount! > 0) ? (
                             <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 text-[10px] md:text-[11px] font-bold uppercase tracking-wider bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 px-3 py-1.5 rounded-xl shrink-0 animate-fade-in shadow-sm">
                                 <CheckCircle2 size={14} />
                                 <span>Settled</span>
@@ -166,6 +234,69 @@ export const GuestCard: React.FC<GuestCardProps> = ({ guest, mode, onSelect, onD
                         {propertyName}
                     </div>
                 </div>
+            )}
+
+            {/* Payment Confirmation Modal */}
+            {isConfirmingPayment && (
+                <Portal>
+                    <div
+                        className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* Backdrop */}
+                        <div
+                            className="absolute inset-0 bg-slate-900/40 dark:bg-slate-900/60 backdrop-blur-sm animate-fade-in"
+                            onClick={() => !isMarkingPaid && setIsConfirmingPayment(false)}
+                        />
+
+                        {/* Modal Dialog */}
+                        <div className="relative bg-white dark:bg-slate-800 w-full max-w-sm rounded-3xl shadow-2xl border border-slate-100 dark:border-white/10 overflow-hidden animate-slide-up">
+                            {/* Close Button */}
+                            <button
+                                onClick={() => !isMarkingPaid && setIsConfirmingPayment(false)}
+                                className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors"
+                            >
+                                <X size={20} />
+                            </button>
+
+                            <div className="p-6 pt-8">
+                                <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-2xl flex items-center justify-center mb-4">
+                                    <AlertTriangle size={24} />
+                                </div>
+                                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
+                                    Confirm Payment
+                                </h3>
+                                <p className="text-slate-600 dark:text-slate-400 text-sm mb-6 leading-relaxed">
+                                    Are you sure you want to mark <strong className="text-slate-900 dark:text-white">{guest.guestName}&apos;s</strong> balance of <strong className="text-indigo-600 dark:text-indigo-400 font-mono">{formatCurrency(balance)}</strong> as fully paid? This will update their account instantly.
+                                </p>
+
+                                <div className="flex gap-3">
+                                    <button
+                                        onClick={() => setIsConfirmingPayment(false)}
+                                        disabled={isMarkingPaid}
+                                        className="flex-1 px-4 py-3 rounded-xl font-bold text-sm text-slate-700 dark:text-slate-300 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 transition-colors disabled:opacity-50"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={confirmPayment}
+                                        disabled={isMarkingPaid}
+                                        className="flex-1 px-4 py-3 rounded-xl font-bold text-sm text-white bg-indigo-600 hover:bg-indigo-700 shadow-md shadow-indigo-600/20 active:scale-95 transition-all flex items-center justify-center disabled:opacity-50"
+                                    >
+                                        {isMarkingPaid ? (
+                                            <span className="flex items-center gap-2">
+                                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                                Processing...
+                                            </span>
+                                        ) : (
+                                            'Yes, Mark Paid'
+                                        )}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </Portal>
             )}
         </div>
     );
