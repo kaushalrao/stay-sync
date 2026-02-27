@@ -3,7 +3,7 @@
 import React, { useState, useMemo, useEffect, Suspense } from 'react';
 import {
     Check, Copy, MessageCircle, Eye, UserSearch,
-    Calendar, Phone, Users, MapPin, BadgeCheck, Clock, UserCheck, Image as ImageIcon
+    Calendar, Phone, Users, MapPin, BadgeCheck, Clock, UserCheck, Image as ImageIcon, Share2, X
 } from 'lucide-react';
 import { GuestDetails, Guest } from '@lib/types';
 import { DEFAULT_GUEST_DETAILS } from '@lib/constants';
@@ -15,10 +15,9 @@ import { useApp } from '@components/providers/AppProvider';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { guestService, templateService } from '@services/index';
 import { format } from 'date-fns';
-import { toPng } from 'html-to-image';
 import { useGuestStore, usePropertyStore, useTemplateStore, useUIStore } from '@store/index';
-import { ReceiptCard } from '@components/shared/ReceiptCard';
 import { calculateNights } from '@lib/utils';
+import { ShareReceiptModal } from '@components/shared/ShareReceiptModal';
 
 function GreeterContent() {
     const properties = usePropertyStore(state => state.properties);
@@ -36,8 +35,7 @@ function GreeterContent() {
     const [currentGuestId, setCurrentGuestId] = useState<string | null>(null);
     const [selectedTempId, setSelectedTempId] = useState('');
     const [copied, setCopied] = useState(false);
-    const [isCapturing, setIsCapturing] = useState(false);
-    const receiptRef = React.useRef<HTMLDivElement>(null);
+    const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false);
 
     const handleSelectGuest = React.useCallback((guest: Guest) => {
         const details = {
@@ -135,47 +133,6 @@ function GreeterContent() {
     const totalAmount = Math.max(0, subTotal - discount);
     const balanceDue = Math.max(0, totalAmount - advancePaid);
 
-    const handleShareImage = async () => {
-        if (!receiptRef.current) return;
-
-        setIsCapturing(true);
-        try {
-            const dataUrl = await toPng(receiptRef.current, {
-                quality: 0.95,
-                backgroundColor: '#1C1F2E', // Match dark mode card background
-                style: {
-                    borderRadius: '0'
-                }
-            });
-
-            const blob = await (await fetch(dataUrl)).blob();
-            const file = new File([blob], `receipt-${guestDetails.guestName || 'guest'}.png`, { type: 'image/png' });
-
-            const shareText = `Here is the quote for your stay at ${selectedProperty?.name}:\n\nDates: ${guestDetails.checkInDate && format(new Date(guestDetails.checkInDate), 'dd MMM')} to ${guestDetails.checkOutDate && format(new Date(guestDetails.checkOutDate), 'dd MMM')} (${nights} Nights)\nGuests: ${guestDetails.numberOfGuests}\nTotal Amount: ₹${totalAmount.toLocaleString()}\n\nPlease let us know to confirm your booking!`;
-
-            if (navigator.share && navigator.canShare({ files: [file] })) {
-                await navigator.share({
-                    files: [file],
-                    title: `Receipt for ${guestDetails.guestName}`,
-                    text: shareText
-                });
-                showToast(`Opening share sheet for ${guestDetails.phoneNumber}`, "success");
-            } else {
-                // Fallback: Download
-                const link = document.createElement('a');
-                link.download = `receipt-${guestDetails.guestName}.png`;
-                link.href = dataUrl;
-                link.click();
-                showToast("System sharing not supported. Image downloaded.", "success");
-            }
-        } catch (err) {
-            console.error('Sharing failed:', err);
-            showToast("Failed to generate receipt image", "error");
-        } finally {
-            setIsCapturing(false);
-        }
-    };
-
     if (loading) {
         return <Loader className="flex h-screen items-center justify-center" />;
     }
@@ -218,8 +175,8 @@ function GreeterContent() {
 
                                     return (
                                         <>
-                                            <div className="flex justify-between items-start border-b border-slate-100 dark:border-white/5 pb-4">
-                                                <div className="space-y-1.5">
+                                            <div className="flex justify-between items-start border-b border-slate-100 dark:border-white/5 pb-4 relative">
+                                                <div className="space-y-1.5 pr-10">
                                                     <h3 className="font-bold text-xl md:text-2xl text-slate-900 dark:text-white tracking-tight">
                                                         {guestDetails.guestName}
                                                     </h3>
@@ -234,6 +191,13 @@ function GreeterContent() {
                                                         </div>
                                                     </div>
                                                 </div>
+                                                <button
+                                                    onClick={() => setIsReceiptModalOpen(true)}
+                                                    className="absolute top-0 right-0 p-2 text-indigo-500 hover:text-indigo-600 dark:text-indigo-400 dark:hover:text-indigo-300 bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 rounded-xl transition-all"
+                                                    title="Share Receipt"
+                                                >
+                                                    <Share2 size={18} strokeWidth={2.5} />
+                                                </button>
                                             </div>
 
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-6">
@@ -294,36 +258,30 @@ function GreeterContent() {
                         onSend={handleWhatsApp}
                         onCopy={handleCopy}
                         copied={copied}
-                        onShareImage={handleShareImage}
-                        isCapturing={isCapturing}
                     />
                 </div>
             </div>
 
-            {/* Hidden Receipt Card for Image Generation */}
-            {currentGuestId && (
-                <div className="absolute top-0 left-[-9999px] w-[500px] pointer-events-none opacity-0">
-                    <ReceiptCard
-                        ref={receiptRef}
-                        guestName={guestDetails.guestName || ''}
-                        phoneNumber={guestDetails.phoneNumber || ''}
-                        property={selectedProperty}
-                        checkInDate={guestDetails.checkInDate}
-                        checkOutDate={guestDetails.checkOutDate}
-                        nights={nights}
-                        numberOfGuests={guestDetails.numberOfGuests || 0}
-                        baseRate={baseRate}
-                        baseTotal={baseTotal}
-                        extraGuestRate={extraGuestRate}
-                        extraGuestsCount={extraGuestsCount}
-                        extraTotal={extraTotal}
-                        discount={discount}
-                        totalAmount={totalAmount}
-                        advancePaid={advancePaid}
-                        balanceDue={balanceDue}
-                    />
-                </div>
-            )}
+            <ShareReceiptModal
+                isOpen={isReceiptModalOpen && !!currentGuestId}
+                onClose={() => setIsReceiptModalOpen(false)}
+                guestName={guestDetails.guestName || ''}
+                phoneNumber={guestDetails.phoneNumber || ''}
+                property={selectedProperty}
+                checkInDate={guestDetails.checkInDate}
+                checkOutDate={guestDetails.checkOutDate}
+                nights={nights || 1}
+                numberOfGuests={guestDetails.numberOfGuests || 1}
+                baseRate={balanceDue / (nights || 1)}
+                baseTotal={balanceDue}
+                extraGuestRate={0}
+                extraGuestsCount={0}
+                extraTotal={0}
+                discount={0}
+                totalAmount={balanceDue}
+                advancePaid={0}
+                balanceDue={balanceDue}
+            />
 
             {/* Mobile Bottom Navigation Bar */}
             <div className="lg:hidden fixed bottom-0 left-0 w-full bg-white/95 dark:bg-[#0f172a]/95 backdrop-blur-xl border-t border-slate-200 dark:border-white/10 p-2 z-30 safe-area-bottom">
@@ -352,14 +310,7 @@ function GreeterContent() {
                         <span className="text-[9px] font-bold tracking-tight">Copy</span>
                     </button>
 
-                    <button
-                        onClick={handleShareImage}
-                        disabled={isCapturing}
-                        className="col-span-1 border-none bg-transparent hover:bg-transparent flex flex-col items-center justify-center rounded-xl text-slate-600 dark:text-slate-400 hover:text-teal-600 dark:hover:text-teal-400 active:scale-95 transition-all disabled:opacity-50"
-                    >
-                        {isCapturing ? <span className="animate-spin text-xl mb-1">⏳</span> : <ImageIcon size={22} className="mb-1" />}
-                        <span className="text-[9px] font-bold tracking-tight">Image</span>
-                    </button>
+
 
                     <button
                         onClick={handleWhatsApp}

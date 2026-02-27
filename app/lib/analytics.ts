@@ -30,10 +30,13 @@ export const calculateDashboardMetrics = (
     selectedProperty: string,
     selectedYear: number
 ) => {
+    // 0. Filter out invalid statuses
+    const validGuests = guests.filter(g => g.status !== 'cancelled' && g.status !== 'deleted');
+
     // 1. Filter by Property
     const filteredByProp = selectedProperty === 'all'
-        ? guests
-        : guests.filter(g => {
+        ? validGuests
+        : validGuests.filter(g => {
             const prop = properties.find(p => p.id === selectedProperty);
             return prop && g.propName === prop.name;
         });
@@ -120,9 +123,11 @@ export const getCurrentMonthStats = (
     const currentMonth = now.getMonth();
     const currentYear = now.getFullYear();
 
+    const validGuests = guests.filter(g => g.status !== 'cancelled' && g.status !== 'deleted');
+
     const filteredByProp = selectedProperty === 'all'
-        ? guests
-        : guests.filter(g => {
+        ? validGuests
+        : validGuests.filter(g => {
             const prop = properties.find(p => p.id === selectedProperty);
             return prop && g.propName === prop.name;
         });
@@ -164,9 +169,11 @@ export const getUpcomingBookings = (
         return [];
     }
 
+    const validGuests = guests.filter(g => g.status !== 'cancelled' && g.status !== 'deleted');
+
     const filteredByProp = selectedProperty === 'all'
-        ? guests
-        : guests.filter(g => {
+        ? validGuests
+        : validGuests.filter(g => {
             const prop = properties.find(p => p.id === selectedProperty);
             return prop && g.propName === prop.name;
         });
@@ -203,9 +210,11 @@ export const getRevenueSparkline = (
         return sparklineData;
     }
 
+    const validGuests = guests.filter(g => g.status !== 'cancelled' && g.status !== 'deleted');
+
     const filteredByProp = selectedProperty === 'all'
-        ? guests
-        : guests.filter(g => {
+        ? validGuests
+        : validGuests.filter(g => {
             const prop = properties.find(p => p.id === selectedProperty);
             return prop && g.propName === prop.name;
         });

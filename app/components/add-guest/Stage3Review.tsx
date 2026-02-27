@@ -104,15 +104,20 @@ export function Stage3Review() {
                 advancePaid: advancePaid,
             };
 
-            if (isEditing && guestData.id) {
+            if (isEditing) {
+                if (!guestData.id) {
+                    showToast("Error: Missing booking ID for update", "error");
+                    setIsSaving(false);
+                    return;
+                }
                 await guestService.updateGuest(guestData.id, finalData as any);
                 updateGuestInStore(guestData.id, finalData as any);
-                showToast("Guest updated successfully!", "success");
+                showToast("Booking updated successfully!", "success");
             } else {
                 finalData.createdAt = Date.now();
                 finalData.status = 'pending';
                 await guestService.addGuest(finalData as any);
-                showToast("Guest saved successfully!", "success");
+                showToast("Booking saved successfully!", "success");
             }
 
             if (shareType === 'whatsapp') {
@@ -170,31 +175,31 @@ export function Stage3Review() {
                 </div>
             </div>
 
-            <div className="py-2 mt-auto border-t border-slate-100 dark:border-slate-800/50 flex flex-col items-center gap-2 shrink-0">
+            <div className="fixed bottom-0 left-0 right-0 p-4 md:p-6 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-t border-slate-200 dark:border-white/10 z-50 lg:static lg:bg-transparent lg:border-t lg:border-slate-100 lg:dark:border-slate-800/50 lg:p-0 lg:pt-4 lg:mt-2 flex flex-col items-center gap-2 shrink-0 transition-all">
                 {!isViewOnly ? (
                     <>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2 w-full">
                             <button
                                 onClick={() => handleSave('none')}
                                 disabled={isSaving || isCapturing}
-                                className="px-5 py-3 bg-slate-100 dark:bg-[#212638] hover:bg-slate-200 dark:hover:bg-[#2A3046] text-slate-900 dark:text-white rounded-xl font-bold transition-all active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50 border border-slate-200 dark:border-[#2D334B] text-sm"
+                                className="px-5 py-3 md:py-4 bg-slate-100 dark:bg-[#212638] hover:bg-slate-200 dark:hover:bg-[#2A3046] text-slate-900 dark:text-white rounded-xl md:rounded-2xl font-bold transition-all active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50 border border-slate-200 dark:border-[#2D334B] text-sm md:text-base"
                             >
-                                <Save size={16} /> Save Only
+                                <Save size={18} /> {isEditing ? 'Update Only' : 'Save Only'}
                             </button>
                             <button
                                 onClick={() => handleSave('whatsapp')}
                                 disabled={isSaving || isCapturing}
-                                className="px-5 py-3 bg-slate-100 dark:bg-[#212638] hover:bg-slate-200 dark:hover:bg-[#2A3046] text-slate-900 dark:text-white rounded-xl font-bold transition-all active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50 border border-slate-200 dark:border-[#2D334B] text-sm"
+                                className="px-5 py-3 md:py-4 bg-slate-100 dark:bg-[#212638] hover:bg-slate-200 dark:hover:bg-[#2A3046] text-slate-900 dark:text-white rounded-xl md:rounded-2xl font-bold transition-all active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50 border border-slate-200 dark:border-[#2D334B] text-sm md:text-base"
                             >
-                                <MessageCircle size={16} /> Text Quote
+                                <MessageCircle size={18} /> {isEditing ? 'Update & Text Quote' : 'Text Quote'}
                             </button>
                         </div>
                         <button
                             onClick={() => handleSave('image')}
                             disabled={isSaving || isCapturing}
-                            className="w-full px-6 py-4 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-bold transition-all shadow-[0_4px_20px_rgba(20,184,166,0.3)] hover:shadow-[0_4px_25px_rgba(20,184,166,0.5)] active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50 text-base"
+                            className="w-full px-6 py-4 bg-teal-600 hover:bg-teal-700 text-white rounded-xl md:rounded-2xl font-bold transition-all shadow-[0_4px_20px_rgba(20,184,166,0.3)] hover:shadow-[0_4px_25px_rgba(20,184,166,0.5)] active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50 text-base md:text-lg"
                         >
-                            {isCapturing ? <span className="animate-spin">⏳</span> : <ImageIcon size={20} />} Save & Share Image Receipt
+                            {isCapturing ? <span className="animate-spin">⏳</span> : <ImageIcon size={20} />} {isEditing ? 'Update & Share Receipt' : 'Save & Share Image Receipt'}
                         </button>
                     </>
                 ) : (

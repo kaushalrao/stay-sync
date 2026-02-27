@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Calendar, Users, Phone, Trash2, ArrowRight, Home, CheckCircle2, MoreVertical, Banknote, Moon, X, AlertTriangle, Edit3 } from 'lucide-react';
+import { Calendar, Users, Phone, Trash2, ArrowRight, Home, CheckCircle2, MoreVertical, Banknote, Moon, X, AlertTriangle, Edit3, Share2, Image as ImageIcon } from 'lucide-react';
 import { GuestCardProps } from '../../lib/types';
 import { formatDate, formatCurrency, getPropertyColorKey, getStatusColor, getDisplayStatus, calculateNights } from '../../lib/utils';
 import { COLOR_VARIANTS } from '../../lib/constants';
@@ -7,6 +7,7 @@ import { useGuestStore, useUIStore, useGuestFormStore } from '@store/index';
 import { guestService } from '@services/index';
 import { Portal } from '../ui/Portal';
 import { useRouter } from 'next/navigation';
+import { ShareReceiptModal } from '../shared/ShareReceiptModal';
 
 export const GuestCard: React.FC<GuestCardProps> = ({ guest, mode, onSelect, onDelete }) => {
     const propertyName = guest.propName || '';
@@ -23,6 +24,7 @@ export const GuestCard: React.FC<GuestCardProps> = ({ guest, mode, onSelect, onD
     const [isConfirmingPayment, setIsConfirmingPayment] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
+    const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false);
 
     const balance = guest.totalAmount ? Math.max(0, guest.totalAmount - guest.advancePaid) : 0;
     const isUnpaid = balance > 0;
@@ -138,6 +140,17 @@ export const GuestCard: React.FC<GuestCardProps> = ({ guest, mode, onSelect, onD
                             >
                                 <Edit3 size={14} className="text-slate-400 group-hover:text-indigo-500 transition-colors" strokeWidth={2.5} />
                                 <span>{isPast ? "View Guest Details" : "Edit Guest"}</span>
+                            </button>
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setIsMenuOpen(false);
+                                    setIsReceiptModalOpen(true);
+                                }}
+                                className="group flex items-center gap-2.5 w-full px-3 py-2 text-[13px] font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-xl transition-colors text-left"
+                            >
+                                <Share2 size={14} className="text-slate-400 group-hover:text-indigo-500 transition-colors" strokeWidth={2.5} />
+                                <span>Share Receipt</span>
                             </button>
                             {onDelete && (
                                 <button
@@ -313,6 +326,27 @@ export const GuestCard: React.FC<GuestCardProps> = ({ guest, mode, onSelect, onD
                     </div>
                 </Portal>
             )}
+
+            <ShareReceiptModal
+                isOpen={isReceiptModalOpen}
+                onClose={() => setIsReceiptModalOpen(false)}
+                guestName={guest.guestName}
+                phoneNumber={guest.phoneNumber || ''}
+                property={{ name: guest.propName } as any}
+                checkInDate={guest.checkInDate}
+                checkOutDate={guest.checkOutDate}
+                nights={numberOfNights || 1}
+                numberOfGuests={guest.numberOfGuests || 1}
+                baseRate={balance / (numberOfNights || 1)}
+                baseTotal={balance}
+                extraGuestRate={0}
+                extraGuestsCount={0}
+                extraTotal={0}
+                discount={0}
+                totalAmount={Math.max(0, balance)}
+                advancePaid={0}
+                balanceDue={Math.max(0, balance)}
+            />
         </div>
     );
 };
