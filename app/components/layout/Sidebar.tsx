@@ -15,6 +15,7 @@ import { signOut } from "firebase/auth";
 import { auth } from '@lib/firebase';
 import { SIDEBAR_NAV_ITEMS } from '@/app/lib/constants';
 import { useInventoryStore, useUIStore } from '@store/index';
+import { flushSync } from 'react-dom';
 
 interface SidebarProps {
     onNavigate?: () => void;
@@ -30,6 +31,46 @@ export function Sidebar({ onNavigate, isCollapsed = false, onToggleCollapse }: S
     const setSelectedPropertyId = useUIStore(state => state.setSelectedPropertyId);
     const needs = useInventoryStore(state => state.needs);
     const hasLowStock = needs.length > 0;
+
+    const handleThemeToggle = async (e: React.MouseEvent) => {
+        // Fallback for browsers that don't support View Transitions
+        // @ts-ignore
+        if (!document.startViewTransition) {
+            toggleTheme();
+            return;
+        }
+
+        const x = e.clientX;
+        const y = e.clientY;
+
+        const endRadius = Math.hypot(
+            Math.max(x, window.innerWidth - x),
+            Math.max(y, window.innerHeight - y)
+        );
+
+        // @ts-ignore
+        const transition = document.startViewTransition(() => {
+            toggleTheme();
+        });
+
+        transition.ready.then(() => {
+            requestAnimationFrame(() => {
+                document.documentElement.animate(
+                    {
+                        clipPath: [
+                            `circle(0px at ${x}px ${y}px)`,
+                            `circle(${endRadius}px at ${x}px ${y}px)`
+                        ],
+                    },
+                    {
+                        duration: 500,
+                        easing: 'ease-out',
+                        pseudoElement: '::view-transition-new(root)',
+                    }
+                );
+            });
+        });
+    };
 
     return (
         <>
@@ -170,7 +211,7 @@ export function Sidebar({ onNavigate, isCollapsed = false, onToggleCollapse }: S
                 `}>
                     {/* Theme Toggle */}
                     <button
-                        onClick={toggleTheme}
+                        onClick={handleThemeToggle}
                         title={isCollapsed ? `Switch to ${theme === 'dark' ? 'light' : 'dark'} mode` : ''}
                         className={`
                             w-full flex items-center 

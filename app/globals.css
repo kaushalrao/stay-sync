@@ -7,6 +7,36 @@
    To change colors globally, simply update the values below.
    ============================================ */
 
+/* ===== SMOOTH TRANSITIONS ===== */
+/* Removed the * selector transition as it causes performance lag and interference.
+   Theme switching is now handled smoothly by the native View Transitions API in ThemeSync.tsx */
+
+/* Custom View Transition for Theme Toggle */
+::view-transition-group(root) {
+  animation-duration: 0.5s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+::view-transition-new(root),
+::view-transition-old(root) {
+  animation: none;
+  mix-blend-mode: normal;
+  display: block;
+  /* Force hardware acceleration for mobile smoothness */
+  transform: translateZ(0);
+  will-change: clip-path;
+  /* Prevent interaction from blocking the UI thread during animation */
+  pointer-events: none;
+}
+
+::view-transition-old(root) {
+  z-index: 1;
+}
+
+::view-transition-new(root) {
+  z-index: 1000;
+}
+
 /* Enable dark mode with class strategy for Tailwind v4 */
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -156,11 +186,6 @@ html {
 
 .light ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
-}
-
-/* ===== SMOOTH TRANSITIONS ===== */
-* {
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
 /* Safe Area Utilities */
