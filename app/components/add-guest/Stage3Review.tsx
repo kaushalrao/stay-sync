@@ -54,7 +54,7 @@ export function Stage3Review() {
             // Give a tiny bit of time for any hydration/transitions
             const dataUrl = await toPng(receiptRef.current, {
                 quality: 0.95,
-                backgroundColor: theme === 'dark' ? '#1C1F2E' : '#ffffff',
+                backgroundColor: theme === 'dark' ? '#131823' : '#ffffff',
                 style: {
                     borderRadius: '0' // Remove rounded corners for a cleaner image share if desired
                 }
@@ -134,10 +134,10 @@ export function Stage3Review() {
     };
 
     return (
-        <div className="flex flex-col lg:h-full animate-fade-in lg:overflow-hidden">
-            <div className="flex-1 lg:overflow-y-auto px-1 pb-64 md:pb-48 lg:pb-2">
-                <div className="flex flex-col justify-center lg:min-h-full max-w-lg mx-auto w-full space-y-3">
-                    <div className="text-center space-y-1 shrink-0 pt-2 lg:pt-4 mb-2">
+        <div className="flex flex-col lg:h-full animate-fade-in lg:overflow-hidden scrollbar-hide">
+            <div className="flex-1 overflow-y-auto lg:overflow-visible px-1 pb-64 md:pb-48 lg:pb-2 scrollbar-hide">
+                <div className="flex flex-col justify-center lg:min-h-full max-w-lg mx-auto w-full space-y-3 lg:space-y-0.5">
+                    <div className="text-center space-y-1 lg:space-y-0.5 shrink-0 pt-2 lg:pt-1 mb-2 lg:mb-1">
                         <div className="flex items-center justify-center gap-2">
                             <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white">Review & Confirm</h2>
                             {isViewOnly && (
@@ -149,7 +149,7 @@ export function Stage3Review() {
                         </p>
                     </div>
 
-                    <div ref={receiptRef} className={theme === 'dark' ? 'dark bg-[#1C1F2E]' : 'bg-white'}>
+                    <div ref={receiptRef} className={theme === 'dark' ? 'dark bg-[#131823]' : 'bg-white'}>
                         <ReceiptCard
                             guestName={guestData.guestName || ''}
                             phoneNumber={guestData.phoneNumber || ''}
@@ -172,7 +172,7 @@ export function Stage3Review() {
                 </div>
             </div>
 
-            <div className="fixed bottom-0 left-0 right-0 p-4 md:p-6 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-t border-slate-200 dark:border-white/10 z-50 lg:static lg:bg-transparent lg:border-t lg:border-slate-100 lg:dark:border-slate-800/50 lg:p-0 lg:pt-4 lg:mt-2 flex flex-col items-center gap-2 shrink-0 transition-all">
+            <div className="fixed bottom-0 left-0 right-0 p-4 md:p-6 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-t border-slate-200 dark:border-white/10 z-50 lg:static lg:bg-transparent lg:border-t lg:border-slate-100 lg:dark:border-slate-800/50 lg:p-0 flex flex-col items-center gap-1.5 shrink-0 transition-all">
                 {!isViewOnly ? (
                     <>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2 w-full">
@@ -194,7 +194,7 @@ export function Stage3Review() {
                         <button
                             onClick={() => handleSave('image')}
                             disabled={isSaving || isCapturing}
-                            className="w-full px-6 py-4 bg-teal-600 hover:bg-teal-700 text-white rounded-xl md:rounded-2xl font-bold transition-all shadow-[0_4px_20px_rgba(20,184,166,0.3)] hover:shadow-[0_4px_25px_rgba(20,184,166,0.5)] active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50 text-base md:text-lg"
+                            className="w-full px-6 py-4 lg:py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-xl md:rounded-2xl font-bold transition-all shadow-[0_4px_20px_rgba(20,184,166,0.3)] hover:shadow-[0_4px_25px_rgba(20,184,166,0.5)] active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50 text-base md:text-lg lg:text-base"
                         >
                             {isCapturing ? <span className="animate-spin">⏳</span> : <ImageIcon size={20} />} {isEditing ? 'Update & Share Receipt' : 'Save & Share Image Receipt'}
                         </button>

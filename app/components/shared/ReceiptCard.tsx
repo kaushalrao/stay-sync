@@ -1,7 +1,7 @@
 import React from 'react';
 import { format } from 'date-fns';
 import { formatCurrency } from '@lib/utils';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, Building2 } from 'lucide-react';
 import { Property } from '@lib/types';
 
 interface ReceiptCardProps {
@@ -23,76 +23,149 @@ interface ReceiptCardProps {
     balanceDue: number;
 }
 
+const formatTime12hr = (timeStr?: string) => {
+    if (!timeStr) return '--:--';
+    const [hoursStr, minutesStr] = timeStr.split(':');
+    const hours = parseInt(hoursStr, 10);
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const hours12 = hours % 12 || 12;
+    return `${hours12}:${minutesStr} ${ampm}`;
+};
+
 export const ReceiptCard = React.forwardRef<HTMLDivElement, ReceiptCardProps>(({
     guestName, phoneNumber, property, checkInDate, checkOutDate, nights,
     numberOfGuests, baseRate, baseTotal, extraGuestRate, extraGuestsCount,
     extraTotal, discount, totalAmount, advancePaid, balanceDue
 }, ref) => {
     return (
-        <div ref={ref} className="bg-white dark:bg-[#1C1F2E] rounded-3xl p-4 md:p-6 shadow-xl relative overflow-hidden group border border-slate-200 dark:border-[#2D334B]">
-            {/* Receipt decoration */}
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-slate-200 dark:via-[#2D334B] to-transparent opacity-50"></div>
-
-            {/* Identity Summary */}
-            <div className="flex justify-between items-center pb-5 border-b border-slate-100 dark:border-[#2D334B]">
-                <div>
-                    <h3 className="font-bold text-lg md:text-xl text-slate-900 dark:text-white tracking-tight">{guestName || 'Guest Name'}</h3>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 font-medium tracking-wide mt-0.5">{phoneNumber || 'Phone Number'}</p>
+        <div ref={ref} className="bg-white dark:bg-[#131823] text-slate-900 dark:text-white rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-800/60 w-full max-w-md mx-auto flex flex-col font-sans">
+            {/* Header: Brand & Trust */}
+            <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800/60 flex justify-between items-center bg-slate-50 dark:bg-[#1A202C]">
+                <div className="flex items-center gap-3">
+                    <div className="overflow-hidden rounded-full">
+                        <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-300 font-bold text-lg border border-slate-300 dark:border-slate-700">
+                            {property?.name ? property.name.charAt(0).toUpperCase() : <Building2 size={20} />}
+                        </div>
+                    </div>
+                    <span className="font-bold text-[15px] tracking-tight text-slate-800 dark:text-slate-200">{property?.name || 'Property'}</span>
                 </div>
-                <CheckCircle2 className="text-teal-500 w-6 h-6 shrink-0" strokeWidth={2.5} />
+                {balanceDue > 0 ? (
+                    <div className="overflow-hidden rounded-full">
+                        <span className="px-3 py-1 bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 text-[10px] font-bold rounded-full uppercase tracking-widest border border-rose-200 dark:border-rose-500/20 whitespace-nowrap block">Balance Pending</span>
+                    </div>
+                ) : (
+                    <div className="overflow-hidden rounded-full">
+                        <span className="px-3 py-1 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold rounded-full uppercase tracking-widest border border-emerald-200 dark:border-emerald-500/20 whitespace-nowrap block">Fully Paid</span>
+                    </div>
+                )}
             </div>
 
-            {/* Stay Summary */}
-            <div className="space-y-4 py-5 border-b border-slate-100 dark:border-[#2D334B]">
-                <div className="flex justify-between text-[13px] md:text-sm items-center">
-                    <span className="text-slate-500 dark:text-slate-400 font-medium tracking-wide">Property</span>
-                    <span className="font-semibold text-slate-800 dark:text-white tracking-tight">{property?.name || 'Unknown'}</span>
+            {/* Zone 1: Guest Identity */}
+            <div className="px-5 pt-5 pb-3">
+                <h2 className="text-[24px] font-black tracking-tight text-slate-900 dark:text-white mb-0.5 leading-none">{guestName || 'Guest Name'}</h2>
+                <p className="font-medium text-[14px] text-slate-500 dark:text-slate-400">{phoneNumber || 'Phone Number'}</p>
+            </div>
+
+            {/* Zone 2: Itinerary */}
+            <div className="px-6 pb-6">
+                <div className="bg-slate-50 dark:bg-slate-800/40 rounded-2xl p-4 md:p-5 flex justify-between items-center border border-slate-100 dark:border-slate-700/50 relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-1.5 h-full bg-indigo-500 dark:bg-indigo-400"></div>
+                    <div className="flex flex-col pl-3 w-[40%]">
+                        <span className="text-[9px] uppercase tracking-[0.15em] font-bold text-slate-400 dark:text-slate-500 mb-0.5">Check-in</span>
+                        <span className="font-bold text-[14px] md:text-[15px] text-slate-800 dark:text-slate-200 tracking-tight">{checkInDate ? format(new Date(checkInDate), 'dd MMM yyyy') : '--'}</span>
+                        <span className="text-[9px] font-medium text-slate-400 dark:text-slate-500 tracking-widest mt-0.5">{formatTime12hr(property?.checkInTime || '14:00')}</span>
+                    </div>
+
+                    {/* Center Timeline */}
+                    <div className="flex-1 flex flex-col items-center justify-center relative px-2 self-stretch min-h-[48px]">
+                        {/* Connecting Line */}
+                        <div className="absolute top-1/2 left-0 right-0 h-[1px] bg-slate-200 dark:bg-slate-700 -translate-y-1/2 -z-10"></div>
+
+                        {/* Nights Pill */}
+                        <div className="z-10 m-auto overflow-hidden rounded-full">
+                            <span className="text-[10px] md:text-[11px] bg-white dark:bg-[#1A202C] text-slate-500 dark:text-slate-400 font-bold px-3 py-1 rounded-full border border-slate-200 dark:border-slate-700 whitespace-nowrap block">
+                                {nights} {nights === 1 ? 'Night' : 'Nights'}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div className="flex flex-col items-end pr-1 w-[40%] text-right">
+                        <span className="text-[9px] uppercase tracking-[0.15em] font-bold text-slate-400 dark:text-slate-500 mb-0.5">Check-out</span>
+                        <span className="font-bold text-[14px] md:text-[15px] text-slate-800 dark:text-slate-200 tracking-tight">{checkOutDate ? format(new Date(checkOutDate), 'dd MMM yyyy') : '--'}</span>
+                        <span className="text-[9px] font-medium text-slate-400 dark:text-slate-500 tracking-widest mt-0.5">{formatTime12hr(property?.checkOutTime || '11:00')}</span>
+                    </div>
                 </div>
-                <div className="flex justify-between text-[13px] md:text-sm items-center">
-                    <span className="text-slate-500 dark:text-slate-400 font-medium tracking-wide">Dates ({nights} Nights)</span>
-                    <span className="font-semibold text-slate-800 dark:text-white tracking-tight">
-                        {checkInDate && format(new Date(checkInDate), 'dd MMM')} - {checkOutDate && format(new Date(checkOutDate), 'dd MMM')}
+
+                <div className="mt-4 flex items-center justify-center">
+                    <span className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[11px] font-bold px-4 py-1.5 rounded-full uppercase tracking-[0.1em] border border-slate-200 dark:border-slate-700">
+                        {numberOfGuests} {numberOfGuests === 1 ? 'Guest' : 'Guests'}
                     </span>
                 </div>
-                <div className="flex justify-between text-[13px] md:text-sm items-center">
-                    <span className="text-slate-500 dark:text-slate-400 font-medium tracking-wide">Guests</span>
-                    <span className="font-semibold text-slate-800 dark:text-white tracking-tight">{numberOfGuests}</span>
-                </div>
             </div>
 
-            {/* Financial Summary */}
-            <div className="space-y-3 pt-5">
-                <div className="flex justify-between text-[13px] md:text-sm items-center">
-                    <span className="text-slate-500 dark:text-slate-400 font-medium tracking-wide">Base Cost (₹{formatCurrency(baseRate)} × {nights})</span>
-                    <span className="font-semibold text-slate-800 dark:text-white tracking-tight">₹{formatCurrency(baseTotal)}</span>
+            {/* Zone 3: Financial Ledger */}
+            <div className="px-5 pb-4 space-y-2">
+                {/* Base Cost */}
+                <div className="flex justify-between items-center">
+                    <span className="font-medium text-[12px] text-slate-500 dark:text-slate-400 tracking-wide">
+                        Base Cost (Upto {numberOfGuests - extraGuestsCount} guests) (₹{formatCurrency(baseRate)} × {nights} 🌙)
+                    </span>
+                    <span className="font-semibold text-[14px] text-slate-900 dark:text-white tabular-nums tracking-tight">₹{formatCurrency(baseTotal)}</span>
                 </div>
+
+                {/* Extra Guests */}
                 {extraTotal > 0 && (
-                    <div className="flex justify-between text-[13px] md:text-sm items-center">
-                        <span className="text-slate-500 dark:text-slate-400 font-medium tracking-wide">Extra Guests (₹{formatCurrency(extraGuestRate)} × {extraGuestsCount} × {nights})</span>
-                        <span className="font-semibold text-slate-800 dark:text-white tracking-tight">₹{formatCurrency(extraTotal)}</span>
+                    <div className="flex justify-between items-center">
+                        <span className="font-medium text-[12px] text-slate-500 dark:text-slate-400 tracking-wide">
+                            Extra Guests (₹{formatCurrency(extraGuestRate)} × {extraGuestsCount} 👤 × {nights} 🌙)
+                        </span>
+                        <span className="font-semibold text-[14px] text-slate-900 dark:text-white tabular-nums tracking-tight">₹{formatCurrency(extraTotal)}</span>
                     </div>
                 )}
+
                 {discount > 0 && (
-                    <div className="flex justify-between text-[13px] md:text-sm items-center text-rose-500">
-                        <span className="font-medium tracking-wide">Discount</span>
-                        <span className="font-semibold tracking-tight">-₹{formatCurrency(discount)}</span>
+                    <div className="flex justify-between items-center">
+                        <span className="font-bold text-[13px] text-emerald-600 dark:text-emerald-400 tracking-wide">Discount</span>
+                        <span className="font-bold text-[15px] text-emerald-600 dark:text-emerald-400 tabular-nums tracking-tight">-₹{formatCurrency(discount)}</span>
                     </div>
                 )}
-                <div className="flex justify-between items-center text-[13px] md:text-sm font-semibold py-1 border-t border-dashed border-slate-200 dark:border-[#2D334B] mt-2 pt-3">
-                    <span className="text-slate-500 dark:text-slate-400 tracking-tight">Total Amount</span>
-                    <span className="text-indigo-600 dark:text-indigo-400 tracking-tight">₹{formatCurrency(totalAmount)}</span>
+
+                <div className="my-2 border-t border-dashed border-slate-200 dark:border-slate-700/80"></div>
+
+                <div className="flex justify-between items-center">
+                    <span className="font-bold text-[13px] text-slate-800 dark:text-slate-200 tracking-wide">Total Amount</span>
+                    <span className="font-bold text-[15px] text-slate-900 dark:text-white tabular-nums tracking-tight">₹{formatCurrency(totalAmount)}</span>
                 </div>
 
                 {advancePaid > 0 && (
-                    <div className="flex justify-between text-[13px] md:text-sm items-center pt-2">
-                        <span className="text-slate-500 dark:text-slate-400 font-medium tracking-wide">Advance Paid</span>
-                        <span className="font-semibold text-teal-600 dark:text-teal-400 tracking-tight">-₹{formatCurrency(advancePaid)}</span>
+                    <div className="flex justify-between items-center pt-1">
+                        <span className="font-bold text-[12px] text-emerald-600 dark:text-emerald-400 tracking-wide">Advance Paid</span>
+                        <span className="font-bold text-[14px] text-emerald-600 dark:text-emerald-400 tabular-nums tracking-tight">-₹{formatCurrency(advancePaid)}</span>
                     </div>
                 )}
-                <div className="flex justify-between items-center text-base md:text-lg font-black pt-4 mt-2 border-t border-slate-100 dark:border-[#2D334B]">
-                    <span className="text-slate-900 dark:text-white tracking-tight">Balance Due</span>
-                    <span className="text-rose-500 tracking-tight text-xl md:text-2xl">₹{formatCurrency(balanceDue)}</span>
+            </div>
+            {/* Zone 4: Action Block (Total Due / Paid) */}
+            {balanceDue > 0 ? (
+                <div className="mx-4 mb-4 mt-0.5 bg-rose-50 dark:bg-rose-500/10 rounded-[24px] p-3 md:p-4 text-center border-2 border-rose-200 dark:border-rose-500/20 relative z-20 overflow-hidden transform-gpu">
+                    <p className="text-rose-600 dark:text-rose-400/80 text-[9px] font-bold uppercase tracking-widest mb-0.5 relative z-10">Amount Due on Arrival</p>
+                    <p className="text-[26px] md:text-[28px] font-black tracking-tighter text-rose-700 dark:text-rose-300 tabular-nums leading-none mb-1">₹{formatCurrency(balanceDue)}</p>
+                    <p className="text-rose-500 dark:text-rose-400/60 text-[9px] font-medium tracking-wide mt-1 md:mt-1.5">Payable via Cash / UPI</p>
                 </div>
+            ) : (
+                <div className="mx-4 mb-4 mt-0.5 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 rounded-[24px] p-3 text-center flex flex-col items-center justify-center relative z-20 overflow-hidden transform-gpu">
+                    <div className="w-8 h-8 bg-emerald-100 dark:bg-emerald-500/20 rounded-full flex items-center justify-center mb-1.5 relative z-10">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" strokeWidth={3} />
+                    </div>
+                    <p className="text-[15px] font-black tracking-tighter text-emerald-800 dark:text-emerald-300 leading-none mb-1 relative z-10">Payment Complete</p>
+                    <p className="text-emerald-600 dark:text-emerald-400/80 text-[9px] font-bold uppercase tracking-widest mt-0.5 relative z-10">Thank you for choosing us!</p>
+                </div>
+            )}
+
+            {/* Footer Validation */}
+            <div className="bg-slate-50 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-800/60 py-2.5 flex items-center justify-center">
+                <p className="text-[8px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] flex items-center gap-1.5 opacity-80">
+                    <span className="w-1.5 h-1.5 rounded-full bg-teal-500 dark:bg-teal-400 inline-block"></span> Powered by Stay Sync
+                </p>
             </div>
         </div>
     );
