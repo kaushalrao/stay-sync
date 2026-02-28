@@ -15,6 +15,7 @@ export function Stage3Review() {
     const properties = usePropertyStore(state => state.properties);
     const updateGuestInStore = useGuestStore(state => state.updateGuestInStore);
     const showToast = useUIStore(state => state.showToast);
+    const theme = useUIStore(state => state.theme);
     const router = useRouter();
     const receiptRef = useRef<HTMLDivElement>(null);
 
@@ -53,7 +54,7 @@ export function Stage3Review() {
             // Give a tiny bit of time for any hydration/transitions
             const dataUrl = await toPng(receiptRef.current, {
                 quality: 0.95,
-                backgroundColor: '#1C1F2E', // Force dark background if in dark mode, or white if needed
+                backgroundColor: theme === 'dark' ? '#1C1F2E' : '#ffffff',
                 style: {
                     borderRadius: '0' // Remove rounded corners for a cleaner image share if desired
                 }
@@ -148,25 +149,26 @@ export function Stage3Review() {
                         </p>
                     </div>
 
-                    <ReceiptCard
-                        ref={receiptRef}
-                        guestName={guestData.guestName || ''}
-                        phoneNumber={guestData.phoneNumber || ''}
-                        property={selectedProperty}
-                        checkInDate={guestData.checkInDate}
-                        checkOutDate={guestData.checkOutDate}
-                        nights={nights}
-                        numberOfGuests={guestData.numberOfGuests || 0}
-                        baseRate={baseRate}
-                        baseTotal={baseTotal}
-                        extraGuestRate={extraGuestRate}
-                        extraGuestsCount={extraGuestsCount}
-                        extraTotal={extraTotal}
-                        discount={discount}
-                        totalAmount={totalAmount}
-                        advancePaid={advancePaid}
-                        balanceDue={balanceDue}
-                    />
+                    <div ref={receiptRef} className={theme === 'dark' ? 'dark bg-[#1C1F2E]' : 'bg-white'}>
+                        <ReceiptCard
+                            guestName={guestData.guestName || ''}
+                            phoneNumber={guestData.phoneNumber || ''}
+                            property={selectedProperty}
+                            checkInDate={guestData.checkInDate}
+                            checkOutDate={guestData.checkOutDate}
+                            nights={nights}
+                            numberOfGuests={guestData.numberOfGuests || 0}
+                            baseRate={baseRate}
+                            baseTotal={baseTotal}
+                            extraGuestRate={extraGuestRate}
+                            extraGuestsCount={extraGuestsCount}
+                            extraTotal={extraTotal}
+                            discount={discount}
+                            totalAmount={totalAmount}
+                            advancePaid={advancePaid}
+                            balanceDue={balanceDue}
+                        />
+                    </div>
                 </div>
             </div>
 
