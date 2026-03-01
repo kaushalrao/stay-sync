@@ -1,4 +1,5 @@
 import { db } from '@/app/lib/firebase';
+import { isValidBookingStatus } from './utils';
 import { collectionGroup, query, where, getDocs, collection } from 'firebase/firestore';
 import { subMonths, startOfMonth, endOfMonth, format, addDays } from 'date-fns';
 
@@ -44,7 +45,7 @@ export async function getRevenueReportForChat(chatId: number | string) {
         guestSnap.docs.forEach(doc => {
             const data = doc.data();
             // In-memory Filter: Not Cancelled AND Date within range
-            if (data.status !== 'cancelled' && data.checkInDate >= startStr && data.checkInDate <= endStr) {
+            if (isValidBookingStatus(data.status) && data.checkInDate >= startStr && data.checkInDate <= endStr) {
                 propBookings += 1;
                 propRevenue += (data.totalAmount || 0);
             }

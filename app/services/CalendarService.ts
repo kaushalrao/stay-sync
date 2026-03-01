@@ -1,6 +1,7 @@
 import { Capacitor, CapacitorHttp } from '@capacitor/core';
 import { APP_URLS } from '../lib/urls';
 import { Guest, CalendarEvent, Property } from '../lib/types';
+import { isValidBookingStatus } from '../lib/utils';
 
 export interface CalendarService {
     fetchExternal(url: string): Promise<{ start: string, end: string, summary: string }[]>;
@@ -64,8 +65,8 @@ export const defaultCalendarService: CalendarService = {
         internalGuests.forEach((data) => {
             // Filter by propName
             if (data.propName !== property.name) return;
-            // Only block for valid statuses (not cancelled, not deleted)
-            if (data.status !== 'cancelled' && data.status !== 'deleted' && data.checkInDate && data.checkOutDate) {
+            // Only block for valid statuses (not cancelled, not deleted, not pending)
+            if (isValidBookingStatus(data.status) && data.checkInDate && data.checkOutDate) {
                 internalEvents.push({
                     start: data.checkInDate,
                     end: data.checkOutDate,

@@ -5,7 +5,7 @@ import { useGuestFormStore, usePropertyStore, useUIStore, useGuestStore } from '
 import { calculateNights, formatCurrency, openWhatsApp } from '@lib/utils';
 import { guestService } from '@services/index';
 import { useRouter } from 'next/navigation';
-import { CheckCircle2, MessageCircle, Save, Share2, Image as ImageIcon } from 'lucide-react';
+import { CheckCircle2, MessageCircle, Save, Image as ImageIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { toPng } from 'html-to-image';
 import { ReceiptCard } from '../shared/ReceiptCard';
@@ -105,6 +105,8 @@ export function Stage3Review() {
                 advancePaid: advancePaid,
             };
 
+            let savedGuestId = guestData.id;
+
             if (isEditing && guestData.id) {
                 await guestService.updateGuest(guestData.id, finalData as any);
                 updateGuestInStore(guestData.id, finalData as any);
@@ -112,7 +114,7 @@ export function Stage3Review() {
             } else {
                 finalData.createdAt = Date.now();
                 finalData.status = 'pending';
-                await guestService.addGuest(finalData as any);
+                savedGuestId = await guestService.addGuest(finalData as any);
                 showToast("Guest saved successfully!", "success");
             }
 
@@ -124,7 +126,7 @@ export function Stage3Review() {
             }
 
             resetForm();
-            router.push(isEditing ? '/guests' : '/greeter');
+            router.push(isEditing ? '/guests' : `/greeter?guestId=${savedGuestId}`);
         } catch (error) {
             console.error(error);
             showToast(`Failed to ${isEditing ? 'update' : 'save'} guest`, "error");
@@ -218,6 +220,24 @@ export function Stage3Review() {
                     Back to Details
                 </button>
             </div>
+
+            {/* Saving Overlay */}
+            {isSaving && (
+                <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center p-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm animate-fade-in">
+                    <div className="bg-white dark:bg-slate-800 p-6 md:p-8 rounded-3xl shadow-2xl border border-slate-100 dark:border-white/10 flex flex-col items-center text-center max-w-sm w-full animate-slide-up">
+                        <div className="relative w-16 h-16 mb-6">
+                            <div className="absolute inset-0 border-4 border-indigo-100 dark:border-indigo-500/20 rounded-full"></div>
+                            <div className="absolute inset-0 border-4 border-indigo-500 rounded-full border-t-transparent animate-spin"></div>
+                        </div>
+                        <h3 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight mb-2">
+                            {isEditing ? 'Updating Booking...' : 'Saving Booking...'}
+                        </h3>
+                        <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                            Please wait while we securely process the details.
+                        </p>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

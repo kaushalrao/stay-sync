@@ -1,5 +1,6 @@
 import { Guest, Property, RevenueData } from './types';
 import { getMonth, parseISO, isSameYear, differenceInDays } from 'date-fns';
+import { isValidBookingStatus } from './utils';
 
 // Helper to check if guest stay is valid (not expired)
 export const isGuestStayValid = (g: Guest, properties: Property[]) => {
@@ -31,7 +32,7 @@ export const calculateDashboardMetrics = (
     selectedYear: number
 ) => {
     // 0. Filter out invalid statuses
-    const validGuests = guests.filter(g => g.status !== 'cancelled' && g.status !== 'deleted');
+    const validGuests = guests.filter(g => isValidBookingStatus(g.status));
 
     // 1. Filter by Property
     const filteredByProp = selectedProperty === 'all'
@@ -123,7 +124,7 @@ export const getCurrentMonthStats = (
     const currentMonth = now.getMonth();
     const currentYear = now.getFullYear();
 
-    const validGuests = guests.filter(g => g.status !== 'cancelled' && g.status !== 'deleted');
+    const validGuests = guests.filter(g => isValidBookingStatus(g.status));
 
     const filteredByProp = selectedProperty === 'all'
         ? validGuests
@@ -169,7 +170,7 @@ export const getUpcomingBookings = (
         return [];
     }
 
-    const validGuests = guests.filter(g => g.status !== 'cancelled' && g.status !== 'deleted');
+    const validGuests = guests.filter(g => isValidBookingStatus(g.status));
 
     const filteredByProp = selectedProperty === 'all'
         ? validGuests
@@ -210,7 +211,7 @@ export const getRevenueSparkline = (
         return sparklineData;
     }
 
-    const validGuests = guests.filter(g => g.status !== 'cancelled' && g.status !== 'deleted');
+    const validGuests = guests.filter(g => isValidBookingStatus(g.status));
 
     const filteredByProp = selectedProperty === 'all'
         ? validGuests

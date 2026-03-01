@@ -24,7 +24,8 @@ export function Stage2StayDetails() {
         if (!guestData.propertyId && properties.length > 0) {
             updateGuestData({
                 propertyId: properties[0].id,
-                propName: properties[0].name
+                propName: properties[0].name,
+                numberOfGuests: properties[0].baseGuests || 1
             });
         }
     }, [properties, guestData.propertyId, updateGuestData]);
@@ -95,7 +96,8 @@ export function Stage2StayDetails() {
                                         const prop = properties.find(p => p.id === e.target.value);
                                         updateGuestData({
                                             propertyId: e.target.value,
-                                            propName: prop?.name
+                                            propName: prop?.name,
+                                            numberOfGuests: prop?.baseGuests || 1
                                         });
                                     }}
                                     className="w-full px-3 py-2.5 md:px-5 md:py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-white/10 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all text-sm md:text-lg font-bold text-slate-900 dark:text-white appearance-none cursor-pointer shadow-sm disabled:opacity-70 disabled:cursor-not-allowed pr-10"

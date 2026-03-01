@@ -72,14 +72,20 @@ export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode =
             .finally(() => setIsLoadingMore(false));
     }, [user, isLoadingMore, guestLastDoc, debouncedSearch, appendGuests]);
 
-    const handleDelete = async (e: React.MouseEvent, id: string) => {
-        e.stopPropagation();
-        if (!confirm('Are you sure you want to delete this guest?')) return;
+    const [guestToDelete, setGuestToDelete] = useState<string | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
 
-        if (!user) return;
+    const handleDeleteClick = (e: React.MouseEvent, id: string) => {
+        e.stopPropagation();
+        setGuestToDelete(id);
+    };
+
+    const confirmDelete = async () => {
+        if (!guestToDelete || !user) return;
+        setIsDeleting(true);
 
         // Find guest and property details for email notification
-        const guest = guests.find(g => g.id === id);
+        const guest = guests.find(g => g.id === guestToDelete);
         if (guest) {
             const property = properties.find(p => p.name === guest.propName);
 
@@ -96,17 +102,22 @@ export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode =
         }
 
         try {
-            await guestService.updateGuest(id, { status: 'deleted' });
+            await guestService.updateGuest(guestToDelete, { status: 'deleted' });
             showToast('Guest marked as deleted.', 'success');
             const { guests: newGuests, lastDoc } = await guestService.getGuests(null, 20, debouncedSearch);
             setGuests(newGuests, lastDoc);
         } catch (error) {
             console.error(error);
             showToast('Error deleting guest', 'error');
+        } finally {
+            setIsDeleting(false);
+            setGuestToDelete(null);
         }
     };
+
     const [selectedMonth, setSelectedMonth] = useState<string>(format(new Date(), 'yyyy-MM'));
 
+    // ... (rest of the internal logic remains same)
     const handlePrevMonth = () => {
         const date = selectedMonth === 'all' ? new Date() : new Date(selectedMonth + '-01');
         setSelectedMonth(format(subMonths(date, 1), 'yyyy-MM'));
@@ -215,7 +226,7 @@ export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode =
                                     guest={guest}
                                     mode={mode}
                                     onSelect={onSelect}
-                                    onDelete={handleDelete}
+                                    onDelete={handleDeleteClick}
                                 />
                             </div>
                         )}
@@ -227,6 +238,55 @@ export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode =
                 )}
                 {isLoadingMore && <div className="text-center py-2 text-xs text-slate-400">Loading more...</div>}
             </div>
+
+            {/* Delete Confirmation Modal */}
+            {guestToDelete && (
+                <div
+                    className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 dark:bg-slate-900/60 backdrop-blur-sm animate-fade-in"
+                    onClick={() => !isDeleting && setGuestToDelete(null)}
+                >
+                    <div
+                        className="relative bg-white dark:bg-slate-800 w-full max-w-sm rounded-3xl shadow-2xl border border-slate-100 dark:border-white/10 overflow-hidden animate-slide-up"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="p-6 pt-8">
+                            <div className="w-12 h-12 bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 rounded-2xl flex items-center justify-center mb-4">
+                                <i className="lucide-trash-2" style={{ width: 24, height: 24 }} dangerouslySetInnerHTML={{ __html: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>' }} />
+                            </div>
+                            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
+                                Delete Guest
+                            </h3>
+                            <p className="text-slate-600 dark:text-slate-400 text-sm mb-6 leading-relaxed">
+                                Are you sure you want to delete <strong className="text-slate-900 dark:text-white">{guests.find(g => g.id === guestToDelete)?.guestName}</strong>?{guests.find(g => g.id === guestToDelete)?.status !== 'pending' && " This will free up their blocked dates on the calendar."}
+                            </p>
+
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => setGuestToDelete(null)}
+                                    disabled={isDeleting}
+                                    className="flex-1 px-4 py-3 rounded-xl font-bold text-sm text-slate-700 dark:text-slate-300 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 transition-colors disabled:opacity-50"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={confirmDelete}
+                                    disabled={isDeleting}
+                                    className="flex-1 px-4 py-3 rounded-xl font-bold text-sm text-white bg-rose-600 hover:bg-rose-700 shadow-md shadow-rose-600/20 active:scale-95 transition-all flex items-center justify-center disabled:opacity-50"
+                                >
+                                    {isDeleting ? (
+                                        <span className="flex items-center gap-2">
+                                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                            Deleting...
+                                        </span>
+                                    ) : (
+                                        'Yes, Delete'
+                                    )}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

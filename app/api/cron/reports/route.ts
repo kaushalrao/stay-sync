@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/app/lib/firebase';
 import { collectionGroup, query, where, getDocs, collection } from 'firebase/firestore';
 import { subMonths, startOfMonth, endOfMonth, format } from 'date-fns';
+import { isValidBookingStatus } from '@/app/lib/utils';
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const CRON_SECRET = process.env.CRON_SECRET;
@@ -75,8 +76,8 @@ export async function GET(req: NextRequest) {
 
             guestSnap.docs.forEach(doc => {
                 const data = doc.data();
-                // In-Memory Filter: Status !cancelled AND Date Range
-                if (data.status !== 'cancelled' && data.checkInDate >= startStr && data.checkInDate <= endStr) {
+                // In-Memory Filter: Valid Booking AND Date Range
+                if (isValidBookingStatus(data.status) && data.checkInDate >= startStr && data.checkInDate <= endStr) {
                     propBookings += 1;
                     propRevenue += (data.totalAmount || 0);
                 }

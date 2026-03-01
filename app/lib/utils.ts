@@ -57,9 +57,9 @@ export const processTemplate = (templateStr: string, data: Record<string, string
     });
 };
 
-
-
-// ... (existing imports)
+export const isValidBookingStatus = (status: Guest['status']): boolean => {
+    return status !== 'cancelled' && status !== 'deleted' && status !== 'pending';
+};
 
 export const getStatusColor = (status: Guest['status'], isPast?: boolean) => {
     if (status === 'deleted') return 'bg-rose-400 shadow-[0_0_8px] shadow-rose-400/50';

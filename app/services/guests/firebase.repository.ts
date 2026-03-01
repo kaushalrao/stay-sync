@@ -6,6 +6,7 @@ import { db, appId } from '@lib/firebase';
 import { IGuestRepository } from './repository.interface';
 import { Guest } from '@/app/lib/types';
 import { getAllowedPropertyIds } from '@/app/store/propertyStore';
+import { isValidBookingStatus } from '@/app/lib/utils';
 
 export class FirebaseGuestRepository implements IGuestRepository {
     private getCollectionRef() {
@@ -94,7 +95,7 @@ export class FirebaseGuestRepository implements IGuestRepository {
         const snapshot = await getDocs(q);
         const guests = snapshot.docs
             .map(doc => ({ id: doc.id, ...doc.data() } as Guest))
-            .filter(g => g.status !== 'cancelled' && g.status !== 'deleted')
+            .filter(g => isValidBookingStatus(g.status))
             .slice(0, limitCount);
 
         return guests;

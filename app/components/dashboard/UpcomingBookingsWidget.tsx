@@ -9,8 +9,8 @@ import { UpcomingBookingsWidgetProps } from '@lib/types';
 export function UpcomingBookingsWidget({ bookings, loading }: UpcomingBookingsWidgetProps) {
     const router = useRouter();
 
-    // Filter out bookings with 'pending' status
-    const activeBookings = bookings.filter(b => b.status !== 'pending');
+    // Pending filter moved to data source
+    const activeBookings = bookings;
 
     return (
         <div className="relative group">
