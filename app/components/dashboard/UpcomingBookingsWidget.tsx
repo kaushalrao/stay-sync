@@ -81,12 +81,12 @@ export function UpcomingBookingsWidget({ bookings, loading }: UpcomingBookingsWi
                         <div className="text-center py-16">
                             <div className="relative inline-flex items-center justify-center mb-6">
                                 <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-full blur-2xl" />
-                                <div className="relative w-20 h-20 bg-gradient-to-br from-slate-800 to-slate-700 rounded-2xl flex items-center justify-center border border-slate-600/50">
-                                    <Calendar className="text-slate-500" size={36} />
+                                <div className="relative w-20 h-20 bg-slate-100 dark:bg-slate-800/80 rounded-2xl flex items-center justify-center border border-slate-200 dark:border-slate-700/50 shadow-sm">
+                                    <Calendar className="text-slate-400 dark:text-slate-500" size={36} />
                                 </div>
                             </div>
-                            <p className="text-slate-300 font-semibold text-lg mb-2">No upcoming bookings</p>
-                            <p className="text-sm text-slate-500">New arrivals will appear here</p>
+                            <p className="text-slate-700 dark:text-slate-300 font-semibold text-lg mb-2">No upcoming bookings</p>
+                            <p className="text-sm text-slate-500 dark:text-slate-500">New arrivals will appear here</p>
                         </div>
                     ) : (
                         <div className="space-y-3">

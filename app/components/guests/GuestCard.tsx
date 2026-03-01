@@ -143,7 +143,7 @@ export const GuestCard: React.FC<GuestCardProps> = ({ guest, mode, onSelect, onD
                             </div>
 
                             {/* Refined Subtle Urgency Indicator */}
-                            {mode === 'page' && isUnpaid && guest.totalAmount && guest.status !== 'deleted' && (
+                            {mode === 'page' && isUnpaid && guest.totalAmount && guest.status !== 'deleted' && guest.status !== 'pending' && (
                                 <div className="flex items-center gap-1.5 text-[10px] text-orange-600 dark:text-orange-400 font-bold uppercase tracking-wider bg-orange-50 dark:bg-orange-500/10 inline-flex px-2 py-0.5 rounded-full border border-orange-200/50 dark:border-orange-500/20">
                                     <span className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></span>
                                     Unpaid
@@ -274,7 +274,7 @@ export const GuestCard: React.FC<GuestCardProps> = ({ guest, mode, onSelect, onD
                         <div className="flex gap-2 items-center flex-wrap sm:flex-nowrap justify-end shrink-0 max-w-[50%]">
                             {guest.status === 'pending' && (
                                 <div className="relative flex shrink-0">
-                                    <span className="absolute inset-0 bg-emerald-500 rounded-xl animate-ping opacity-30"></span>
+                                    <span className="absolute inset-0 bg-emerald-500 rounded-xl animate-pulse opacity-20 scale-105 blur-sm"></span>
                                     <button
                                         onClick={handleConfirmBookingClick}
                                         disabled={isMarkingBooked}

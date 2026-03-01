@@ -40,7 +40,7 @@ export const ReceiptCard = React.forwardRef<HTMLDivElement, ReceiptCardProps>(({
     return (
         <div ref={ref} className="bg-white dark:bg-[#131823] text-slate-900 dark:text-white rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-800/60 w-full max-w-md mx-auto flex flex-col font-sans">
             {/* Header: Brand & Trust */}
-            <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800/60 flex justify-between items-center bg-slate-50 dark:bg-[#1A202C]">
+            <div className="px-4 md:px-5 py-3 md:py-4 border-b border-slate-100 dark:border-slate-800/60 flex justify-between items-center bg-slate-50 dark:bg-[#1A202C]">
                 <div className="flex items-center gap-3">
                     <div className="overflow-hidden rounded-full">
                         <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-300 font-bold text-lg border border-slate-300 dark:border-slate-700">
@@ -61,23 +61,23 @@ export const ReceiptCard = React.forwardRef<HTMLDivElement, ReceiptCardProps>(({
             </div>
 
             {/* Zone 1: Guest Identity */}
-            <div className="px-5 pt-5 pb-3">
+            <div className="px-4 md:px-5 pt-4 md:pt-5 pb-2 md:pb-3">
                 <h2 className="text-[24px] font-black tracking-tight text-slate-900 dark:text-white mb-0.5 leading-none">{guestName || 'Guest Name'}</h2>
                 <p className="font-medium text-[14px] text-slate-500 dark:text-slate-400">{phoneNumber || 'Phone Number'}</p>
             </div>
 
             {/* Zone 2: Itinerary */}
-            <div className="px-6 pb-6">
-                <div className="bg-slate-50 dark:bg-slate-800/40 rounded-2xl p-4 md:p-5 flex justify-between items-center border border-slate-100 dark:border-slate-700/50 relative overflow-hidden">
+            <div className="px-4 md:px-6 pb-4 md:pb-6">
+                <div className="bg-slate-50 dark:bg-slate-800/40 rounded-2xl p-3 md:p-5 flex justify-between items-center border border-slate-100 dark:border-slate-700/50 relative overflow-hidden gap-1 md:gap-2">
                     <div className="absolute top-0 left-0 w-1.5 h-full bg-indigo-500 dark:bg-indigo-400"></div>
-                    <div className="flex flex-col pl-3 w-[40%]">
+                    <div className="flex flex-col pl-2 md:pl-3 flex-1 min-w-0">
                         <span className="text-[9px] uppercase tracking-[0.15em] font-bold text-slate-400 dark:text-slate-500 mb-0.5">Check-in</span>
-                        <span className="font-bold text-[14px] md:text-[15px] text-slate-800 dark:text-slate-200 tracking-tight">{checkInDate ? format(new Date(checkInDate), 'dd MMM yyyy') : '--'}</span>
+                        <span className="font-bold text-[13px] md:text-[15px] text-slate-800 dark:text-slate-200 tracking-tight whitespace-nowrap overflow-hidden text-ellipsis">{checkInDate ? format(new Date(checkInDate), 'dd MMM yyyy') : '--'}</span>
                         <span className="text-[9px] font-medium text-slate-400 dark:text-slate-500 tracking-widest mt-0.5">{formatTime12hr(property?.checkInTime || '14:00')}</span>
                     </div>
 
                     {/* Center Timeline */}
-                    <div className="flex-1 flex flex-col items-center justify-center relative px-2 self-stretch min-h-[48px]">
+                    <div className="shrink-0 flex flex-col items-center justify-center relative px-1 md:px-2 self-stretch min-h-[48px]">
                         {/* Connecting Line */}
                         <div className="absolute top-1/2 left-0 right-0 h-[1px] bg-slate-200 dark:bg-slate-700 -translate-y-1/2 -z-10"></div>
 
@@ -89,9 +89,9 @@ export const ReceiptCard = React.forwardRef<HTMLDivElement, ReceiptCardProps>(({
                         </div>
                     </div>
 
-                    <div className="flex flex-col items-end pr-1 w-[40%] text-right">
+                    <div className="flex flex-col items-end flex-1 min-w-0 text-right">
                         <span className="text-[9px] uppercase tracking-[0.15em] font-bold text-slate-400 dark:text-slate-500 mb-0.5">Check-out</span>
-                        <span className="font-bold text-[14px] md:text-[15px] text-slate-800 dark:text-slate-200 tracking-tight">{checkOutDate ? format(new Date(checkOutDate), 'dd MMM yyyy') : '--'}</span>
+                        <span className="font-bold text-[13px] md:text-[15px] text-slate-800 dark:text-slate-200 tracking-tight whitespace-nowrap overflow-hidden text-ellipsis">{checkOutDate ? format(new Date(checkOutDate), 'dd MMM yyyy') : '--'}</span>
                         <span className="text-[9px] font-medium text-slate-400 dark:text-slate-500 tracking-widest mt-0.5">{formatTime12hr(property?.checkOutTime || '11:00')}</span>
                     </div>
                 </div>
@@ -104,22 +104,22 @@ export const ReceiptCard = React.forwardRef<HTMLDivElement, ReceiptCardProps>(({
             </div>
 
             {/* Zone 3: Financial Ledger */}
-            <div className="px-5 pb-4 space-y-2">
+            <div className="px-4 md:px-5 pb-4 space-y-2">
                 {/* Base Cost */}
-                <div className="flex justify-between items-center">
-                    <span className="font-medium text-[12px] text-slate-500 dark:text-slate-400 tracking-wide">
-                        Base Cost (Upto {numberOfGuests - extraGuestsCount} guests) (₹{formatCurrency(baseRate)} × {nights} 🌙)
+                <div className="flex justify-between items-start gap-3">
+                    <span className="font-medium text-[12px] text-slate-500 dark:text-slate-400 tracking-wide leading-snug">
+                        Base Cost (Upto {numberOfGuests - extraGuestsCount} guests) <br className="hidden md:block" />(₹{formatCurrency(baseRate)} × {nights} 🌙)
                     </span>
-                    <span className="font-semibold text-[14px] text-slate-900 dark:text-white tabular-nums tracking-tight">₹{formatCurrency(baseTotal)}</span>
+                    <span className="font-semibold text-[14px] text-slate-900 dark:text-white tabular-nums tracking-tight shrink-0 mt-0.5">₹{formatCurrency(baseTotal)}</span>
                 </div>
 
                 {/* Extra Guests */}
                 {extraTotal > 0 && (
-                    <div className="flex justify-between items-center">
-                        <span className="font-medium text-[12px] text-slate-500 dark:text-slate-400 tracking-wide">
-                            Extra Guests (₹{formatCurrency(extraGuestRate)} × {extraGuestsCount} 👤 × {nights} 🌙)
+                    <div className="flex justify-between items-start gap-3">
+                        <span className="font-medium text-[12px] text-slate-500 dark:text-slate-400 tracking-wide leading-snug">
+                            Extra Guests <br className="hidden md:block" />(₹{formatCurrency(extraGuestRate)} × {extraGuestsCount} 👤 × {nights} 🌙)
                         </span>
-                        <span className="font-semibold text-[14px] text-slate-900 dark:text-white tabular-nums tracking-tight">₹{formatCurrency(extraTotal)}</span>
+                        <span className="font-semibold text-[14px] text-slate-900 dark:text-white tabular-nums tracking-tight shrink-0 mt-0.5">₹{formatCurrency(extraTotal)}</span>
                     </div>
                 )}
 
@@ -132,15 +132,15 @@ export const ReceiptCard = React.forwardRef<HTMLDivElement, ReceiptCardProps>(({
 
                 <div className="my-2 border-t border-dashed border-slate-200 dark:border-slate-700/80"></div>
 
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center gap-2">
                     <span className="font-bold text-[13px] text-slate-800 dark:text-slate-200 tracking-wide">Total Amount</span>
-                    <span className="font-bold text-[15px] text-slate-900 dark:text-white tabular-nums tracking-tight">₹{formatCurrency(totalAmount)}</span>
+                    <span className="font-bold text-[15px] text-slate-900 dark:text-white tabular-nums tracking-tight shrink-0">₹{formatCurrency(totalAmount)}</span>
                 </div>
 
                 {advancePaid > 0 && (
-                    <div className="flex justify-between items-center pt-1">
+                    <div className="flex justify-between items-center pt-1 gap-2">
                         <span className="font-bold text-[12px] text-emerald-600 dark:text-emerald-400 tracking-wide">Advance Paid</span>
-                        <span className="font-bold text-[14px] text-emerald-600 dark:text-emerald-400 tabular-nums tracking-tight">-₹{formatCurrency(advancePaid)}</span>
+                        <span className="font-bold text-[14px] text-emerald-600 dark:text-emerald-400 tabular-nums tracking-tight shrink-0">-₹{formatCurrency(advancePaid)}</span>
                     </div>
                 )}
             </div>
