@@ -9,6 +9,9 @@ import { UpcomingBookingsWidgetProps } from '@lib/types';
 export function UpcomingBookingsWidget({ bookings, loading }: UpcomingBookingsWidgetProps) {
     const router = useRouter();
 
+    // Filter out bookings with 'pending' status
+    const activeBookings = bookings.filter(b => b.status !== 'pending');
+
     return (
         <div className="relative group">
             {/* Gradient border effect */}
@@ -38,8 +41,8 @@ export function UpcomingBookingsWidget({ bookings, loading }: UpcomingBookingsWi
                                     </span>
                                 ) : (
                                     <>
-                                        <span className="font-semibold text-indigo-600 dark:text-indigo-400">{bookings.length}</span>
-                                        <span>booking{bookings.length !== 1 ? 's' : ''} coming up</span>
+                                        <span className="font-semibold text-indigo-600 dark:text-indigo-400">{activeBookings.length}</span>
+                                        <span>booking{activeBookings.length !== 1 ? 's' : ''} coming up</span>
                                     </>
                                 )}
                             </p>
@@ -74,7 +77,7 @@ export function UpcomingBookingsWidget({ bookings, loading }: UpcomingBookingsWi
                                 </div>
                             ))}
                         </div>
-                    ) : bookings.length === 0 ? (
+                    ) : activeBookings.length === 0 ? (
                         <div className="text-center py-16">
                             <div className="relative inline-flex items-center justify-center mb-6">
                                 <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-full blur-2xl" />
@@ -87,7 +90,7 @@ export function UpcomingBookingsWidget({ bookings, loading }: UpcomingBookingsWi
                         </div>
                     ) : (
                         <div className="space-y-3">
-                            {bookings.map((booking, index) => (
+                            {activeBookings.map((booking, index) => (
                                 <div
                                     key={booking.id}
                                     className="group/card relative cursor-pointer"

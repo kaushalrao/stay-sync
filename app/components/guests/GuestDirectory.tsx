@@ -36,7 +36,7 @@ export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode =
 
     const [search, setSearch] = useState('');
     const debouncedSearch = useDebounce(search, 500);
-    const [statusFilter, setStatusFilter] = useState<'upcoming' | 'past' | 'all' | 'deleted'>('all');
+    const [statusFilter, setStatusFilter] = useState<'upcoming' | 'past' | 'all' | 'deleted' | 'pending'>('all');
 
     React.useEffect(() => {
         if (!user) return;
@@ -134,12 +134,14 @@ export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode =
 
         if (statusFilter === 'upcoming') {
             matchesStatus = displayStatus === 'UPCOMING';
+        } else if (statusFilter === 'pending') {
+            matchesStatus = g.status === 'pending';
         } else if (statusFilter === 'past') {
             matchesStatus = displayStatus === 'PAST';
         } else if (statusFilter === 'deleted') {
             matchesStatus = displayStatus === 'DELETED';
         } else {
-            // 'all' filter: exclude deleted BY DEFAULT
+            // 'all' filter: exclude deleted BY DEFAULT, maybe exclude pending here? Let's leave pending visible in 'all'.
             matchesStatus = displayStatus !== 'DELETED';
         }
 
@@ -184,9 +186,7 @@ export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode =
                     search={search}
                     setSearch={setSearch}
                     selectedMonth={selectedMonth}
-                    handlePrevMonth={handlePrevMonth}
-                    handleNextMonth={handleNextMonth}
-                    toggleAllMonths={toggleAllMonths}
+                    setSelectedMonth={setSelectedMonth}
                     statusFilter={statusFilter}
                     setStatusFilter={setStatusFilter}
                     mode={mode}

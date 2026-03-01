@@ -61,7 +61,7 @@ export const FEATURE_CARD_STYLES = {
     }
 };
 
-export const GUEST_FILTER_OPTIONS = ['all', 'upcoming', 'past', 'deleted'] as const;
+export const GUEST_FILTER_OPTIONS = ['all', 'upcoming', 'pending', 'past', 'deleted'] as const;
 
 export const VARIABLE_CATEGORIES = {
     "Property Details": ['propertyName', 'wifiName', 'wifiPass', 'locationLink', 'propertyLink', 'checkInTime', 'checkOutTime', 'baseGuests'],

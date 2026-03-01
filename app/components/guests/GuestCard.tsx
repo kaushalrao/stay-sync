@@ -273,14 +273,17 @@ export const GuestCard: React.FC<GuestCardProps> = ({ guest, mode, onSelect, onD
                         {/* Actions / Status */}
                         <div className="flex gap-2 items-center flex-wrap sm:flex-nowrap justify-end shrink-0 max-w-[50%]">
                             {guest.status === 'pending' && (
-                                <button
-                                    onClick={handleConfirmBookingClick}
-                                    disabled={isMarkingBooked}
-                                    className="group/btn relative bg-emerald-600 hover:bg-emerald-700 text-white border border-emerald-500/50 hover:border-emerald-600 px-3 md:px-4 py-2 rounded-xl transition-all duration-300 flex items-center gap-1.5 md:gap-2 font-bold text-[10px] md:text-[11px] uppercase tracking-wider shadow-md shadow-emerald-600/20 hover:shadow-emerald-600/40 active:scale-95 disabled:opacity-50 shrink-0"
-                                >
-                                    <CheckCircle2 size={16} className="transition-transform group-hover/btn:scale-110" />
-                                    <span className="hidden sm:inline">Confirm</span>
-                                </button>
+                                <div className="relative flex shrink-0">
+                                    <span className="absolute inset-0 bg-emerald-500 rounded-xl animate-ping opacity-30"></span>
+                                    <button
+                                        onClick={handleConfirmBookingClick}
+                                        disabled={isMarkingBooked}
+                                        className="group/btn relative bg-emerald-600 hover:bg-emerald-700 text-white border border-emerald-500/50 hover:border-emerald-600 px-4 py-2 md:py-2.5 rounded-xl transition-all duration-300 flex items-center gap-1.5 md:gap-2 font-bold text-[11px] md:text-xs uppercase tracking-wider shadow-lg shadow-emerald-600/30 hover:shadow-emerald-600/50 active:scale-95 disabled:opacity-50"
+                                    >
+                                        <CheckCircle2 size={16} className="transition-transform group-hover/btn:scale-110" />
+                                        <span>Confirm</span>
+                                    </button>
+                                </div>
                             )}
 
                             {isUnpaid && guest.totalAmount && guest.status !== 'deleted' && guest.status !== 'pending' ? (
