@@ -3,7 +3,7 @@
 import React, { useState, useMemo, useEffect, Suspense } from 'react';
 import {
     Check, Copy, MessageCircle, Eye, UserSearch,
-    Calendar, Phone, Users, MapPin, BadgeCheck, Clock, UserCheck, Image as ImageIcon, Share2, X
+    Calendar, Phone, Users, MapPin, BadgeCheck, Clock, UserCheck, Image as ImageIcon, Share2, X, Edit3
 } from 'lucide-react';
 import { GuestDetails, Guest } from '@lib/types';
 import { DEFAULT_GUEST_DETAILS } from '@lib/constants';
@@ -15,7 +15,7 @@ import { useApp } from '@components/providers/AppProvider';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { guestService, templateService } from '@services/index';
 import { format } from 'date-fns';
-import { useGuestStore, usePropertyStore, useTemplateStore, useUIStore } from '@store/index';
+import { useGuestStore, usePropertyStore, useTemplateStore, useUIStore, useGuestFormStore } from '@store/index';
 import { calculateNights } from '@lib/utils';
 import { ShareReceiptModal } from '@components/shared/ShareReceiptModal';
 
@@ -24,6 +24,7 @@ function GreeterContent() {
     const templates = useTemplateStore(state => state.templates);
     const showToast = useUIStore(state => state.showToast);
     const guestsFromStore = useGuestStore(state => state.guests);
+    const loadGuestForEdit = useGuestFormStore(state => state.loadGuestForEdit);
 
     const { user, loading } = useApp();
     const router = useRouter();
@@ -193,13 +194,30 @@ function GreeterContent() {
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <button
-                                                    onClick={() => setIsReceiptModalOpen(true)}
-                                                    className="absolute top-0 right-0 p-2 text-indigo-500 hover:text-indigo-600 dark:text-indigo-400 dark:hover:text-indigo-300 bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 rounded-xl transition-all"
-                                                    title="Share Receipt"
-                                                >
-                                                    <Share2 size={18} strokeWidth={2.5} />
-                                                </button>
+                                                <div className="absolute top-0 right-0 flex items-center gap-2">
+                                                    {(guest?.status === 'pending' || guest?.status === 'booked') && (
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                if (guest) {
+                                                                    loadGuestForEdit(guest);
+                                                                    router.push('/add-guest');
+                                                                }
+                                                            }}
+                                                            className="p-2 text-indigo-500 hover:text-indigo-600 dark:text-indigo-400 dark:hover:text-indigo-300 bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 rounded-xl transition-all"
+                                                            title="Edit Guest"
+                                                        >
+                                                            <Edit3 size={18} strokeWidth={2.5} />
+                                                        </button>
+                                                    )}
+                                                    <button
+                                                        onClick={() => setIsReceiptModalOpen(true)}
+                                                        className="p-2 text-indigo-500 hover:text-indigo-600 dark:text-indigo-400 dark:hover:text-indigo-300 bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 rounded-xl transition-all"
+                                                        title="Share Receipt"
+                                                    >
+                                                        <Share2 size={18} strokeWidth={2.5} />
+                                                    </button>
+                                                </div>
                                             </div>
 
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-6">
