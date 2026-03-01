@@ -31,12 +31,13 @@ function GreeterContent() {
     const searchParams = useSearchParams();
     const guestIdParam = searchParams.get('guestId');
 
-    const [mobileTab, setMobileTab] = useState<'context' | 'preview'>('context');
     const [guestDetails, setGuestDetails] = useState<GuestDetails>(DEFAULT_GUEST_DETAILS);
     const [currentGuestId, setCurrentGuestId] = useState<string | null>(null);
     const [selectedTempId, setSelectedTempId] = useState('');
+    const [editedMessage, setEditedMessage] = useState('');
     const [copied, setCopied] = useState(false);
     const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false);
+    const [isGuestListOpen, setIsGuestListOpen] = useState(false);
 
     const handleSelectGuest = React.useCallback((guest: Guest) => {
         const details: GuestDetails = {
@@ -52,7 +53,6 @@ function GreeterContent() {
         };
         setGuestDetails(details);
         setCurrentGuestId(guest.id);
-        setMobileTab('context');
         showToast("Guest selected", "success");
     }, [showToast]);
 
@@ -107,9 +107,14 @@ function GreeterContent() {
         return templateService.generateMessage(selectedTemplate.content, selectedProperty, enrichedDetails);
     }, [enrichedDetails, selectedProperty, selectedTemplate, currentGuestId]);
 
+    // Sync edited message with generated one when dependencies change
+    useEffect(() => {
+        setEditedMessage(generatedMessage);
+    }, [generatedMessage]);
+
     const handleCopy = () => {
         if (!currentGuestId) return;
-        navigator.clipboard.writeText(generatedMessage);
+        navigator.clipboard.writeText(editedMessage);
         setCopied(true);
         showToast('Message copied', 'success');
         setTimeout(() => setCopied(false), 2000);
@@ -117,7 +122,7 @@ function GreeterContent() {
 
     const handleWhatsApp = () => {
         if (!currentGuestId) return showToast("Select a guest first", "error");
-        openWhatsApp(generatedMessage, guestDetails.phoneNumber);
+        openWhatsApp(editedMessage, guestDetails.phoneNumber);
     };
 
     // Calculate financials for receipt
@@ -141,15 +146,38 @@ function GreeterContent() {
     }
 
     return (
-        <div className="px-4 md:px-8 pb-24 md:pb-0 pt-4 lg:pt-8 flex flex-col md:gap-10 h-full relative border-box">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 flex-1 animate-fade-in p-0 lg:pb-8">
-                {/* Left Section: Context & Templates (Formerly Middle) */}
-                <div className={`lg:col-span-6 flex flex-col space-y-4 md:space-y-6 ${mobileTab === 'context' ? 'block' : 'hidden'} lg:flex`}>
+        <div className="px-4 md:px-8 pb-4 lg:pb-8 pt-0 flex flex-col md:gap-10 min-h-screen relative border-box">
+            {/* Mobile Sticky Top Header */}
+            {currentGuestId && (
+                <div className="lg:hidden sticky top-0 left-0 right-0 z-40 bg-white/80 dark:bg-[#0f172a]/80 backdrop-blur-xl border-b border-slate-200 dark:border-white/10 px-4 py-3 flex items-center justify-between mx-[-1rem]">
+                    <div
+                        onClick={() => setIsGuestListOpen(true)}
+                        className="flex items-center gap-2 max-w-[70%] cursor-pointer active:opacity-70 transition-opacity"
+                    >
+                        <div className="w-8 h-8 rounded-full bg-indigo-500/10 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+                            <UserSearch size={16} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <h2 className="text-sm font-bold text-slate-900 dark:text-white truncate">
+                                Messaging {guestDetails.guestName}
+                            </h2>
+                            <p className="text-[10px] text-slate-500 font-medium flex items-center gap-1">
+                                Tap to change guest <Clock size={10} className="inline" />
+                            </p>
+                        </div>
+                        <Calendar size={14} className="text-slate-400" />
+                    </div>
+                </div>
+            )}
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 flex-1 animate-fade-in p-0 lg:pb-8 pt-4 lg:pt-8">
+                {/* Left Section: Context & Templates */}
+                <div className="lg:col-span-6 flex flex-col space-y-4 md:space-y-6">
 
                     {/* Context Card */}
-                    <div className="bg-white dark:bg-slate-900 p-5 md:p-6 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden relative group shrink-0">
+                    <div className="bg-white dark:bg-slate-900 p-4 md:p-6 rounded-2xl md:rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden relative group shrink-0">
                         {/* Decorative background accent */}
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full -translate-y-16 translate-x-16 blur-3xl pointer-events-none" />
+                        <div className="absolute top-0 right-0 w-24 md:w-32 h-24 md:h-32 bg-indigo-500/5 rounded-full -translate-y-12 md:-translate-y-16 translate-x-12 md:translate-x-16 blur-3xl pointer-events-none" />
 
                         {currentGuestId ? (
                             <div className="space-y-5">
@@ -178,19 +206,19 @@ function GreeterContent() {
 
                                     return (
                                         <>
-                                            <div className="flex justify-between items-start border-b border-slate-100 dark:border-white/5 pb-4 relative">
-                                                <div className="space-y-1.5 pr-10">
-                                                    <h3 className="font-bold text-xl md:text-2xl text-slate-900 dark:text-white tracking-tight">
+                                            <div className="flex justify-between items-start border-b border-slate-100 dark:border-white/5 pb-3 md:pb-4 relative">
+                                                <div className="space-y-1 md:space-y-1.5 pr-10">
+                                                    <h3 className="font-bold text-lg md:text-2xl text-slate-900 dark:text-white tracking-tight">
                                                         {guestDetails.guestName}
                                                     </h3>
-                                                    <div className="flex flex-wrap items-center gap-3">
-                                                        <div className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 ${statusConfig.className}`}>
-                                                            <StatusIcon size={10} strokeWidth={3} />
+                                                    <div className="flex flex-wrap items-center gap-2 md:gap-3">
+                                                        <div className={`px-2 py-0.5 rounded-full text-[9px] md:text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 ${statusConfig.className}`}>
+                                                            <StatusIcon size={9} strokeWidth={3} className="md:w-[10px] md:h-[10px]" />
                                                             {statusConfig.label}
                                                         </div>
-                                                        <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 text-xs font-semibold">
-                                                            <MapPin size={12} className="text-indigo-500" strokeWidth={2.5} />
-                                                            <span>{guest?.propName || selectedProperty?.name}</span>
+                                                        <div className="flex items-center gap-1 md:gap-1.5 text-slate-500 dark:text-slate-400 text-[10px] md:text-xs font-semibold">
+                                                            <MapPin size={10} className="text-indigo-500 md:w-3 md:h-3" strokeWidth={2.5} />
+                                                            <span className="truncate max-w-[100px] md:max-w-none">{guest?.propName || selectedProperty?.name}</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -220,34 +248,34 @@ function GreeterContent() {
                                                 </div>
                                             </div>
 
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-6">
-                                                <div className="space-y-1.5">
-                                                    <div className="flex items-center gap-2 text-slate-400 dark:text-slate-500">
-                                                        <Calendar size={14} strokeWidth={2.5} />
-                                                        <span className="text-[10px] uppercase font-bold tracking-widest leading-none mt-0.5">Stay Period</span>
+                                            <div className="grid grid-cols-2 md:grid-cols-2 gap-y-3 gap-x-4 md:gap-y-4 md:gap-x-6">
+                                                <div className="space-y-1 md:space-y-1.5 col-span-2 md:col-span-1">
+                                                    <div className="flex items-center gap-1.5 md:gap-2 text-slate-400 dark:text-slate-500">
+                                                        <Calendar size={12} strokeWidth={2.5} className="md:w-3.5 md:h-3.5" />
+                                                        <span className="text-[9px] md:text-[10px] uppercase font-bold tracking-widest leading-none mt-0.5">Stay Period</span>
                                                     </div>
-                                                    <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
+                                                    <p className="text-xs md:text-sm font-bold text-slate-800 dark:text-slate-200">
                                                         {guestDetails.checkInDate && format(new Date(guestDetails.checkInDate), 'MMM d')} - {guestDetails.checkOutDate && format(new Date(guestDetails.checkOutDate), 'MMM d')}
-                                                        <span className="text-indigo-500 font-medium ml-1.5">({nights} Nights)</span>
+                                                        <span className="text-indigo-500 font-medium ml-1 md:ml-1.5">({nights} N)</span>
                                                     </p>
                                                 </div>
 
-                                                <div className="space-y-1.5">
-                                                    <div className="flex items-center gap-2 text-slate-400 dark:text-slate-500">
-                                                        <Users size={14} strokeWidth={2.5} />
-                                                        <span className="text-[10px] uppercase font-bold tracking-widest leading-none mt-0.5">Occupancy</span>
+                                                <div className="space-y-1 md:space-y-1.5">
+                                                    <div className="flex items-center gap-1.5 md:gap-2 text-slate-400 dark:text-slate-500">
+                                                        <Users size={12} strokeWidth={2.5} className="md:w-3.5 md:h-3.5" />
+                                                        <span className="text-[9px] md:text-[10px] uppercase font-bold tracking-widest leading-none mt-0.5">Guests</span>
                                                     </div>
-                                                    <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
-                                                        {guestDetails.numberOfGuests} Guests
+                                                    <p className="text-xs md:text-sm font-bold text-slate-800 dark:text-slate-200">
+                                                        {guestDetails.numberOfGuests}
                                                     </p>
                                                 </div>
 
-                                                <div className="space-y-1.5">
-                                                    <div className="flex items-center gap-2 text-slate-400 dark:text-slate-500">
-                                                        <Phone size={14} strokeWidth={2.5} />
-                                                        <span className="text-[10px] uppercase font-bold tracking-widest leading-none mt-0.5">Contact</span>
+                                                <div className="space-y-1 md:space-y-1.5">
+                                                    <div className="flex items-center gap-1.5 md:gap-2 text-slate-400 dark:text-slate-500">
+                                                        <Phone size={12} strokeWidth={2.5} className="md:w-3.5 md:h-3.5" />
+                                                        <span className="text-[9px] md:text-[10px] uppercase font-bold tracking-widest leading-none mt-0.5">Contact</span>
                                                     </div>
-                                                    <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
+                                                    <p className="text-xs md:text-sm font-bold text-slate-800 dark:text-slate-200 truncate">
                                                         {guestDetails.phoneNumber}
                                                     </p>
                                                 </div>
@@ -272,9 +300,10 @@ function GreeterContent() {
                 </div>
 
                 {/* Right Section: Preview Phone */}
-                <div className={`lg:col-span-6 lg:sticky lg:top-24 ${mobileTab === 'preview' ? 'block' : 'hidden'} lg:block`}>
+                <div className="lg:col-span-6 lg:sticky lg:top-24">
                     <PreviewPhone
-                        message={generatedMessage}
+                        message={editedMessage}
+                        onChange={setEditedMessage}
                         onSend={handleWhatsApp}
                         onCopy={handleCopy}
                         copied={copied}
@@ -303,44 +332,69 @@ function GreeterContent() {
                 balanceDue={balanceDue}
             />
 
-            {/* Mobile Bottom Navigation Bar */}
-            <div className="lg:hidden fixed bottom-0 left-0 w-full bg-white/95 dark:bg-[#0f172a]/95 backdrop-blur-xl border-t border-slate-200 dark:border-white/10 p-2 z-30 safe-area-bottom">
-                <div className="grid grid-cols-5 gap-1 h-16 pb-2">
-                    <button
-                        onClick={() => setMobileTab('context')}
-                        className={`col-span-1 border-none bg-transparent hover:bg-transparent flex flex-col items-center justify-center rounded-xl transition-all ${mobileTab === 'context' ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-500/10' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
-                    >
-                        <UserSearch size={22} className="mb-1" />
-                        <span className="text-[9px] font-bold tracking-tight">Details</span>
-                    </button>
-
-                    <button
-                        onClick={() => setMobileTab('preview')}
-                        className={`col-span-1 border-none bg-transparent hover:bg-transparent flex flex-col items-center justify-center rounded-xl transition-all ${mobileTab === 'preview' ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-500/10' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
-                    >
-                        <Eye size={22} className="mb-1" />
-                        <span className="text-[9px] font-bold tracking-tight">Preview</span>
-                    </button>
-
+            {/* Mobile Sticky CTA */}
+            <div className="lg:hidden fixed bottom-0 left-0 w-full bg-white/95 dark:bg-[#0f172a]/95 backdrop-blur-xl border-t border-slate-200 dark:border-white/10 p-3 z-30 safe-area-bottom shadow-[0_-10px_40px_rgba(0,0,0,0.05)] dark:shadow-[0_-10px_40px_rgba(0,0,0,0.2)]">
+                <div className="flex gap-2 h-14 w-full">
                     <button
                         onClick={handleCopy}
-                        className="col-span-1 border-none bg-transparent hover:bg-transparent flex flex-col items-center justify-center rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white active:scale-95 transition-all"
+                        className="flex-shrink-0 w-14 h-14 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 flex items-center justify-center rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white active:scale-95 transition-all outline-none"
+                        aria-label="Copy message"
                     >
-                        {copied ? <Check size={22} className="text-green-400 mb-1" /> : <Copy size={22} className="mb-1" />}
-                        <span className="text-[9px] font-bold tracking-tight">Copy</span>
+                        {copied ? <Check size={22} className="text-green-500" /> : <Copy size={22} />}
                     </button>
-
-
 
                     <button
                         onClick={handleWhatsApp}
-                        className="col-span-1 border-none bg-transparent hover:bg-transparent flex flex-col items-center justify-center rounded-xl text-slate-600 dark:text-slate-400 hover:text-green-600 dark:hover:text-green-400 active:scale-95 transition-all"
+                        disabled={!editedMessage || !currentGuestId}
+                        className="flex-1 bg-gradient-to-r from-[#25D366] to-[#128C7E] hover:from-[#20bd5a] hover:to-[#0f7a6a] disabled:from-slate-300 disabled:to-slate-400 dark:disabled:from-slate-700 dark:disabled:to-slate-800 flex items-center justify-center gap-2 rounded-xl text-white font-bold text-base active:scale-95 transition-all shadow-lg hover:shadow-xl disabled:shadow-none disabled:opacity-50 outline-none"
                     >
-                        <MessageCircle size={22} className="mb-1" />
-                        <span className="text-[9px] font-bold tracking-tight">Send</span>
+                        <MessageCircle size={22} fill="white" className="text-white" />
+                        <span>Send on WhatsApp</span>
                     </button>
                 </div>
             </div>
+
+            {/* Bottom Spacer for Mobile Scroll - Just enough to clear the sticky CTA */}
+            <div className="lg:hidden h-28 w-full shrink-0" aria-hidden="true" />
+
+            {/* Mobile Guest Selector Overlay */}
+            {isGuestListOpen && (
+                <div className="fixed inset-0 z-50 lg:hidden">
+                    <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setIsGuestListOpen(false)} />
+                    <div className="absolute bottom-0 left-0 w-full h-[70vh] bg-white dark:bg-slate-900 rounded-t-[2rem] shadow-2xl flex flex-col overflow-hidden animate-slide-up">
+                        <div className="p-4 border-b border-slate-100 dark:border-white/5 flex items-center justify-between">
+                            <h3 className="font-bold text-lg text-slate-900 dark:text-white">Switch Guest</h3>
+                            <button onClick={() => setIsGuestListOpen(false)} className="p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500">
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                            {guestsFromStore
+                                .filter(g => g.status !== 'deleted')
+                                .sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime())
+                                .map(guest => (
+                                    <button
+                                        key={guest.id}
+                                        onClick={() => {
+                                            handleSelectGuest(guest);
+                                            setIsGuestListOpen(false);
+                                        }}
+                                        className={`w-full text-left p-4 rounded-2xl border transition-all flex items-center justify-between ${currentGuestId === guest.id
+                                            ? 'bg-indigo-50 border-indigo-200 dark:bg-indigo-500/10 dark:border-indigo-500/30'
+                                            : 'bg-white border-slate-100 dark:bg-slate-800 dark:border-white/5'
+                                            }`}
+                                    >
+                                        <div>
+                                            <p className="font-bold text-slate-900 dark:text-white">{guest.guestName}</p>
+                                            <p className="text-xs text-slate-500 dark:text-slate-400 capitalize">{guest.propName} • {guest.status.replace('_', ' ')}</p>
+                                        </div>
+                                        {currentGuestId === guest.id && <Check size={18} className="text-indigo-600 dark:text-indigo-400" />}
+                                    </button>
+                                ))}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
