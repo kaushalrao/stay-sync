@@ -48,7 +48,7 @@ export function UpcomingBookingsWidget({ bookings, loading }: UpcomingBookingsWi
                     </div>
                     <button
                         onClick={() => router.push('/guests')}
-                        className="group/btn flex items-center gap-2 px-5 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl text-sm font-bold hover:scale-105 transition-all shadow-xl shadow-slate-900/10 dark:shadow-white/5 active:scale-95"
+                        className="group/btn flex items-center gap-2 px-5 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl text-sm font-bold hover:scale-105 transition-all shadow-xl shadow-slate-900/10 dark:shadow-white/5 active:scale-95 whitespace-nowrap shrink-0"
                     >
                         Manage All
                         <ArrowRight size={16} className="group-hover/btn:translate-x-1 transition-transform" />
