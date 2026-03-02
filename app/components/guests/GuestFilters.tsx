@@ -3,6 +3,7 @@ import { Search, ChevronLeft, ChevronRight, ListFilter, X, Check } from 'lucide-
 import { format } from 'date-fns';
 import { GuestFiltersProps } from '../../lib/types';
 import { GUEST_FILTER_OPTIONS } from '../../lib/constants';
+import { Portal } from '../ui/Portal';
 
 // --- Sub-components for better readability ---
 
@@ -33,10 +34,10 @@ const MobileSearchAndButton = ({ search, setSearch, activeFilterCount, onOpenFil
     </div>
 );
 
-const DesktopFilterControls = ({ 
-    search, setSearch, mode, selectedMonth, 
-    handlePrevMonth, handleNextMonth, toggleAllMonths, 
-    statusFilter, setStatusFilter 
+const DesktopFilterControls = ({
+    search, setSearch, mode, selectedMonth,
+    handlePrevMonth, handleNextMonth, toggleAllMonths,
+    statusFilter, setStatusFilter
 }: any) => (
     <div className={`hidden md:flex flex-col ${mode === 'page' ? 'md:flex-row' : ''} gap-4`}>
         <div className="relative group flex-1">
@@ -79,11 +80,10 @@ const DesktopFilterControls = ({
                     <button
                         key={filter}
                         onClick={() => setStatusFilter(filter)}
-                        className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all w-full flex items-center justify-center ${
-                            statusFilter === filter
+                        className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all w-full flex items-center justify-center ${statusFilter === filter
                             ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20'
                             : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/5'
-                        }`}
+                            }`}
                     >
                         {filter}
                     </button>
@@ -102,110 +102,112 @@ const MobileFilterBottomSheet = ({
     if (!isOpen) return null;
 
     return (
-        <div className="md:hidden fixed inset-0 z-[100] flex flex-col justify-end">
-            {/* Backdrop */}
-            <div
-                className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
-                onClick={onClose}
-            />
+        <Portal>
+            <div className="md:hidden fixed inset-0 z-[100] flex flex-col justify-end">
+                {/* Backdrop */}
+                <div
+                    className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
+                    onClick={onClose}
+                />
 
-            {/* Sheet Content */}
-            <div className="relative bg-white dark:bg-slate-900 rounded-t-[32px] w-full max-h-[85vh] flex flex-col shadow-2xl animate-slide-up transform-gpu">
+                {/* Sheet Content */}
+                <div className="relative bg-white dark:bg-slate-900 rounded-t-[32px] w-full max-h-[85vh] flex flex-col shadow-2xl animate-slide-up transform-gpu">
 
-                {/* Handle */}
-                <div className="w-full flex justify-center pt-3 pb-2" onClick={onClose}>
-                    <div className="w-12 h-1.5 bg-slate-300 dark:bg-slate-700 rounded-full" />
-                </div>
-
-                {/* Header */}
-                <div className="flex items-center justify-between px-6 pb-4 border-b border-slate-100 dark:border-slate-800">
-                    <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">Filters</h3>
-                    <button
-                        onClick={onClose}
-                        className="p-2 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
-                    >
-                        <X size={18} />
-                    </button>
-                </div>
-
-                {/* Scrollable Filters */}
-                <div className="flex-1 overflow-y-auto px-6 py-6 space-y-8">
-
-                    {/* Timeframe Section */}
-                    <div className="space-y-3">
-                        <h4 className="text-sm font-bold text-slate-900 dark:text-slate-200 uppercase tracking-widest">Timeframe</h4>
-                        <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-2">
-                            <button
-                                onClick={handleMobilePrevMonth}
-                                className="p-3 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition-colors"
-                            >
-                                <ChevronLeft size={20} />
-                            </button>
-                            <button
-                                onClick={toggleMobileAllMonths}
-                                className="flex-1 text-center font-bold text-slate-900 dark:text-white py-2 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors text-[15px]"
-                            >
-                                {localSelectedMonth === 'all' ? 'All Time' : format(new Date(localSelectedMonth + '-01'), 'MMMM yyyy')}
-                            </button>
-                            <button
-                                onClick={handleMobileNextMonth}
-                                className="p-3 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition-colors"
-                            >
-                                <ChevronRight size={20} />
-                            </button>
-                        </div>
+                    {/* Handle */}
+                    <div className="w-full flex justify-center pt-3 pb-2" onClick={onClose}>
+                        <div className="w-12 h-1.5 bg-slate-300 dark:bg-slate-700 rounded-full" />
                     </div>
 
-                    {/* Status Section */}
-                    <div className="space-y-3">
-                        <h4 className="text-sm font-bold text-slate-900 dark:text-slate-200 uppercase tracking-widest">Booking Status</h4>
-                        <div className="flex flex-col gap-2">
-                            {GUEST_FILTER_OPTIONS.map((filter) => (
+                    {/* Header */}
+                    <div className="flex items-center justify-between px-6 pb-4 border-b border-slate-100 dark:border-slate-800">
+                        <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">Filters</h3>
+                        <button
+                            onClick={onClose}
+                            className="p-2 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                        >
+                            <X size={18} />
+                        </button>
+                    </div>
+
+                    {/* Scrollable Filters */}
+                    <div className="flex-1 overflow-y-auto px-6 py-6 space-y-8">
+
+                        {/* Timeframe Section */}
+                        <div className="space-y-3">
+                            <h4 className="text-sm font-bold text-slate-900 dark:text-slate-200 uppercase tracking-widest">Timeframe</h4>
+                            <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-2">
                                 <button
-                                    key={filter}
-                                    onClick={() => setLocalStatusFilter(filter)}
-                                    className={`w-full flex items-center justify-between px-5 py-4 rounded-2xl border transition-all ${localStatusFilter === filter
-                                        ? 'bg-indigo-50 dark:bg-indigo-500/10 border-indigo-500 text-indigo-700 dark:text-indigo-300 font-bold shadow-sm'
-                                        : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600 font-medium'
-                                        }`}
+                                    onClick={handleMobilePrevMonth}
+                                    className="p-3 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition-colors"
                                 >
-                                    <span className="capitalize text-[15px] tracking-wide">{filter}</span>
-                                    {localStatusFilter === filter && (
-                                        <div className="w-5 h-5 rounded-full bg-indigo-500 flex items-center justify-center">
-                                            <Check size={12} className="text-white" strokeWidth={3} />
-                                        </div>
-                                    )}
+                                    <ChevronLeft size={20} />
                                 </button>
-                            ))}
+                                <button
+                                    onClick={toggleMobileAllMonths}
+                                    className="flex-1 text-center font-bold text-slate-900 dark:text-white py-2 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors text-[15px]"
+                                >
+                                    {localSelectedMonth === 'all' ? 'All Time' : format(new Date(localSelectedMonth + '-01'), 'MMMM yyyy')}
+                                </button>
+                                <button
+                                    onClick={handleMobileNextMonth}
+                                    className="p-3 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition-colors"
+                                >
+                                    <ChevronRight size={20} />
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Status Section */}
+                        <div className="space-y-3">
+                            <h4 className="text-sm font-bold text-slate-900 dark:text-slate-200 uppercase tracking-widest">Booking Status</h4>
+                            <div className="flex flex-col gap-2">
+                                {GUEST_FILTER_OPTIONS.map((filter) => (
+                                    <button
+                                        key={filter}
+                                        onClick={() => setLocalStatusFilter(filter)}
+                                        className={`w-full flex items-center justify-between px-5 py-4 rounded-2xl border transition-all ${localStatusFilter === filter
+                                            ? 'bg-indigo-50 dark:bg-indigo-500/10 border-indigo-500 text-indigo-700 dark:text-indigo-300 font-bold shadow-sm'
+                                            : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600 font-medium'
+                                            }`}
+                                    >
+                                        <span className="capitalize text-[15px] tracking-wide">{filter}</span>
+                                        {localStatusFilter === filter && (
+                                            <div className="w-5 h-5 rounded-full bg-indigo-500 flex items-center justify-center">
+                                                <Check size={12} className="text-white" strokeWidth={3} />
+                                            </div>
+                                        )}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                    </div>
+
+                    {/* Sticky Bottom Actions */}
+                    <div className="p-6 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 safe-area-bottom">
+                        <div className="flex gap-3">
+                            <button
+                                onClick={onClear}
+                                className="px-6 py-4 rounded-xl font-bold text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                            >
+                                Clear
+                            </button>
+                            <button
+                                onClick={onApply}
+                                disabled={!hasChanges}
+                                className={`flex-1 font-bold rounded-xl py-4 transition-all ${hasChanges
+                                    ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-600/20'
+                                    : 'bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed'
+                                    }`}
+                            >
+                                Show Results
+                            </button>
                         </div>
                     </div>
 
                 </div>
-
-                {/* Sticky Bottom Actions */}
-                <div className="p-6 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 safe-area-bottom">
-                    <div className="flex gap-3">
-                        <button
-                            onClick={onClear}
-                            className="px-6 py-4 rounded-xl font-bold text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
-                        >
-                            Clear
-                        </button>
-                        <button
-                            onClick={onApply}
-                            disabled={!hasChanges}
-                            className={`flex-1 font-bold rounded-xl py-4 transition-all ${hasChanges
-                                ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-600/20'
-                                : 'bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed'
-                                }`}
-                        >
-                            Show Results
-                        </button>
-                    </div>
-                </div>
-
             </div>
-        </div>
+        </Portal>
     );
 };
 
