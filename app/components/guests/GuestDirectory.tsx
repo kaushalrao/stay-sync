@@ -87,7 +87,7 @@ export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode =
         // Find guest and property details for email notification
         const guest = guests.find(g => g.id === guestToDelete);
         if (guest) {
-            const property = properties.find(p => p.name === guest.propName);
+            const property = properties.find(p => p.id === guest.propertyId);
 
             // Fire and forget email notification if property exists
             if (property) {

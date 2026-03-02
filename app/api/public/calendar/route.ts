@@ -1,12 +1,8 @@
-
 import { NextRequest, NextResponse } from 'next/server';
 import { db, appId } from '../../../lib/firebase';
 import { doc, getDoc, collection, getDocs, query, where } from 'firebase/firestore';
 
-// Helper to format date for iCal (YYYYMMDD)
-const formatICalDate = (dateStr: string) => {
-    return dateStr.replace(/-/g, '');
-};
+export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
@@ -14,92 +10,82 @@ export async function GET(req: NextRequest) {
     const propertyId = searchParams.get('propertyId');
 
     if (!uid || !propertyId) {
-        return NextResponse.json({ error: 'Missing uid or propertyId' }, { status: 400 });
+        return NextResponse.json({ error: 'User ID and Property ID are required' }, { status: 400 });
     }
 
     try {
-        // 1. Fetch Property to get the name
-        // Path: artifacts/{appId}/users/{uid}/properties/{propertyId}
-        const propRef = doc(db, `artifacts/${appId}/users/${uid}/properties`, propertyId);
-        const propSnap = await getDoc(propRef);
+        // 1. Verify Property Ownership/Access via property_users mapping
+        // Mapping doc ID is {uid}_{propertyId}
+        const mappingRef = doc(db, `artifacts/${appId}/property_users`, `${uid}_${propertyId}`);
+        const mappingSnap = await getDoc(mappingRef);
 
-        if (!propSnap.exists()) {
-            return NextResponse.json({ error: 'Property not found' }, { status: 404 });
+        if (!mappingSnap.exists()) {
+            return NextResponse.json({ error: 'Access denied or property not found' }, { status: 403 });
         }
 
-        const propertyData = propSnap.data();
-        const propertyName = propertyData.name;
+        // 2. Fetch Property Details to get the canonical name
+        const propertyRef = doc(db, `artifacts/${appId}/properties`, propertyId);
+        const propertySnap = await getDoc(propertyRef);
 
-        // 2. Fetch Guests matching this property matches logic in GuestDirectory
-        // Path: artifacts/{appId}/users/{uid}/guests
-        const guestsRef = collection(db, `artifacts/${appId}/users/${uid}/guests`);
-        // Filter by propName. 
-        // Note: Ensure your Guest type and DB use 'propName'. 
-        // If not indexed, this might need fallback, but for now assuming 'propName' is valid field.
-        const q = query(guestsRef, where('propName', '==', propertyName));
-        const querySnapshot = await getDocs(q);
+        if (!propertySnap.exists()) {
+            return NextResponse.json({ error: 'Property details not found' }, { status: 404 });
+        }
 
-        let events = '';
+        const propertyData = propertySnap.data() as any;
+        const propName = propertyData.name || 'Property';
 
-        querySnapshot.forEach((doc) => {
-            const guest = doc.data();
+        // 3. Fetch Guests matching this propertyId
+        const guestsRef = collection(db, `artifacts/${appId}/guests`);
+        const qGuests = query(
+            guestsRef,
+            where('propertyId', '==', propertyId),
+            where('status', '==', 'booked')
+        );
 
-            // Only export active/upcoming bookings
-            // We usually want to block dates for CONFIRMED bookings.
-            // Assuming 'upcoming', 'active', 'completed' (past but still occupied?) 
-            // Actually, we should probably output all existing bookings that have valid dates
-            // regardless of status unless they are 'cancelled'.
-            if (guest.status === 'cancelled') return;
+        const snapshot = await getDocs(qGuests);
+        const guests = snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() } as any));
 
-            if (guest.checkInDate && guest.checkOutDate) {
-                const start = formatICalDate(guest.checkInDate); // YYYYMMDD
-                const end = formatICalDate(guest.checkOutDate);   // YYYYMMDD
-                // iCal DTEND is exclusive for Dates. 
-                // DTSTART:20240101, DTEND:20240103 means nights of 1st and 2nd. Checkout on 3rd.
-                // Our data is CheckIn and CheckOut date strings (YYYY-MM-DD). 
+        let icalContent = [
+            'BEGIN:VCALENDAR',
+            'VERSION:2.0',
+            'PRODID:-//StaySync//GuestGreeter//EN',
+            'CALSCALE:GREGORIAN',
+            'METHOD:PUBLISH',
+            `X-WR-CALNAME:${propName} Stays`,
+            'X-WR-TIMEZONE:UTC'
+        ];
 
-                // UUID/UID
-                const eventUid = doc.id + '@stay-sync.app';
-                const created = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+        guests.forEach(guest => {
+            // Only include stays with valid dates
+            if (!guest.checkInDate || !guest.checkOutDate) return;
 
-                const guestName = guest.guestName || 'Guest';
-                const guestsCount = guest.numberOfGuests || 0;
-                const phone = guest.phoneNumber || 'N/A';
-                const total = guest.totalAmount || 'N/A';
+            const checkIn = guest.checkInDate.replace(/-/g, '');
+            const checkOut = guest.checkOutDate.replace(/-/g, '');
+            const summary = `${guest.guestName || 'Guest'} - ${propName}`;
+            const description = `Guest: ${guest.guestName}\\nProperty: ${propName}\\nGuests: ${guest.numberOfGuests || 1}\\nStatus: ${guest.status}`;
 
-                events += `BEGIN:VEVENT
-DTSTART;VALUE=DATE:${start}
-DTEND;VALUE=DATE:${end}
-DTSTAMP:${created}
-UID:${eventUid}
-SUMMARY:🏠 ${guestName} (${guestsCount} guests) - Stay Sync
-DESCRIPTION:Guest: ${guestName}\\nPhone: ${phone}\\nTotal: ${total}\\nProperty: ${propertyName}\\nSource: Stay Sync
-END:VEVENT
-`;
-            }
+            icalContent.push('BEGIN:VEVENT');
+            icalContent.push(`UID:${guest.id}@staysync.pro`);
+            icalContent.push(`DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]}Z`);
+            icalContent.push(`DTSTART;VALUE=DATE:${checkIn}`);
+            icalContent.push(`DTEND;VALUE=DATE:${checkOut}`);
+            icalContent.push(`SUMMARY:${summary}`);
+            icalContent.push(`DESCRIPTION:${description}`);
+            icalContent.push('STATUS:CONFIRMED');
+            icalContent.push('END:VEVENT');
         });
 
-        // 3. Construct iCal File
-        const calendarContent = `BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//Stay Sync//NONSGML Calendar//EN
-CALSCALE:GREGORIAN
-METHOD:PUBLISH
-X-WR-CALNAME:Stay Sync
-${events}END:VCALENDAR`;
+        icalContent.push('END:VCALENDAR');
 
-        // 4. Return as text/calendar
-        return new NextResponse(calendarContent, {
-            status: 200,
+        return new Response(icalContent.join('\r\n'), {
             headers: {
                 'Content-Type': 'text/calendar; charset=utf-8',
-                'Content-Disposition': `attachment; filename="calendar_${propertyId}.ics"`,
-                'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate', // Prevent caching so updates are seen
-            },
+                'Content-Disposition': `attachment; filename="calendar-${propertyId}.ics"`,
+                'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=600'
+            }
         });
-
     } catch (error) {
-        console.error("iCal Generation Error:", error);
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+        console.error('iCal Generation Error:', error);
+        return NextResponse.json({ error: 'Failed to generate calendar' }, { status: 500 });
     }
 }

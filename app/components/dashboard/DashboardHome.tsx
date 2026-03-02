@@ -38,7 +38,7 @@ export function DashboardHome() {
         if (upcomingBookings.length > 0) {
             const guest = upcomingBookings[0];
             // Find property for time details
-            const statsProperty = properties.find(p => p.name === guest.propName);
+            const statsProperty = properties.find(p => p.id === guest.propertyId);
             widgetService.updateWidgetData(guest, statsProperty);
         } else {
             widgetService.updateWidgetData(null);

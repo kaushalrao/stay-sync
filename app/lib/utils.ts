@@ -61,12 +61,13 @@ export const isValidBookingStatus = (status: Guest['status']): boolean => {
     return status !== 'cancelled' && status !== 'deleted' && status !== 'pending';
 };
 
-export const getStatusColor = (status: Guest['status'], isPast?: boolean) => {
+export const getStatusColor = (status: Guest['status'], isPast?: boolean, isHosting?: boolean) => {
     if (status === 'deleted') return 'bg-rose-400 shadow-[0_0_8px] shadow-rose-400/50';
     if (status === 'cancelled') return 'bg-slate-400';
     if (status === 'pending') return 'bg-amber-400 shadow-[0_0_8px] shadow-amber-400/50';
 
     // Status is 'booked'
+    if (isHosting) return 'bg-emerald-500 shadow-[0_0_8px] shadow-emerald-500/50';
     if (isPast) return 'bg-slate-400';
     return 'bg-blue-400 shadow-[0_0_8px] shadow-blue-400/50';
 };
@@ -79,7 +80,16 @@ export const getDisplayStatus = (guest: Guest): string => {
     const today = new Date().toISOString().split('T')[0];
     const isPastDate = !!(guest.checkOutDate && guest.checkOutDate < today);
 
-    return isPastDate ? 'PAST' : 'UPCOMING';
+    if (isPastDate) return 'PAST';
+
+    // Check if currently hosting
+    if (guest.checkInDate && guest.checkOutDate) {
+        if (today >= guest.checkInDate && today <= guest.checkOutDate) {
+            return 'HOSTING';
+        }
+    }
+
+    return 'UPCOMING';
 };
 
 export const getPropertyColorKey = (name: string) => {

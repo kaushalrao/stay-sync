@@ -63,8 +63,8 @@ export const defaultCalendarService: CalendarService = {
         const internalEvents: CalendarEvent[] = [];
 
         internalGuests.forEach((data) => {
-            // Filter by propName
-            if (data.propName !== property.name) return;
+            // Strict filter by propertyId
+            if (data.propertyId !== property.id) return;
             // Only block for valid statuses (not cancelled, not deleted, not pending)
             if (isValidBookingStatus(data.status) && data.checkInDate && data.checkOutDate) {
                 internalEvents.push({

@@ -15,6 +15,7 @@ export const GuestCard: React.FC<GuestCardProps> = ({ guest, mode, onSelect, onD
     const styles = COLOR_VARIANTS[colorKey];
     const displayStatus = getDisplayStatus(guest);
     const isPast = displayStatus === 'PAST';
+    const isHosting = displayStatus === 'HOSTING';
 
     const router = useRouter();
     const loadGuestForEdit = useGuestFormStore(state => state.loadGuestForEdit);
@@ -30,7 +31,7 @@ export const GuestCard: React.FC<GuestCardProps> = ({ guest, mode, onSelect, onD
     const [confirmAdvancePaid, setConfirmAdvancePaid] = useState(guest.advancePaid?.toString() || '');
 
     const properties = usePropertyStore(state => state.properties);
-    const selectedProperty = properties.find(p => p.name === guest.propName);
+    const selectedProperty = properties.find(p => p.id === guest.propertyId);
 
     const balance = guest.totalAmount ? Math.max(0, guest.totalAmount - (guest.advancePaid || 0)) : 0;
     const isUnpaid = balance > 0;
@@ -137,8 +138,8 @@ export const GuestCard: React.FC<GuestCardProps> = ({ guest, mode, onSelect, onD
                     <div>
                         <h4 className="text-slate-900 dark:text-white font-bold text-sm md:text-base leading-tight pr-8">{guest.guestName}</h4>
                         <div className="flex items-center flex-wrap gap-2 mt-1">
-                            <div className="flex items-center gap-1.5 text-[10px] text-slate-600 dark:text-slate-400 font-bold uppercase tracking-wider bg-slate-100/50 dark:bg-slate-800/50 inline-flex px-2 py-0.5 rounded-full backdrop-blur-sm border border-slate-200/50 dark:border-white/5">
-                                <span className={`w-1.5 h-1.5 rounded-full ${getStatusColor(guest.status, isPast)}`}></span>
+                            <div className={`flex items-center gap-1.5 text-[10px] ${isHosting ? 'text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200/50 dark:border-emerald-500/20' : 'text-slate-600 dark:text-slate-400 bg-slate-100/50 dark:bg-slate-800/50 border-slate-200/50 dark:border-white/5'} font-bold uppercase tracking-wider inline-flex px-2 py-0.5 rounded-full backdrop-blur-sm border`}>
+                                <span className={`w-1.5 h-1.5 rounded-full ${getStatusColor(guest.status, isPast, isHosting)}`}></span>
                                 {displayStatus}
                             </div>
 

@@ -12,7 +12,7 @@ export const isGuestStayValid = (g: Guest, properties: Property[]) => {
 
     // 3. Time Check
     const now = new Date();
-    const property = properties.find(p => p.name === g.propName);
+    const property = properties.find(p => p.id === g.propertyId);
     const checkOutTime = property?.checkOutTime || '11:00';
 
     const [year, month, day] = g.checkOutDate.split('-').map(Number);
@@ -37,10 +37,7 @@ export const calculateDashboardMetrics = (
     // 1. Filter by Property
     const filteredByProp = selectedProperty === 'all'
         ? validGuests
-        : validGuests.filter(g => {
-            const prop = properties.find(p => p.id === selectedProperty);
-            return prop && g.propName === prop.name;
-        });
+        : validGuests.filter(g => g.propertyId === selectedProperty);
 
     // 2. Filter by Year (for specific stats)
     const filteredByYear = filteredByProp.filter(g => {
@@ -128,10 +125,7 @@ export const getCurrentMonthStats = (
 
     const filteredByProp = selectedProperty === 'all'
         ? validGuests
-        : validGuests.filter(g => {
-            const prop = properties.find(p => p.id === selectedProperty);
-            return prop && g.propName === prop.name;
-        });
+        : validGuests.filter(g => g.propertyId === selectedProperty);
 
     const currentMonthGuests = filteredByProp.filter(g => {
         if (!g.checkInDate) return false;
@@ -174,10 +168,7 @@ export const getUpcomingBookings = (
 
     const filteredByProp = selectedProperty === 'all'
         ? validGuests
-        : validGuests.filter(g => {
-            const prop = properties.find(p => p.id === selectedProperty);
-            return prop && g.propName === prop.name;
-        });
+        : validGuests.filter(g => g.propertyId === selectedProperty);
 
     return filteredByProp
         .filter(g => isGuestStayValid(g, properties))
@@ -215,10 +206,7 @@ export const getRevenueSparkline = (
 
     const filteredByProp = selectedProperty === 'all'
         ? validGuests
-        : validGuests.filter(g => {
-            const prop = properties.find(p => p.id === selectedProperty);
-            return prop && g.propName === prop.name;
-        });
+        : validGuests.filter(g => g.propertyId === selectedProperty);
 
     // Get last 6 months
     for (let i = 5; i >= 0; i--) {
