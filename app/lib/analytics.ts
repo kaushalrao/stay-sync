@@ -164,14 +164,18 @@ export const getUpcomingBookings = (
         return [];
     }
 
-    const validGuests = guests.filter(g => isValidBookingStatus(g.status));
+    // For the upcoming list, we display both 'booked' and 'pending' 
+    // but exclude 'cancelled' and 'deleted'
+    const displayableGuests = guests.filter(g => g.status !== 'cancelled' && g.status !== 'deleted');
 
     const filteredByProp = selectedProperty === 'all'
-        ? validGuests
-        : validGuests.filter(g => g.propertyId === selectedProperty);
+        ? displayableGuests
+        : displayableGuests.filter(g => g.propertyId === selectedProperty);
+
+    const today = new Date().toISOString().split('T')[0];
 
     return filteredByProp
-        .filter(g => isGuestStayValid(g, properties))
+        .filter(g => (g.checkOutDate && g.checkOutDate >= today))
         .sort((a, b) => new Date(a.checkInDate).getTime() - new Date(b.checkInDate).getTime())
         .slice(0, limit);
 };

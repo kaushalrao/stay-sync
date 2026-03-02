@@ -7,6 +7,7 @@ import { IGuestRepository } from './repository.interface';
 import { Guest } from '@/app/lib/types';
 import { getAllowedPropertyIds } from '@/app/store/propertyStore';
 import { isValidBookingStatus } from '@/app/lib/utils';
+import { getUpcomingBookings } from '@/app/lib/analytics';
 
 export class FirebaseGuestRepository implements IGuestRepository {
     private getCollectionRef() {
@@ -77,28 +78,23 @@ export class FirebaseGuestRepository implements IGuestRepository {
         const allowedPropIds = getAllowedPropertyIds();
         if (allowedPropIds.length === 0) return [];
 
-        const today = new Date().toISOString().split('T')[0];
-
-        // We query slightly more to handle potential filtering if needed, but primarily reliance on checkInDate
-        // Note: 'upcoming' usually means checkInDate >= today. 
-        // We also want to filter out cancelled if possible, but Firestore doesn't support != easily with range.
-        // So we fetch, then filter in memory if needed.
-
+        // Simplified query: fetch recent guests for the properties and filter in memory
+        // This avoids complex range/ordering index requirements
         const q = query(
             this.getCollectionRef(),
             where('propertyId', 'in', allowedPropIds.slice(0, 10)),
-            where('checkInDate', '>=', today),
-            orderBy('checkInDate', 'asc'),
-            limit(limitCount * 2) // Fetch double to allow for some filtering (e.g. cancelled)
+            orderBy('createdAt', 'desc'),
+            limit(limitCount * 4) // Fetch a larger window to ensure enough valid stays
         );
 
         const snapshot = await getDocs(q);
-        const guests = snapshot.docs
-            .map(doc => ({ id: doc.id, ...doc.data() } as Guest))
-            .filter(g => isValidBookingStatus(g.status))
-            .slice(0, limitCount);
+        const guests = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Guest));
 
-        return guests;
+        // Use the new utility function to filter and sort
+        // Note: This method doesn't have access to 'properties' or 'selectedProperty',
+        // so it will return a broader list that can be further filtered by the caller.
+        // Assuming 'all' properties and no specific selection for this repository method.
+        return getUpcomingBookings(guests, [], 'all', limitCount);
     }
 
     async getGuest(guestId: string): Promise<Guest | null> {
