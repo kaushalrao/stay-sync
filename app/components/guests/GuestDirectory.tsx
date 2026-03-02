@@ -116,6 +116,7 @@ export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode =
     };
 
     const [selectedMonth, setSelectedMonth] = useState<string>(format(new Date(), 'yyyy-MM'));
+    const [selectedYear, setSelectedYear] = useState<string>(format(new Date(), 'yyyy'));
 
     // ... (rest of the internal logic remains same)
     const handlePrevMonth = () => {
@@ -157,8 +158,9 @@ export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode =
         }
 
         const matchesMonth = selectedMonth === 'all' || (g.checkInDate && g.checkInDate.startsWith(selectedMonth));
+        const matchesYear = g.checkInDate && g.checkInDate.startsWith(selectedYear);
 
-        return matchesSearch && matchesStatus && matchesMonth;
+        return matchesSearch && matchesStatus && matchesMonth && matchesYear;
     }).sort((a, b) => {
         const dateA = new Date(a.checkInDate).getTime();
         const dateB = new Date(b.checkInDate).getTime();
@@ -198,6 +200,8 @@ export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode =
                     setSearch={setSearch}
                     selectedMonth={selectedMonth}
                     setSelectedMonth={setSelectedMonth}
+                    selectedYear={selectedYear}
+                    setSelectedYear={setSelectedYear}
                     statusFilter={statusFilter}
                     setStatusFilter={setStatusFilter}
                     mode={mode}

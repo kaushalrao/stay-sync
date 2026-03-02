@@ -133,6 +133,8 @@ export interface GuestFiltersProps {
     setSearch: (value: string) => void;
     selectedMonth: string;
     setSelectedMonth: (month: string) => void;
+    selectedYear: string;
+    setSelectedYear: (year: string) => void;
     statusFilter: 'upcoming' | 'past' | 'all' | 'deleted' | 'pending';
     setStatusFilter: (filter: 'upcoming' | 'past' | 'all' | 'deleted' | 'pending') => void;
     mode: 'page' | 'picker';

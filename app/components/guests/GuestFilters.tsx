@@ -35,9 +35,10 @@ const MobileSearchAndButton = ({ search, setSearch, activeFilterCount, onOpenFil
 );
 
 const DesktopFilterControls = ({
-    search, setSearch, mode, selectedMonth,
+    search, setSearch, mode, selectedMonth, setSelectedMonth,
+    selectedYear, setSelectedYear,
     handlePrevMonth, handleNextMonth, toggleAllMonths,
-    statusFilter, setStatusFilter
+    statusFilter, setStatusFilter, years
 }: any) => (
     <div className={`hidden md:flex flex-col ${mode === 'page' ? 'md:flex-row' : ''} gap-4`}>
         <div className="relative group flex-1">
@@ -51,7 +52,26 @@ const DesktopFilterControls = ({
             />
         </div>
 
-        <div className={`flex flex-col ${mode === 'page' ? 'md:flex-row' : ''} gap-3 shrink-0`}>
+        <div className={`flex flex-col lg:flex-row gap-3 shrink-0`}>
+            {/* Year Filter */}
+            <div className="flex bg-slate-100 dark:bg-slate-900/50 border border-slate-300 dark:border-white/10 rounded-xl p-1 shrink-0">
+                {years.map((year: string) => (
+                    <button
+                        key={year}
+                        onClick={() => {
+                            setSelectedYear(year);
+                            setSelectedMonth('all');
+                        }}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${selectedYear === year
+                            ? 'bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                            : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                            }`}
+                    >
+                        {year}
+                    </button>
+                ))}
+            </div>
+
             {/* Month Filter Navigator */}
             <div className={`flex items-center justify-between gap-1 bg-slate-100 dark:bg-slate-900/50 border border-slate-300 dark:border-white/10 rounded-xl p-1 w-full ${mode === 'page' ? 'md:w-auto' : ''} min-w-[200px]`}>
                 <button
@@ -64,7 +84,7 @@ const DesktopFilterControls = ({
                     onClick={toggleAllMonths}
                     className="flex-1 text-center text-sm font-bold text-slate-900 dark:text-white py-1 hover:text-indigo-600 dark:hover:text-indigo-300 transition-colors truncate px-2"
                 >
-                    {selectedMonth === 'all' ? 'All Months' : format(new Date(selectedMonth + '-01'), 'MMMM yyyy')}
+                    {selectedMonth === 'all' ? 'All Months' : format(new Date(selectedMonth + '-01'), 'MMMM')}
                 </button>
                 <button
                     onClick={handleNextMonth}
@@ -96,8 +116,9 @@ const DesktopFilterControls = ({
 const MobileFilterBottomSheet = ({
     isOpen, onClose, hasChanges,
     localSelectedMonth, handleMobilePrevMonth, handleMobileNextMonth, toggleMobileAllMonths,
+    localSelectedYear, setLocalSelectedYear, setLocalSelectedMonth,
     localStatusFilter, setLocalStatusFilter,
-    onClear, onApply
+    onClear, onApply, years
 }: any) => {
     if (!isOpen) return null;
 
@@ -132,9 +153,31 @@ const MobileFilterBottomSheet = ({
                     {/* Scrollable Filters */}
                     <div className="flex-1 overflow-y-auto px-6 py-6 space-y-8">
 
-                        {/* Timeframe Section */}
+                        {/* Year Selection */}
                         <div className="space-y-3">
-                            <h4 className="text-sm font-bold text-slate-900 dark:text-slate-200 uppercase tracking-widest">Timeframe</h4>
+                            <h4 className="text-sm font-bold text-slate-900 dark:text-slate-200 uppercase tracking-widest">Year</h4>
+                            <div className="flex bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-1.5 overflow-x-auto no-scrollbar">
+                                {years.map((year: string) => (
+                                    <button
+                                        key={year}
+                                        onClick={() => {
+                                            setLocalSelectedYear(year);
+                                            setLocalSelectedMonth('all');
+                                        }}
+                                        className={`flex-1 min-w-[70px] py-2.5 rounded-xl text-sm font-bold transition-all ${localSelectedYear === year
+                                            ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-md'
+                                            : 'text-slate-500 dark:text-slate-400'
+                                            }`}
+                                    >
+                                        {year}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Timeframe Section (Month) */}
+                        <div className="space-y-3">
+                            <h4 className="text-sm font-bold text-slate-900 dark:text-slate-200 uppercase tracking-widest">Month</h4>
                             <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-2">
                                 <button
                                     onClick={handleMobilePrevMonth}
@@ -146,7 +189,7 @@ const MobileFilterBottomSheet = ({
                                     onClick={toggleMobileAllMonths}
                                     className="flex-1 text-center font-bold text-slate-900 dark:text-white py-2 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors text-[15px]"
                                 >
-                                    {localSelectedMonth === 'all' ? 'All Time' : format(new Date(localSelectedMonth + '-01'), 'MMMM yyyy')}
+                                    {localSelectedMonth === 'all' ? 'All Months' : format(new Date(localSelectedMonth + '-01'), 'MMMM')}
                                 </button>
                                 <button
                                     onClick={handleMobileNextMonth}
@@ -217,40 +260,65 @@ export const GuestFilters: React.FC<GuestFiltersProps> = ({
     setSearch,
     selectedMonth,
     setSelectedMonth,
+    selectedYear,
+    setSelectedYear,
     statusFilter,
     setStatusFilter,
     mode
 }) => {
     const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
 
+    // Generate years dynamically: current year and past 2 years
+    const currentYearNum = new Date().getFullYear();
+    const years = Array.from({ length: 3 }, (_, i) => (currentYearNum - (2 - i)).toString());
+
     // Local state for mobile deferred filtering
     const [localSelectedMonth, setLocalSelectedMonth] = useState(selectedMonth);
+    const [localSelectedYear, setLocalSelectedYear] = useState(selectedYear);
     const [localStatusFilter, setLocalStatusFilter] = useState(statusFilter);
 
     // Sync local state when modal opens
     useEffect(() => {
         if (isMobileFilterOpen) {
             setLocalSelectedMonth(selectedMonth);
+            setLocalSelectedYear(selectedYear);
             setLocalStatusFilter(statusFilter);
         }
-    }, [isMobileFilterOpen, selectedMonth, statusFilter]);
+    }, [isMobileFilterOpen, selectedMonth, selectedYear, statusFilter]);
 
     // Check if local filters differ from applied global filters
-    const hasChanges = localSelectedMonth !== selectedMonth || localStatusFilter !== statusFilter;
+    const hasChanges = localSelectedMonth !== selectedMonth || localSelectedYear !== selectedYear || localStatusFilter !== statusFilter;
 
-    // Calculate active filter count for the badge (default state is 'all' status and current month)
+    // Calculate active filter count for the badge
     const currentMonthStr = format(new Date(), 'yyyy-MM');
-    const activeFilterCount = (statusFilter !== 'all' ? 1 : 0) + (selectedMonth !== currentMonthStr ? 1 : 0);
+    const currentYearStr = format(new Date(), 'yyyy');
+    const activeFilterCount = (statusFilter !== 'all' ? 1 : 0) +
+        (selectedMonth !== currentMonthStr && selectedMonth !== 'all' ? 1 : 0) +
+        (selectedYear !== currentYearStr ? 1 : 0);
 
     // ----- Desktop Handlers -----
     const handlePrevMonth = () => {
         const date = selectedMonth === 'all' ? new Date() : new Date(selectedMonth + '-01');
-        setSelectedMonth(format(new Date(date.getFullYear(), date.getMonth() - 1, 1), 'yyyy-MM'));
+        const newDate = new Date(date.getFullYear(), date.getMonth() - 1, 1);
+        const newYearStr = format(newDate, 'yyyy');
+
+        // Only navigate if within the dynamic year range
+        if (years.includes(newYearStr)) {
+            setSelectedMonth(format(newDate, 'yyyy-MM'));
+            setSelectedYear(newYearStr);
+        }
     };
 
     const handleNextMonth = () => {
         const date = selectedMonth === 'all' ? new Date() : new Date(selectedMonth + '-01');
-        setSelectedMonth(format(new Date(date.getFullYear(), date.getMonth() + 1, 1), 'yyyy-MM'));
+        const newDate = new Date(date.getFullYear(), date.getMonth() + 1, 1);
+        const newYearStr = format(newDate, 'yyyy');
+
+        // Only navigate if within the dynamic year range
+        if (years.includes(newYearStr)) {
+            setSelectedMonth(format(newDate, 'yyyy-MM'));
+            setSelectedYear(newYearStr);
+        }
     };
 
     const toggleAllMonths = () => {
@@ -260,12 +328,24 @@ export const GuestFilters: React.FC<GuestFiltersProps> = ({
     // ----- Mobile Local Handlers -----
     const handleMobilePrevMonth = () => {
         const date = localSelectedMonth === 'all' ? new Date() : new Date(localSelectedMonth + '-01');
-        setLocalSelectedMonth(format(new Date(date.getFullYear(), date.getMonth() - 1, 1), 'yyyy-MM'));
+        const newDate = new Date(date.getFullYear(), date.getMonth() - 1, 1);
+        const newYearStr = format(newDate, 'yyyy');
+
+        if (years.includes(newYearStr)) {
+            setLocalSelectedMonth(format(newDate, 'yyyy-MM'));
+            setLocalSelectedYear(newYearStr);
+        }
     };
 
     const handleMobileNextMonth = () => {
         const date = localSelectedMonth === 'all' ? new Date() : new Date(localSelectedMonth + '-01');
-        setLocalSelectedMonth(format(new Date(date.getFullYear(), date.getMonth() + 1, 1), 'yyyy-MM'));
+        const newDate = new Date(date.getFullYear(), date.getMonth() + 1, 1);
+        const newYearStr = format(newDate, 'yyyy');
+
+        if (years.includes(newYearStr)) {
+            setLocalSelectedMonth(format(newDate, 'yyyy-MM'));
+            setLocalSelectedYear(newYearStr);
+        }
     };
 
     const toggleMobileAllMonths = () => {
@@ -275,6 +355,7 @@ export const GuestFilters: React.FC<GuestFiltersProps> = ({
     const applyMobileFilters = () => {
         setStatusFilter(localStatusFilter);
         setSelectedMonth(localSelectedMonth);
+        setSelectedYear(localSelectedYear);
         setIsMobileFilterOpen(false);
     };
 
@@ -292,11 +373,15 @@ export const GuestFilters: React.FC<GuestFiltersProps> = ({
                 setSearch={setSearch}
                 mode={mode}
                 selectedMonth={selectedMonth}
+                setSelectedMonth={setSelectedMonth}
+                selectedYear={selectedYear}
+                setSelectedYear={setSelectedYear}
                 handlePrevMonth={handlePrevMonth}
                 handleNextMonth={handleNextMonth}
                 toggleAllMonths={toggleAllMonths}
                 statusFilter={statusFilter}
                 setStatusFilter={setStatusFilter}
+                years={years}
             />
 
             <MobileFilterBottomSheet
@@ -304,16 +389,21 @@ export const GuestFilters: React.FC<GuestFiltersProps> = ({
                 onClose={() => setIsMobileFilterOpen(false)}
                 hasChanges={hasChanges}
                 localSelectedMonth={localSelectedMonth}
+                setLocalSelectedMonth={setLocalSelectedMonth}
                 handleMobilePrevMonth={handleMobilePrevMonth}
                 handleMobileNextMonth={handleMobileNextMonth}
                 toggleMobileAllMonths={toggleMobileAllMonths}
+                localSelectedYear={localSelectedYear}
+                setLocalSelectedYear={setLocalSelectedYear}
                 localStatusFilter={localStatusFilter}
                 setLocalStatusFilter={setLocalStatusFilter}
                 onClear={() => {
                     setLocalStatusFilter('all');
                     setLocalSelectedMonth(format(new Date(), 'yyyy-MM'));
+                    setLocalSelectedYear(format(new Date(), 'yyyy'));
                 }}
                 onApply={applyMobileFilters}
+                years={years}
             />
         </div>
     );
