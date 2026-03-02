@@ -2,154 +2,196 @@
 
 import React from 'react';
 import { format, parseISO } from 'date-fns';
-import { Calendar, MapPin, ArrowRight, Sparkles } from 'lucide-react';
+import { Calendar, MapPin, ArrowRight, Sparkles, MessageSquare, Clock } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { UpcomingBookingsWidgetProps } from '@lib/types';
 
 export function UpcomingBookingsWidget({ bookings, loading }: UpcomingBookingsWidgetProps) {
     const router = useRouter();
 
-    // Pending filter moved to data source
-    const activeBookings = bookings;
+    // Limit to 4 for card density, keeping the view clean
+    const activeBookings = bookings.slice(0, 4);
 
     return (
         <div className="relative group">
-            {/* Gradient border effect */}
-            <div className="absolute -inset-[1px] bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-3xl opacity-20 group-hover:opacity-40 blur-sm transition-all duration-500" />
+            {/* Ambient Background Glow */}
+            <div className="absolute -inset-[2px] bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-pink-500/20 rounded-[32px] blur-2xl opacity-50 group-hover:opacity-100 transition-opacity duration-700" />
 
-            {/* Main card */}
-            <div className="relative bg-gradient-to-br from-white via-slate-50 to-slate-100 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800 rounded-2xl md:rounded-3xl p-4 md:p-6 lg:p-8 shadow-2xl border border-slate-200 dark:border-slate-700/50 backdrop-blur-xl overflow-hidden">
-                {/* Decorative background elements */}
-                <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 dark:bg-indigo-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-                <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-500/5 dark:bg-purple-500/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+            {/* Main Container */}
+            <div className="relative bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl rounded-[32px] p-5 md:p-8 shadow-[0_8px_32px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.5)] border border-white/20 dark:border-white/5 overflow-hidden">
+
+                {/* Decorative Accents */}
+                <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-500/10 dark:bg-indigo-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 animate-pulse" />
 
                 {/* Header */}
-                <div className="relative z-10 flex items-start justify-between mb-4 md:mb-6 lg:mb-8 gap-2">
-                    <div className="flex items-start gap-2 md:gap-3 lg:gap-4">
-                        <div className="p-2 md:p-2.5 lg:p-3 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-xl md:rounded-2xl border border-indigo-500/20 backdrop-blur-sm flex-shrink-0">
-                            <Calendar className="text-indigo-400" size={20} />
+                <div className="relative z-10 flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                            <Calendar className="text-white" size={24} />
                         </div>
-                        <div className="min-w-0">
-                            <h3 className="text-lg md:text-xl lg:text-2xl font-bold text-slate-900 dark:text-white mb-0.5 md:mb-1 tracking-tight">
-                                Upcoming Arrivals
+                        <div>
+                            <h3 className="text-lg md:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+                                Arrivals <span className="text-indigo-600 dark:text-indigo-400">expected</span>
                             </h3>
-                            <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 flex items-center gap-1.5 md:gap-2">
-                                {loading ? (
-                                    <span className="inline-flex items-center gap-2">
-                                        <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-pulse" />
-                                        Loading...
-                                    </span>
-                                ) : (
-                                    <>
-                                        <span className="font-semibold text-indigo-600 dark:text-indigo-400">{activeBookings.length}</span>
-                                        <span>booking{activeBookings.length !== 1 ? 's' : ''} coming up</span>
-                                    </>
-                                )}
+                            <p className="text-[11px] md:text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest flex items-center gap-2 mt-0.5">
+                                {loading ? 'Fetching bookings...' : `${activeBookings.length} this week`}
+                                {!loading && activeBookings.some(b => {
+                                    const diff = parseISO(b.checkInDate).getTime() - new Date().getTime();
+                                    return diff > 0 && diff < 86400000;
+                                }) && (
+                                        <span className="flex items-center gap-1 text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/20 animate-pulse">
+                                            <Clock size={10} /> Live
+                                        </span>
+                                    )}
                             </p>
                         </div>
                     </div>
                     <button
                         onClick={() => router.push('/guests')}
-                        className="group/btn flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 md:py-2.5 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 hover:from-indigo-500/20 hover:to-purple-500/20 border border-indigo-500/20 hover:border-indigo-500/40 rounded-lg md:rounded-xl text-xs md:text-sm font-semibold text-indigo-600 dark:text-indigo-300 hover:text-indigo-700 dark:hover:text-indigo-200 transition-all duration-300 shadow-lg shadow-indigo-500/5 hover:shadow-indigo-500/10 flex-shrink-0"
+                        className="group/btn flex items-center gap-2 px-5 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl text-sm font-bold hover:scale-105 transition-all shadow-xl shadow-slate-900/10 dark:shadow-white/5 active:scale-95"
                     >
-                        View All
+                        Manage All
                         <ArrowRight size={16} className="group-hover/btn:translate-x-1 transition-transform" />
                     </button>
                 </div>
 
-                {/* Bookings List */}
-                <div className="relative z-10">
+                {/* List Body */}
+                <div className="relative z-10 space-y-4">
                     {loading ? (
                         <div className="space-y-4">
                             {[1, 2, 3].map((i) => (
-                                <div key={i} className="animate-pulse">
-                                    <div className="flex items-center gap-3 md:gap-4 lg:gap-5 p-3 md:p-4 lg:p-5 bg-slate-100 dark:bg-slate-800/40 rounded-xl md:rounded-2xl border border-slate-200 dark:border-slate-700/30">
-                                        <div className="w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-slate-300 to-slate-400 dark:from-slate-700 dark:to-slate-600 rounded-xl md:rounded-2xl flex-shrink-0" />
-                                        <div className="flex-1 space-y-2 md:space-y-3 min-w-0">
-                                            <div className="h-3 md:h-4 bg-slate-300 dark:bg-slate-700 rounded-lg w-1/2 md:w-1/3" />
-                                            <div className="h-2 md:h-3 bg-slate-300/70 dark:bg-slate-700/70 rounded-lg w-2/3 md:w-1/2" />
-                                        </div>
-                                        <div className="space-y-1.5 md:space-y-2 flex-shrink-0">
-                                            <div className="h-4 md:h-5 bg-slate-300 dark:bg-slate-700 rounded-lg w-16 md:w-20" />
-                                            <div className="h-2 md:h-3 bg-slate-300/70 dark:bg-slate-700/70 rounded-lg w-12 md:w-16" />
-                                        </div>
-                                    </div>
-                                </div>
+                                <div key={i} className="h-24 bg-slate-100 dark:bg-slate-800/40 rounded-2xl animate-pulse border border-slate-200 dark:border-slate-800" />
                             ))}
                         </div>
                     ) : activeBookings.length === 0 ? (
-                        <div className="text-center py-16">
-                            <div className="relative inline-flex items-center justify-center mb-6">
-                                <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-full blur-2xl" />
-                                <div className="relative w-20 h-20 bg-slate-100 dark:bg-slate-800/80 rounded-2xl flex items-center justify-center border border-slate-200 dark:border-slate-700/50 shadow-sm">
-                                    <Calendar className="text-slate-400 dark:text-slate-500" size={36} />
-                                </div>
+                        <div className="flex flex-col items-center justify-center py-12 text-center">
+                            <div className="w-16 h-16 bg-slate-100 dark:bg-white/5 rounded-2xl flex items-center justify-center mb-4">
+                                <Sparkles className="text-slate-300 dark:text-slate-600" size={32} />
                             </div>
-                            <p className="text-slate-700 dark:text-slate-300 font-semibold text-lg mb-2">No upcoming bookings</p>
-                            <p className="text-sm text-slate-500 dark:text-slate-500">New arrivals will appear here</p>
+                            <p className="text-slate-900 dark:text-white font-semibold text-lg">Your calendar is clear</p>
+                            <p className="text-slate-500 text-sm">New arrivals will show up here.</p>
                         </div>
-                    ) : (
-                        <div className="space-y-3">
-                            {activeBookings.map((booking, index) => (
-                                <div
-                                    key={booking.id}
-                                    className="group/card relative cursor-pointer"
-                                    onClick={() => router.push(`/greeter?guestId=${booking.id}`)}
-                                    style={{ animationDelay: `${index * 50}ms` }}
-                                >
-                                    {/* Card hover glow */}
-                                    <div className="absolute -inset-[1px] bg-gradient-to-r from-indigo-500/0 via-purple-500/0 to-pink-500/0 group-hover/card:from-indigo-500/30 group-hover/card:via-purple-500/30 group-hover/card:to-pink-500/30 rounded-2xl opacity-0 group-hover/card:opacity-100 blur-sm transition-all duration-500" />
+                    ) : (activeBookings.map((booking, index) => {
+                        const nights = booking.checkOutDate ? Math.ceil((parseISO(booking.checkOutDate).getTime() - parseISO(booking.checkInDate).getTime()) / (1000 * 60 * 60 * 24)) : 0;
 
-                                    {/* Card content */}
-                                    <div className="relative flex items-center gap-3 md:gap-4 lg:gap-5 p-3 md:p-4 lg:p-5 bg-slate-100 dark:bg-slate-800/40 group-hover/card:bg-slate-200 dark:group-hover/card:bg-slate-800/60 rounded-xl md:rounded-2xl border border-slate-200 dark:border-slate-700/30 group-hover/card:border-slate-300 dark:group-hover/card:border-slate-600/50 transition-all duration-300 backdrop-blur-sm">
-                                        {/* Avatar with gradient */}
-                                        <div className="relative flex-shrink-0">
-                                            <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl md:rounded-2xl blur-md opacity-50 group-hover/card:opacity-75 transition-opacity" />
-                                            <div className="relative w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 rounded-xl md:rounded-2xl bg-gradient-to-br from-indigo-400 via-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-base md:text-lg lg:text-xl shadow-lg">
-                                                {booking.guestName.charAt(0).toUpperCase()}
-                                            </div>
-                                        </div>
+                        return (
+                            <div
+                                key={booking.id}
+                                onClick={() => router.push(`/greeter?guestId=${booking.id}`)}
+                                style={{ animationDelay: `${index * 100}ms` }}
+                                className="group/card relative cursor-pointer animate-slide-up"
+                            >
+                                {/* Stabilized Inner Wrapper: decoupled transform for hit-area stability */}
+                                <div className="transform transition-all duration-300 group-hover/card:-translate-y-1 group-active/card:scale-[0.99]">
+                                    {/* Desktop Grid (Hidden on Mobile) */}
+                                    <div className="hidden md:grid grid-cols-12 items-center gap-4 p-5 bg-white dark:bg-slate-800/40 hover:bg-slate-50 dark:hover:bg-slate-800/60 rounded-2xl border border-slate-200/60 dark:border-white/5 transition-colors shadow-sm hover:shadow-xl group-hover/card:border-indigo-500/30">
 
-                                        {/* Details */}
-                                        <div className="flex-1 min-w-0">
-                                            <h4 className="font-bold text-slate-900 dark:text-white mb-1 md:mb-1.5 lg:mb-2 truncate text-sm md:text-base lg:text-lg group-hover/card:text-slate-800 dark:group-hover/card:text-indigo-100 transition-colors">
-                                                {booking.guestName}
-                                            </h4>
-                                            <div className="flex flex-wrap items-center gap-2 md:gap-3 lg:gap-4 text-xs md:text-sm">
-                                                <div className="flex items-center gap-1 md:gap-1.5 text-slate-600 dark:text-slate-400 group-hover/card:text-slate-700 dark:group-hover/card:text-slate-300 transition-colors max-w-[120px] md:max-w-none">
-                                                    <MapPin size={12} className="text-indigo-400/70 flex-shrink-0" />
-                                                    <span className="truncate font-medium">{booking.propName}</span>
-                                                </div>
-                                                <div className="flex items-center gap-1 md:gap-1.5 px-2 md:px-3 py-0.5 md:py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-md md:rounded-lg text-indigo-600 dark:text-indigo-300 font-semibold flex-shrink-0">
-                                                    <Calendar size={12} />
-                                                    <span className="text-xs md:text-sm">{format(parseISO(booking.checkInDate), 'MMM dd')}</span>
+                                        {/* 1-4: Guest Profile */}
+                                        <div className="col-span-4 flex items-center gap-4">
+                                            <div className="relative">
+                                                <div className="absolute inset-0 bg-indigo-500 blur-lg opacity-0 group-hover/card:opacity-20 transition-opacity" />
+                                                <div className="relative w-14 h-14 bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-500/20 dark:to-purple-500/20 rounded-2xl flex items-center justify-center border border-indigo-200 dark:border-indigo-500/30">
+                                                    <span className="text-indigo-600 dark:text-indigo-300 font-bold text-xl">
+                                                        {booking.guestName.charAt(0).toUpperCase()}
+                                                    </span>
                                                 </div>
                                             </div>
-                                        </div>
-
-                                        {/* Amount with premium styling */}
-                                        <div className="text-right flex-shrink-0">
-                                            <div className="flex items-center gap-1 md:gap-1.5 mb-0.5 md:mb-1 justify-end">
-                                                <Sparkles size={12} className="text-yellow-400/70 hidden md:block" />
-                                                <p className="font-bold text-sm md:text-base lg:text-xl bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">
-                                                    ₹{booking.totalAmount?.toLocaleString('en-IN') || 0}
+                                            <div className="min-w-0">
+                                                <p className="text-slate-900 dark:text-white font-bold truncate text-lg">
+                                                    {booking.guestName}
                                                 </p>
+                                                <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400 px-2 py-0.5 bg-emerald-500/10 rounded-full border border-emerald-500/20">
+                                                    Booked
+                                                </span>
                                             </div>
-                                            <p className="text-[10px] md:text-xs text-slate-500 dark:text-slate-500 font-medium">
-                                                {booking.checkOutDate && Math.ceil((parseISO(booking.checkOutDate).getTime() - parseISO(booking.checkInDate).getTime()) / (1000 * 60 * 60 * 24))} nights
+                                        </div>
+
+                                        {/* 5-8: Stay Context */}
+                                        <div className="col-span-4 space-y-1">
+                                            <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
+                                                <MapPin size={14} fill="currentColor" fillOpacity={0.1} />
+                                                <span className="text-sm font-bold truncate">{booking.propName}</span>
+                                            </div>
+                                            <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-xs font-semibold">
+                                                <Calendar size={14} className="opacity-50" />
+                                                <span>{format(parseISO(booking.checkInDate), 'MMM dd')} — {booking.checkOutDate ? format(parseISO(booking.checkOutDate), 'MMM dd') : '?'}</span>
+                                            </div>
+                                        </div>
+
+                                        {/* 9-11: Revenue */}
+                                        <div className="col-span-3 text-right">
+                                            <p className="text-xl font-bold text-slate-900 dark:text-white">
+                                                ₹{booking.totalAmount?.toLocaleString('en-IN') || 0}
+                                            </p>
+                                            <p className="text-xs font-semibold text-slate-400 uppercase tracking-tighter">
+                                                Stay: {nights} nights
                                             </p>
                                         </div>
 
-                                        {/* Hover arrow indicator - hidden on mobile */}
-                                        <ArrowRight
-                                            size={20}
-                                            className="hidden md:block text-slate-400 dark:text-slate-600 group-hover/card:text-indigo-600 dark:group-hover/card:text-indigo-400 opacity-0 group-hover/card:opacity-100 -translate-x-2 group-hover/card:translate-x-0 transition-all duration-300"
-                                        />
+                                        {/* 12: Action Reveal */}
+                                        <div className="col-span-1 flex justify-end">
+                                            <div className="w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center text-white opacity-0 group-hover/card:opacity-100 transform translate-x-2 group-hover/card:translate-x-0 transition-all duration-300 shadow-lg shadow-indigo-500/20">
+                                                <MessageSquare size={18} />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Mobile Cluster (Hidden on Desktop) */}
+                                    <div className="md:hidden flex flex-col gap-3 p-4 bg-white dark:bg-slate-800/40 rounded-[24px] border border-slate-200 dark:border-white/10 active:bg-slate-100 dark:active:bg-slate-800 transition-colors shadow-sm">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-12 h-12 bg-indigo-500/10 rounded-2xl flex items-center justify-center border border-indigo-200 dark:border-indigo-500/20">
+                                                    <span className="text-indigo-600 dark:text-indigo-400 font-bold text-lg">{booking.guestName.charAt(0)}</span>
+                                                </div>
+                                                <div>
+                                                    <p className="text-[15px] font-bold text-slate-900 dark:text-white">{booking.guestName}</p>
+                                                    <div className="flex items-center gap-1 text-[10px] uppercase font-bold text-indigo-500 tracking-wider">
+                                                        <Clock size={10} /> {nights} nights
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <p className="text-base font-bold text-slate-900 dark:text-white">₹{booking.totalAmount?.toLocaleString('en-IN') || 0}</p>
+                                                <div className="w-8 h-8 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-lg flex items-center justify-center border border-indigo-500/20">
+                                                    <MessageSquare size={14} />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-center justify-between px-3 py-2 bg-indigo-50 dark:bg-indigo-500/10 rounded-xl border border-indigo-100 dark:border-indigo-500/20">
+                                            <div className="flex items-center gap-2 min-w-0">
+                                                <MapPin size={12} className="text-indigo-500 shrink-0" />
+                                                <span className="text-xs font-semibold text-slate-800 dark:text-indigo-300 truncate">{booking.propName}</span>
+                                            </div>
+                                            <div className="flex items-center gap-1.5 shrink-0 pl-2 ml-2 border-l border-indigo-200 dark:border-indigo-500/20">
+                                                <Calendar size={12} className="text-indigo-500" />
+                                                <span className="text-xs font-bold text-slate-800 dark:text-indigo-300">{format(parseISO(booking.checkInDate), 'MMM dd')}</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                            ))}
-                        </div>
-                    )}
+                            </div>
+                        );
+                    }))}
+                </div>
+
+                {/* Bottom Stats Insight */}
+                <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between opacity-60">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                        Peak Arrival Window: <span className="text-indigo-600 dark:text-indigo-400 font-bold">14:00 - 16:00</span>
+                    </p>
+                    <div className="flex -space-x-2">
+                        {bookings.slice(0, 3).map((b, i) => (
+                            <div key={i} className="w-6 h-6 rounded-full border-2 border-white dark:border-slate-900 bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-[8px] font-semibold">
+                                {b.guestName.charAt(0)}
+                            </div>
+                        ))}
+                        {bookings.length > 3 && (
+                            <div className="w-6 h-6 rounded-full border-2 border-white dark:border-slate-900 bg-indigo-500 flex items-center justify-center text-white text-[8px] font-semibold">
+                                +{bookings.length - 3}
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>
