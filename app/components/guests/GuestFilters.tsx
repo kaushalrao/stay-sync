@@ -139,9 +139,8 @@ const MobileFilterBottomSheet = ({
                         <div className="w-12 h-1.5 bg-slate-300 dark:bg-slate-700 rounded-full" />
                     </div>
 
-                    {/* Header */}
-                    <div className="flex items-center justify-between px-6 pb-4 border-b border-slate-100 dark:border-slate-800">
-                        <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">Filters</h3>
+                    <div className="flex items-center justify-between px-6 pb-3 border-b border-slate-100 dark:border-slate-800">
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">Filters</h3>
                         <button
                             onClick={onClose}
                             className="p-2 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
@@ -154,9 +153,9 @@ const MobileFilterBottomSheet = ({
                     <div className="flex-1 overflow-y-auto px-6 py-6 space-y-8">
 
                         {/* Year Selection */}
-                        <div className="space-y-3">
-                            <h4 className="text-sm font-bold text-slate-900 dark:text-slate-200 uppercase tracking-widest">Year</h4>
-                            <div className="flex bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-1.5 overflow-x-auto no-scrollbar">
+                        <div className="space-y-2">
+                            <h4 className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Year</h4>
+                            <div className="flex bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-1 overflow-x-auto no-scrollbar">
                                 {years.map((year: string) => (
                                     <button
                                         key={year}
@@ -164,7 +163,7 @@ const MobileFilterBottomSheet = ({
                                             setLocalSelectedYear(year);
                                             setLocalSelectedMonth('all');
                                         }}
-                                        className={`flex-1 min-w-[70px] py-2.5 rounded-xl text-sm font-bold transition-all ${localSelectedYear === year
+                                        className={`flex-1 min-w-[70px] py-2 rounded-xl text-xs font-bold transition-all ${localSelectedYear === year
                                             ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-md'
                                             : 'text-slate-500 dark:text-slate-400'
                                             }`}
@@ -176,9 +175,9 @@ const MobileFilterBottomSheet = ({
                         </div>
 
                         {/* Timeframe Section (Month) */}
-                        <div className="space-y-3">
-                            <h4 className="text-sm font-bold text-slate-900 dark:text-slate-200 uppercase tracking-widest">Month</h4>
-                            <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-2">
+                        <div className="space-y-2">
+                            <h4 className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Month</h4>
+                            <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-1.5">
                                 <button
                                     onClick={handleMobilePrevMonth}
                                     className="p-3 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition-colors"
@@ -187,7 +186,7 @@ const MobileFilterBottomSheet = ({
                                 </button>
                                 <button
                                     onClick={toggleMobileAllMonths}
-                                    className="flex-1 text-center font-bold text-slate-900 dark:text-white py-2 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors text-[15px]"
+                                    className="flex-1 text-center font-bold text-slate-900 dark:text-white py-2 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors text-xs"
                                 >
                                     {localSelectedMonth === 'all' ? 'All Months' : format(new Date(localSelectedMonth + '-01'), 'MMMM')}
                                 </button>
@@ -201,19 +200,19 @@ const MobileFilterBottomSheet = ({
                         </div>
 
                         {/* Status Section */}
-                        <div className="space-y-3">
-                            <h4 className="text-sm font-bold text-slate-900 dark:text-slate-200 uppercase tracking-widest">Booking Status</h4>
-                            <div className="flex flex-col gap-2">
+                        <div className="space-y-2">
+                            <h4 className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Booking Status</h4>
+                            <div className="flex flex-col gap-1.5">
                                 {GUEST_FILTER_OPTIONS.map((filter) => (
                                     <button
                                         key={filter}
                                         onClick={() => setLocalStatusFilter(filter)}
-                                        className={`w-full flex items-center justify-between px-5 py-4 rounded-2xl border transition-all ${localStatusFilter === filter
+                                        className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border transition-all ${localStatusFilter === filter
                                             ? 'bg-indigo-50 dark:bg-indigo-500/10 border-indigo-500 text-indigo-700 dark:text-indigo-300 font-bold shadow-sm'
                                             : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600 font-medium'
                                             }`}
                                     >
-                                        <span className="capitalize text-[15px] tracking-wide">{filter}</span>
+                                        <span className="capitalize text-sm tracking-wide">{filter}</span>
                                         {localStatusFilter === filter && (
                                             <div className="w-5 h-5 rounded-full bg-indigo-500 flex items-center justify-center">
                                                 <Check size={12} className="text-white" strokeWidth={3} />
@@ -227,18 +226,18 @@ const MobileFilterBottomSheet = ({
                     </div>
 
                     {/* Sticky Bottom Actions */}
-                    <div className="p-6 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 safe-area-bottom">
+                    <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 safe-area-bottom">
                         <div className="flex gap-3">
                             <button
                                 onClick={onClear}
-                                className="px-6 py-4 rounded-xl font-bold text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                                className="px-5 py-3 rounded-xl font-bold text-sm text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                             >
                                 Clear
                             </button>
                             <button
                                 onClick={onApply}
                                 disabled={!hasChanges}
-                                className={`flex-1 font-bold rounded-xl py-4 transition-all ${hasChanges
+                                className={`flex-1 font-bold text-sm rounded-xl py-3 transition-all ${hasChanges
                                     ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-600/20'
                                     : 'bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed'
                                     }`}
