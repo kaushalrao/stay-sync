@@ -37,16 +37,16 @@ export class GuestService {
     async sendNotification(params: {
         guest: Guest | any,
         property: any,
-        type: 'new' | 'updated',
         totalAmount: number,
-        origin: string
+        origin: string,
+        status?: string
     }) {
         return triggerBookingNotification({
             guest: params.guest,
             property: params.property,
-            type: params.type,
             totalAmount: params.totalAmount,
-            dashboardLink: `${params.origin}/greeter?guestId=${params.guest.id}`
+            dashboardLink: `${params.origin}/greeter?guestId=${params.guest.id}`,
+            status: params.status || params.guest.status
         });
     }
 }

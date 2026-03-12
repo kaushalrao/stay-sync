@@ -94,9 +94,9 @@ export const GuestDirectory: React.FC<GuestDirectoryProps> = ({ onSelect, mode =
                 triggerBookingNotification({
                     guest: { ...guest, checkInDate: guest.checkInDate, checkOutDate: guest.checkOutDate }, // Ensure dates are strings as expected
                     property,
-                    type: 'cancelled',
                     totalAmount: guest.totalAmount,
-                    dashboardLink: `${window.location.origin}/greeter`
+                    dashboardLink: `${window.location.origin}/greeter`,
+                    status: 'cancelled'
                 });
             }
         }

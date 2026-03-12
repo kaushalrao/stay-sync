@@ -4,17 +4,17 @@ import { calculateNights, formatDate, formatCurrency } from './utils';
 interface NotificationParams {
     guest: Partial<Guest> & { guestName: string; checkInDate: string; checkOutDate: string; numberOfGuests: number };
     property: Property;
-    type: 'new' | 'cancelled' | 'updated';
     totalAmount?: string | number; // Can be pre-formatted string or number
     dashboardLink?: string;
+    status?: string;
 }
 
 export const triggerBookingNotification = async ({
     guest,
     property,
-    type,
     totalAmount,
-    dashboardLink
+    dashboardLink,
+    status
 }: NotificationParams) => {
     const recipients = [];
     if (property.hostEmail) recipients.push(property.hostEmail);
@@ -40,7 +40,6 @@ export const triggerBookingNotification = async ({
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                type,
                 recipients,
                 guestName: guest.guestName,
                 propName: property.name,
@@ -49,10 +48,11 @@ export const triggerBookingNotification = async ({
                 numberOfGuests: guest.numberOfGuests,
                 nights,
                 totalAmount: formattedTotalAmount,
-                dashboardLink: link
+                dashboardLink: link,
+                status: status || guest.status
             })
         });
     } catch (err) {
-        console.error(`Failed to trigger ${type} booking notification`, err);
+        console.error(`Failed to trigger booking notification`, err);
     }
 };

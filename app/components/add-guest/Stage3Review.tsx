@@ -110,11 +110,27 @@ export function Stage3Review() {
             if (isEditing && guestData.id) {
                 await guestService.updateGuest(guestData.id, finalData as any);
                 updateGuestInStore(guestData.id, finalData as any);
+                // Trigger notification for update
+                await guestService.sendNotification({
+                    guest: { ...finalData, id: guestData.id },
+                    property: selectedProperty,
+                    totalAmount: finalData.totalAmount,
+                    origin: window.location.origin,
+                    status: finalData.status
+                });
                 showToast("Guest updated successfully!", "success");
             } else {
                 finalData.createdAt = Date.now();
                 finalData.status = 'pending';
                 savedGuestId = await guestService.addGuest(finalData as any);
+                // Trigger notification for new guest
+                await guestService.sendNotification({
+                    guest: { ...finalData, id: savedGuestId },
+                    property: selectedProperty,
+                    totalAmount: finalData.totalAmount,
+                    origin: window.location.origin,
+                    status: finalData.status
+                });
                 showToast("Guest saved successfully!", "success");
             }
 

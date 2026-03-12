@@ -6,7 +6,6 @@ export async function POST(req: NextRequest) {
         const body = await req.json();
         const {
             recipients,
-            type,
             guestName,
             propName,
             checkInDate,
@@ -14,7 +13,8 @@ export async function POST(req: NextRequest) {
             numberOfGuests,
             nights,
             totalAmount,
-            dashboardLink
+            dashboardLink,
+            status
         } = body;
 
         if (!recipients || !Array.isArray(recipients) || recipients.length === 0) {
@@ -25,7 +25,6 @@ export async function POST(req: NextRequest) {
         const emailPromises = recipients.map(to =>
             emailService.sendBookingNotification(
                 to,
-                type,
                 guestName,
                 propName,
                 checkInDate,
@@ -33,13 +32,14 @@ export async function POST(req: NextRequest) {
                 numberOfGuests,
                 nights,
                 totalAmount,
-                dashboardLink
+                dashboardLink,
+                status
             )
         );
 
         await Promise.all(emailPromises);
 
-        return NextResponse.json({ success: true, message: `Sent ${type} notification to ${recipients.length} recipients` });
+        return NextResponse.json({ success: true, message: `Sent notification to ${recipients.length} recipients` });
 
     } catch (error) {
         console.error('Failed to send booking notification:', error);

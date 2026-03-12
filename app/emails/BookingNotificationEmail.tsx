@@ -16,7 +16,6 @@ import {
 import * as React from "react";
 
 interface BookingNotificationEmailProps {
-    type: 'new' | 'cancelled' | 'updated';
     guestName: string;
     propName: string;
     checkInDate: string;
@@ -25,10 +24,10 @@ interface BookingNotificationEmailProps {
     nights: number;
     totalAmount?: string; // Optional for cancellations if not needed
     dashboardLink: string;
+    status: 'pending' | 'booked' | 'cancelled' | 'deleted' | string;
 }
 
 export const BookingNotificationEmail = ({
-    type = 'new',
     guestName,
     propName,
     checkInDate,
@@ -37,33 +36,35 @@ export const BookingNotificationEmail = ({
     nights,
     totalAmount,
     dashboardLink,
+    status,
 }: BookingNotificationEmailProps) => {
-    const isNew = type === 'new';
-    const isUpdated = type === 'updated';
+    const isCancelled = status === 'cancelled' || status === 'deleted';
+    const isBooked = status === 'booked' || status === 'checked_in' || status === 'checked_out';
+    const isPending = !isCancelled && !isBooked;
 
     let previewText = '';
-    if (isNew) previewText = `New Booking: ${guestName} at ${propName}`;
-    else if (isUpdated) previewText = `Booking Updated: ${guestName} at ${propName}`;
-    else previewText = `Booking Cancelled: ${guestName} at ${propName}`;
+    if (isCancelled) previewText = `Booking Cancelled: ${guestName} at ${propName}`;
+    else if (isBooked) previewText = `Booking Confirmed: ${guestName} at ${propName}`;
+    else previewText = `Booking Update: ${guestName} at ${propName} (${status?.toUpperCase()})`;
 
     // Theme colors
     const theme = {
-        main: isNew ? '#10B981' : (isUpdated ? '#3B82F6' : '#F43F5E'), // emerald-500 : blue-500 : rose-500
-        bg: isNew ? '#ecfdf5' : (isUpdated ? '#eff6ff' : '#fff1f2'),     // emerald-50 : blue-50 : rose-50
-        border: isNew ? '#d1fae5' : (isUpdated ? '#dbeafe' : '#ffe4e6'), // emerald-100 : blue-100 : rose-100
-        text: isNew ? '#065f46' : (isUpdated ? '#1e3a8a' : '#9f1239'),   // emerald-800 : blue-900 : rose-800
-        darkText: isNew ? '#064e3b' : (isUpdated ? '#172554' : '#881337'), // emerald-900 : blue-950 : rose-900
+        main: isBooked ? '#10B981' : (isPending ? '#3B82F6' : '#F43F5E'), // emerald-500 : blue-500 : rose-500
+        bg: isBooked ? '#ecfdf5' : (isPending ? '#eff6ff' : '#fff1f2'),     // emerald-50 : blue-50 : rose-50
+        border: isBooked ? '#d1fae5' : (isPending ? '#dbeafe' : '#ffe4e6'), // emerald-100 : blue-100 : rose-100
+        text: isBooked ? '#065f46' : (isPending ? '#1e3a8a' : '#9f1239'),   // emerald-800 : blue-900 : rose-800
+        darkText: isBooked ? '#064e3b' : (isPending ? '#172554' : '#881337'), // emerald-900 : blue-950 : rose-900
     };
 
     const getHeaderText = () => {
-        if (isNew) return 'New Booking';
-        if (isUpdated) return 'Booking Updated';
-        return 'Cancelled';
+        if (isCancelled) return 'Cancelled';
+        if (isBooked) return 'Confirmed';
+        return 'Booking Update';
     };
 
     const getIcon = () => {
-        if (isNew) return '🎉';
-        if (isUpdated) return '📝';
+        if (isBooked) return '🎉';
+        if (isPending) return '📝';
         return '❌';
     };
 
@@ -115,6 +116,13 @@ export const BookingNotificationEmail = ({
                                     <Text className="text-white text-[14px] m-0 mt-1 opacity-90 font-medium">
                                         {propName}
                                     </Text>
+                                    {status && (
+                                        <div className="mt-3 inline-block px-3 py-1 bg-white/20 rounded-full border border-white/30 backdrop-blur-sm">
+                                            <Text className="text-white text-[10px] m-0 font-bold uppercase tracking-widest leading-none">
+                                                {status}
+                                            </Text>
+                                        </div>
+                                    )}
                                 </Column>
                             </Row>
 
@@ -146,7 +154,7 @@ export const BookingNotificationEmail = ({
                                                 style={{ backgroundColor: theme.bg, borderColor: theme.border }}
                                             >
                                                 <Text className="text-[10px] font-bold uppercase tracking-wider m-0 mb-1 opacity-70" style={{ color: theme.darkText }}>
-                                                    {isNew ? 'Total Payout' : (isUpdated ? 'New Total' : 'Amount')}
+                                                    {isBooked ? 'Total Payout' : 'Amount'}
                                                 </Text>
                                                 <Text className="text-[24px] font-bold m-0 tracking-tight" style={{ color: theme.text }}>
                                                     {totalAmount}

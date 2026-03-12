@@ -110,6 +110,14 @@ export const GuestCard: React.FC<GuestCardProps> = ({ guest, mode, onSelect, onD
 
             await guestService.updateGuest(guest.id, updates);
             updateGuestInStore(guest.id, updates);
+            // Trigger notification for confirmed booking (as 'updated' type)
+            await guestService.sendNotification({
+                guest: { ...guest, ...updates },
+                property: selectedProperty,
+                totalAmount: guest.totalAmount || 0,
+                origin: window.location.origin,
+                status: 'booked'
+            });
             showToast('Booking confirmed!', 'success');
             setIsConfirmingBooking(false);
         } catch (error) {

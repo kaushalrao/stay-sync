@@ -104,7 +104,6 @@ export const emailService = {
 
     sendBookingNotification: async (
         to: string,
-        type: 'new' | 'cancelled' | 'updated',
         guestName: string,
         propName: string,
         checkInDate: string,
@@ -112,18 +111,23 @@ export const emailService = {
         numberOfGuests: number,
         nights: number,
         totalAmount: string,
-        dashboardLink: string
+        dashboardLink: string,
+        status: string
     ) => {
-        let subject = `New Booking: ${guestName} at ${propName}`;
-        if (type === 'cancelled') subject = `Booking Cancelled: ${guestName} at ${propName}`;
-        if (type === 'updated') subject = `Booking Updated: ${guestName} at ${propName}`;
+        const upperStatus = (status || 'pending').toUpperCase();
+        let subject = `Booking Update: ${guestName} at ${propName} (${upperStatus})`;
+        
+        if (upperStatus === 'BOOKED' || upperStatus === 'CHECKED_IN') {
+            subject = `Booking Confirmed: ${guestName} at ${propName}`;
+        } else if (upperStatus === 'CANCELLED' || upperStatus === 'DELETED') {
+            subject = `Booking Cancelled: ${guestName} at ${propName}`;
+        }
 
         return sendEmail({
             to: to,
             subject: subject,
             component: (
                 <BookingNotificationEmail
-                    type={type}
                     guestName={guestName}
                     propName={propName}
                     checkInDate={checkInDate}
@@ -132,6 +136,7 @@ export const emailService = {
                     nights={nights}
                     totalAmount={totalAmount}
                     dashboardLink={dashboardLink}
+                    status={status || 'pending'}
                 />
             ),
         });
