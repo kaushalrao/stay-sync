@@ -1,0 +1,2 @@
+echo "🚀 Validating build before push..."
+npm run build

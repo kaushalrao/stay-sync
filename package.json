@@ -9,7 +9,8 @@
     "build:mobile": "mv app/api app/_api && IS_MOBILE_BUILD=true next build; status=$?; mv app/_api app/api; exit $status",
     "sync": "npm run build:mobile && npx cap sync",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "prepare": "husky"
   },
   "dependencies": {
     "@capacitor/android": "^8.0.2",
@@ -47,6 +48,7 @@
     "autoprefixer": "^10.4.16",
     "eslint": "^8.56.0",
     "eslint-config-next": "14.2.1",
+    "husky": "^9.1.7",
     "postcss": "^8.4.32",
     "tailwindcss": "^4",
     "typescript": "^5.3.3"
