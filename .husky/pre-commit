@@ -1,0 +1,2 @@
+echo "🔍 Validating code quality before commit..."
+npx lint-staged
