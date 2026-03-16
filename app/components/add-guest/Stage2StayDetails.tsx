@@ -8,6 +8,7 @@ import { DatePicker } from '@components/calendar/DatePicker';
 import { Input } from '@components/ui/Input';
 import { Users, Wallet, Home } from 'lucide-react';
 import { CalendarEvent } from '@lib/types';
+import { Dropdown } from '@components/ui/Dropdown';
 
 export function Stage2StayDetails() {
     const { guestData, isViewOnly, updateGuestData, setStage } = useGuestFormStore();
@@ -65,6 +66,12 @@ export function Stage2StayDetails() {
 
     const isNextDisabled = !guestData.checkInDate || !guestData.checkOutDate || !guestData.propertyId || (guestData.numberOfGuests || 0) < 1;
 
+    const propertyOptions = properties.map(p => ({
+        id: p.id,
+        label: p.name,
+        icon: <Home size={18} />
+    }));
+
     return (
         <div className="flex flex-col lg:h-full animate-fade-in lg:overflow-hidden">
             <div className="flex-1 lg:overflow-y-auto px-1 pb-2">
@@ -84,34 +91,22 @@ export function Stage2StayDetails() {
 
                     <div className="space-y-6 md:space-y-8">
                         {/* Property Selection */}
-                        <div className="space-y-2 group">
-                            <label className="text-[10px] font-black text-slate-500 underline-offset-4 dark:text-slate-400 uppercase tracking-[0.2em] ml-1 flex items-center gap-2 group-focus-within:text-indigo-500 transition-colors">
-                                <Home size={14} className="text-indigo-500" /> Property Selection <span className="text-rose-500">*</span>
-                            </label>
-                            <div className="relative group">
-                                <select
-                                    value={guestData.propertyId || ''}
-                                    disabled={isViewOnly}
-                                    onChange={(e) => {
-                                        const prop = properties.find(p => p.id === e.target.value);
-                                        updateGuestData({
-                                            propertyId: e.target.value,
-                                            propName: prop?.name,
-                                            numberOfGuests: prop?.baseGuests || 1
-                                        });
-                                    }}
-                                    className="w-full px-3 py-2.5 md:px-5 md:py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-white/10 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all text-sm md:text-lg font-bold text-slate-900 dark:text-white appearance-none cursor-pointer shadow-sm disabled:opacity-70 disabled:cursor-not-allowed pr-10"
-                                >
-                                    <option value="" disabled>Select a property</option>
-                                    {properties.map(p => (
-                                        <option key={p.id} value={p.id}>{p.name}</option>
-                                    ))}
-                                </select>
-                                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 group-hover:text-indigo-500 transition-colors">
-                                    <Home size={18} strokeWidth={2.5} />
-                                </div>
-                            </div>
-                        </div>
+                        <Dropdown
+                            label="Property Selection"
+                            icon={<Home size={14} className="text-indigo-500" />}
+                            options={propertyOptions}
+                            value={guestData.propertyId || ''}
+                            disabled={isViewOnly}
+                            placeholder="Select a property"
+                            onChange={(id) => {
+                                const prop = properties.find(p => p.id === id);
+                                updateGuestData({
+                                    propertyId: id,
+                                    propName: prop?.name,
+                                    numberOfGuests: prop?.baseGuests || 1
+                                });
+                            }}
+                        />
 
                         {/* Dates Row */}
                         <div className="grid grid-cols-2 gap-6">

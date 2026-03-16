@@ -9,6 +9,7 @@ import { Input } from '@components/ui/Input';
 import { MaintenanceIssue } from '@lib/types';
 import { usePropertyStore, useUIStore } from '@store/index';
 import { useMaintenance } from '@hooks/maintenance/useMaintenance';
+import { Dropdown } from '@components/ui/Dropdown';
 
 export function MaintenanceClient() {
     const { user } = useApp();
@@ -19,6 +20,10 @@ export function MaintenanceClient() {
 
     const [isAdding, setIsAdding] = useState(false);
     const [filterStatus, setFilterStatus] = useState<'all' | 'pending' | 'fixed'>('all');
+    
+    // Form State for new issue
+    const [newIssueProperty, setNewIssueProperty] = useState(properties[0]?.id || '');
+    const [newIssuePriority, setNewIssuePriority] = useState<'low' | 'medium' | 'high'>('medium');
 
     const {
         issues,
@@ -96,36 +101,33 @@ export function MaintenanceClient() {
             </div>
 
             {/* Filters */}
-            <div className="flex flex-col md:flex-row flex-wrap gap-4 mb-8 bg-white dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm dark:shadow-none">
-                <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-sm font-bold uppercase tracking-wider mb-2 md:mb-0">
-                    <Filter size={14} /> Filters:
+            <div className="relative z-20 flex flex-col md:flex-row flex-wrap gap-4 mb-4 bg-white dark:bg-slate-800/50 p-3 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm dark:shadow-none items-center">
+                <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-widest ml-1">
+                    <Filter size={12} /> Filters:
                 </div>
-                <div className="relative w-full md:w-auto">
-                    <select
-                        value={filterStatus}
-                        onChange={(e) => setFilterStatus(e.target.value as any)}
-                        className="w-full md:w-auto bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-white/10 rounded-lg pl-3 pr-10 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-orange-500 appearance-none cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
-                    >
-                        <option value="all">All Status</option>
-                        <option value="pending">Pending</option>
-                        <option value="fixed">Fixed</option>
-                    </select>
-                    <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-                </div>
+                
+                <Dropdown
+                    variant="filter"
+                    options={[
+                        { id: 'all', label: 'All Status' },
+                        { id: 'pending', label: 'Pending' },
+                        { id: 'fixed', label: 'Fixed' }
+                    ]}
+                    value={filterStatus}
+                    onChange={(val) => setFilterStatus(val as any)}
+                    className="w-full md:w-auto min-w-[140px]"
+                />
 
-                <div className="relative w-full md:w-auto">
-                    <select
-                        value={filterProp}
-                        onChange={(e) => setFilterProp(e.target.value)}
-                        className="w-full md:w-auto bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-white/10 rounded-lg pl-3 pr-10 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-orange-500 appearance-none cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
-                    >
-                        <option value="all">All Properties</option>
-                        {properties.map(p => (
-                            <option key={p.id} value={p.id}>{p.name}</option>
-                        ))}
-                    </select>
-                    <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-                </div>
+                <Dropdown
+                    variant="filter"
+                    options={[
+                        { id: 'all', label: 'All Properties', icon: <Home size={14} /> },
+                        ...properties.map(p => ({ id: p.id, label: p.name, icon: <Home size={14} /> }))
+                    ]}
+                    value={filterProp}
+                    onChange={setFilterProp}
+                    className="w-full md:w-auto min-w-[140px]"
+                />
             </div>
 
             {/* Add Modal */}
@@ -146,27 +148,29 @@ export function MaintenanceClient() {
                                 <Input name="title" label="Issue Description" placeholder="e.g. Leaky faucet in bathroom" required autoFocus />
                             </div>
                             <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Property</label>
-                                    <div className="relative">
-                                        <select name="propertyId" className="w-full bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-white/10 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:outline-none focus:border-orange-500 transition-colors appearance-none" required>
-                                            {properties.map(p => (
-                                                <option key={p.id} value={p.id}>{p.name}</option>
-                                            ))}
-                                        </select>
-                                        <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-                                    </div>
+                                <div className="space-y-1">
+                                    <Dropdown
+                                        label="Property"
+                                        options={properties.map(p => ({ id: p.id, label: p.name, icon: <Home size={14} /> }))}
+                                        value={newIssueProperty}
+                                        onChange={setNewIssueProperty}
+                                        className="w-full"
+                                    />
+                                    <input type="hidden" name="propertyId" value={newIssueProperty} />
                                 </div>
-                                <div>
-                                    <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Priority</label>
-                                    <div className="relative">
-                                        <select name="priority" className="w-full bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-white/10 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:outline-none focus:border-orange-500 transition-colors appearance-none">
-                                            <option value="low">Low</option>
-                                            <option value="medium">Medium</option>
-                                            <option value="high">High</option>
-                                        </select>
-                                        <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-                                    </div>
+                                <div className="space-y-1">
+                                    <Dropdown
+                                        label="Priority"
+                                        options={[
+                                            { id: 'low', label: 'Low' },
+                                            { id: 'medium', label: 'Medium' },
+                                            { id: 'high', label: 'High' }
+                                        ]}
+                                        value={newIssuePriority}
+                                        onChange={(val) => setNewIssuePriority(val as any)}
+                                        className="w-full"
+                                    />
+                                    <input type="hidden" name="priority" value={newIssuePriority} />
                                 </div>
                             </div>
                         </div>

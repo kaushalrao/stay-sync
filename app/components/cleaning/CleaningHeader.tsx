@@ -1,7 +1,8 @@
 import React from 'react';
-import { ChevronDown, ShoppingBag, AlertCircle } from 'lucide-react';
+import { ShoppingBag, AlertCircle } from 'lucide-react';
 import { Property } from '@lib/types';
 import { useInventoryStore } from '@store/index';
+import { Dropdown } from '@components/ui/Dropdown';
 
 interface CleaningHeaderProps {
     properties: Property[];
@@ -10,10 +11,17 @@ interface CleaningHeaderProps {
     onViewLogs: () => void;
 }
 
+
 export function CleaningHeader({ properties, selectedPropertyId, onPropertyChange, onViewLogs }: CleaningHeaderProps) {
     const pendingCount = useInventoryStore(state =>
         state.needs.filter(n => n.propertyId === selectedPropertyId && n.status === 'pending').length
     );
+
+    const propertyOptions = properties.map(p => ({
+        id: p.id,
+        label: p.name,
+        icon: <ShoppingBag size={14} />
+    }));
 
     return (
         <div className="sticky top-0 z-10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-white/5 px-4 py-3 mb-6 transition-all duration-300">
@@ -26,18 +34,13 @@ export function CleaningHeader({ properties, selectedPropertyId, onPropertyChang
                 </div>
 
                 <div className="flex items-center gap-3">
-                    <div className="relative group">
-                        <select
-                            value={selectedPropertyId}
-                            onChange={(e) => onPropertyChange(e.target.value)}
-                            className="appearance-none pl-4 pr-10 py-2 bg-slate-100 dark:bg-slate-800 border-none rounded-xl text-sm font-bold text-slate-700 dark:text-slate-200 cursor-pointer focus:ring-2 focus:ring-emerald-500/20 transition-all hover:bg-slate-200 dark:hover:bg-slate-700"
-                        >
-                            {properties.map(p => (
-                                <option key={p.id} value={p.id}>{p.name}</option>
-                            ))}
-                        </select>
-                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" size={16} />
-                    </div>
+                    <Dropdown
+                        variant="filter"
+                        options={propertyOptions}
+                        value={selectedPropertyId}
+                        onChange={onPropertyChange}
+                        className="min-w-[150px]"
+                    />
 
                     <button
                         onClick={onViewLogs}
