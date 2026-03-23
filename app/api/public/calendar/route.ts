@@ -35,11 +35,12 @@ export async function GET(req: NextRequest) {
         const propName = propertyData.name || 'Property';
 
         // 3. Fetch Guests matching this propertyId
+        // Excluding 'pending', 'cancelled', 'deleted', 'draft'
         const guestsRef = collection(db, `artifacts/${appId}/guests`);
         const qGuests = query(
             guestsRef,
             where('propertyId', '==', propertyId),
-            where('status', '==', 'booked')
+            where('status', 'in', ['booked', 'checked_in', 'checked_out', 'pending_payment'])
         );
 
         const snapshot = await getDocs(qGuests);
@@ -81,7 +82,7 @@ export async function GET(req: NextRequest) {
             headers: {
                 'Content-Type': 'text/calendar; charset=utf-8',
                 'Content-Disposition': `attachment; filename="calendar-${propertyId}.ics"`,
-                'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=600'
+                'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate'
             }
         });
     } catch (error) {
